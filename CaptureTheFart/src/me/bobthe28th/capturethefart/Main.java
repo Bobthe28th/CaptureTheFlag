@@ -95,7 +95,7 @@ public class Main extends JavaPlugin implements Listener {
             player.setPlayerListHeader("capture the FART!");
         }
 
-        Bukkit.broadcastMessage("farted");
+        Bukkit.broadcastMessage("farted (vine boom sound effect)");
     }
 
     @EventHandler
