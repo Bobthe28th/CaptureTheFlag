@@ -347,13 +347,13 @@ public class CTFCommands implements CommandExecutor {
 ////            packet.getItemSlots().write(0, EnumWrappers.ItemSlot.HEAD);
 ////                packet.getItemModifier().write(0,new ItemStack(Material.RED_BANNER));
 //
-            PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_EQUIPMENT);
+//            PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_EQUIPMENT);
 
-			try {
-		        ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
-		    } catch (Exception e) {
-		        e.printStackTrace();
-		    }
+//			try {
+//		        ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
+//		    } catch (Exception e) {
+//		        e.printStackTrace();
+//		    }
 
 //                player.setCooldown(Material.DIRT, 120);
 
