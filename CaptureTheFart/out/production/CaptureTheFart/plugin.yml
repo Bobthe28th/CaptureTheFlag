@@ -1,0 +1,41 @@
+name: CaptureTheFart
+version: 0.5
+author: Bobthe28th
+main: me.bobthe28th.capturethefart.Main
+description: Capture the flag but funnie
+api-version: 1.13
+depend: [ProtocolLib]
+commands:
+  ctfjoin:
+    description: Joins a player to CTF
+    usage: /<command> target
+  ctfleave:
+    description: Makes a player leave CTF
+    usage: /<command> target
+  ctffulljoin:
+    description: Joins a player to CTF with a class on a team
+    usage: /<command> target class team
+  ctfteamjoin:
+    description: Joins a player to a CTF team
+    usage: /<command> target team
+  ctfteamleave:
+    description: Makes a player leave a CTF team
+    usage: /<command> target team
+  ctfteams:
+    description: Lists the teams and their players
+    usage: /<command>
+  ctfsetclass:
+    description: Sets a player to a class
+    usage: /<command> target class
+  ctfleaveclass:
+    description: Removes a player from a class
+    usage: /<command> target
+  fly:
+    description: toggles flight
+    usage: /<command>
+  heal:
+    description: heals
+    usage: /<command>
+  test:
+    description: for debug
+    usage: /<command>
