@@ -65,15 +65,7 @@ public class WizStickIce extends CTFDoubleCooldownItem {
                     Block b = player.getTargetBlock(null, 20);
                     Location loc = b.getLocation().add(new Vector(0.5, 1.0, 0.5));
 
-                    Entity target = null;
-                    for (Entity other : player.getWorld().getPlayers()) {
-                        final Vector n = other.getLocation().toVector().subtract(player.getLocation().toVector());
-                        if (player.getLocation().getDirection().normalize().crossProduct(n).lengthSquared() < 1 && n.normalize().dot(player.getLocation().getDirection().normalize()) >= 0) {
-                            if (target == null || target.getLocation().distanceSquared(player.getLocation()) > other.getLocation().distanceSquared(player.getLocation())) {
-                                target = other;
-                            }
-                        }
-                    }
+                    Entity target = Main.getLookedAtPlayer(player);
 
                     if (target != null) {
                         loc = target.getLocation();
