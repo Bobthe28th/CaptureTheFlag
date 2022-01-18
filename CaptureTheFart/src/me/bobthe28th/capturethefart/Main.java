@@ -92,7 +92,7 @@ public class Main extends JavaPlugin implements Listener {
         }
 
         for(Player player : Bukkit.getOnlinePlayers()) {
-            player.setPlayerListHeader("capture the FART");
+            player.setPlayerListHeader("capture the FART!");
         }
 
         Bukkit.broadcastMessage("farted");
@@ -102,7 +102,7 @@ public class Main extends JavaPlugin implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        player.setPlayerListHeader("capture the FART");
+        player.setPlayerListHeader("capture the FART!");
 
     }
 
