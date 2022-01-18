@@ -76,16 +76,7 @@ public class WizStickWind extends CTFDoubleCooldownItem {
 
                     int range = 500;
 
-                    Entity target = null;
-
-                    for (Entity other : player.getPlayer().getWorld().getPlayers()) {
-                        final Vector n = other.getLocation().toVector().subtract(player.getPlayer().getLocation().toVector());
-                        if (player.getPlayer().getLocation().getDirection().normalize().crossProduct(n).lengthSquared() < 1 && n.normalize().dot(player.getPlayer().getLocation().getDirection().normalize()) >= 0) {
-                            if (target == null || target.getLocation().distanceSquared(player.getPlayer().getLocation()) > other.getLocation().distanceSquared(player.getPlayer().getLocation())) {
-                                target = other;
-                            }
-                        }
-                    }
+                    Entity target = getLookedAtPlayer(player);
 
                     Block b = p.getTargetBlock(null, range);
                     Location loc = b.getLocation().add(new Vector(0.5, 1, 0.5));
