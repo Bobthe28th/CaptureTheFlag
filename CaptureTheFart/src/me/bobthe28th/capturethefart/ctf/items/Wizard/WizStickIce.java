@@ -85,6 +85,7 @@ public class WizStickIce extends CTFDoubleCooldownItem {
                         for (int x = 0; x < sizeR; x++) {
                             Location l = loc.clone().add(new Vector(x - (sizeR - 1.0)/2, height, z - (sizeR - 1.0)/2));
                             FallingBlock f = event.getPlayer().getWorld().spawnFallingBlock(l, Bukkit.createBlockData(Material.SNOW_BLOCK));
+                            f.setDropItem(false);
                             f.setMetadata("playerSent", new FixedMetadataValue(plugin, Objects.requireNonNull(player.getPlayer()).getName()));
                         }
                     }
