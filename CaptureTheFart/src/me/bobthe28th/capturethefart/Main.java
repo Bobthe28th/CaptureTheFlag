@@ -280,7 +280,8 @@ public class Main extends JavaPlugin implements Listener {
     public static Entity getLookedAtPlayer(Player player) {
 
         Entity target = null;
-        for (Entity other : player.getPlayer().getWorld().getPlayers()) {
+        for (Entity other : Objects.requireNonNull(player.getPlayer()).getWorld().getPlayers()) {
+
             final Vector n = other.getLocation().toVector().subtract(player.getPlayer().getLocation().toVector());
             if (player.getPlayer().getLocation().getDirection().normalize().crossProduct(n).lengthSquared() < 1 && n.normalize().dot(player.getPlayer().getLocation().getDirection().normalize()) >= 0) {
                 if (target == null || target.getLocation().distanceSquared(player.getPlayer().getLocation()) > other.getLocation().distanceSquared(player.getPlayer().getLocation())) {
