@@ -38,21 +38,21 @@ public class CTFCommands implements CommandExecutor {
         if (!(sender instanceof Player player)) {
             return true;
         }
-
+	
+    	Player target = null;
 
         switch (cmd.getName().toLowerCase()) {
             case "ctfjoin":
-                Player t = null;
                 if (args.length > 0) {
-                    t = Bukkit.getPlayer(args[0]);
+                    target = Bukkit.getPlayer(args[0]);
                 }
-                if (t != null) {
-                    if (Main.CTFPlayers.containsKey(t)) {
-                        player.sendMessage(ChatColor.RED + t.getName() + " is already a CTF player!" + ChatColor.RESET);
+                if (target != null) {
+                    if (Main.CTFPlayers.containsKey(target)) {
+                        player.sendMessage(ChatColor.RED + target.getName() + " is already a CTF player!" + ChatColor.RESET);
                         return true;
                     }
-                    player.sendMessage(ChatColor.GREEN + "Made " + t.getName() + " a CTF player." + ChatColor.RESET);
-                    Main.CTFPlayers.put(t, new CTFPlayer(plugin, t));
+                    player.sendMessage(ChatColor.GREEN + "Made " + target.getName() + " a CTF player." + ChatColor.RESET);
+                    Main.CTFPlayers.put(target, new CTFPlayer(plugin, target));
                     return true;
                 }
 
@@ -65,17 +65,16 @@ public class CTFCommands implements CommandExecutor {
 
                 return true;
             case "ctfleave":
-                Player t1 = null;
                 if (args.length > 0) {
-                    t1 = Bukkit.getPlayer(args[0]);
+                    target = Bukkit.getPlayer(args[0]);
                 }
-                if (t1 != null) {
-                    if (Main.CTFPlayers.containsKey(t1)) {
-                        Main.CTFPlayers.get(t1).remove();
-                        player.sendMessage(ChatColor.GREEN + "Removed " + t1.getName() + " from being a CTF player." + ChatColor.RESET);
+                if (target != null) {
+                    if (Main.CTFPlayers.containsKey(target)) {
+                        Main.CTFPlayers.get(target).remove();
+                        player.sendMessage(ChatColor.GREEN + "Removed " + target.getName() + " from being a CTF player." + ChatColor.RESET);
                         return true;
                     }
-                    player.sendMessage(ChatColor.RED + t1.getName() + " is not a CTF player." + ChatColor.RESET);
+                    player.sendMessage(ChatColor.RED + target.getName() + " is not a CTF player." + ChatColor.RESET);
                     return true;
                 }
 
@@ -87,14 +86,13 @@ public class CTFCommands implements CommandExecutor {
                 player.sendMessage(ChatColor.RED + "You are not a CTF player." + ChatColor.RESET);
                 return true;
             case "ctffulljoin":
-                Player t6 = null;
                 if (args.length > 0) {
-                    t6 = Bukkit.getPlayer(args[0]);
+                    target = Bukkit.getPlayer(args[0]);
                 } else {
                     Bukkit.broadcastMessage(ChatColor.RED + "Please specify a player." + ChatColor.RESET);
                     return true;
                 }
-                if (t6 != null) {
+                if (target != null) {
                     if (args.length > 1) {
                         String className = args[1];
                         Class<?> cClass = null;
@@ -137,17 +135,17 @@ public class CTFCommands implements CommandExecutor {
                             if (team != null) {
 
                                 try {
-                                    if (!Main.CTFPlayers.containsKey(t6)) {
-                                        Main.CTFPlayers.put(t6, new CTFPlayer(plugin, t6));
+                                    if (!Main.CTFPlayers.containsKey(target)) {
+                                        Main.CTFPlayers.put(target, new CTFPlayer(plugin, target));
                                     }
 
-                                    Main.CTFPlayers.get(t6).setTeam(team);
+                                    Main.CTFPlayers.get(target).setTeam(team);
 
                                     Constructor<?> constructor = cClass.getConstructor(CTFPlayer.class, Main.class);
-                                    CTFClass c = (CTFClass) constructor.newInstance(Main.CTFPlayers.get(t6),plugin);
-                                    Main.CTFPlayers.get(t6).setClass(c);
+                                    CTFClass c = (CTFClass) constructor.newInstance(Main.CTFPlayers.get(target),plugin);
+                                    Main.CTFPlayers.get(target).setClass(c);
                                     t6.setGameMode(GameMode.SURVIVAL);
-                                    player.sendMessage(ChatColor.GREEN + "Set " + t6.getName() + " to: " + ChatColor.RESET + c.getFormattedName() + ChatColor.GREEN + " on " + team.getFormattedName());
+                                    player.sendMessage(ChatColor.GREEN + "Set " + target.getName() + " to: " + ChatColor.RESET + c.getFormattedName() + ChatColor.GREEN + " on " + team.getFormattedName());
                                 } catch (Exception ignored) {}
 
                             } else {
@@ -167,13 +165,12 @@ public class CTFCommands implements CommandExecutor {
 
                 return true;
             case "ctfteamjoin":
-                Player t2 = null;
                 if (args.length > 0) {
-                    t2 = Bukkit.getPlayer(args[0]);
+                    target = Bukkit.getPlayer(args[0]);
                 }
-                if (t2 != null) {
+                if (target != null) {
 
-                    if (Main.CTFPlayers.containsKey(t2)) {
+                    if (Main.CTFPlayers.containsKey(target)) {
                         CTFTeam team = null;
                         StringBuilder teamName = new StringBuilder();
                         if (args.length > 2) {
@@ -195,29 +192,28 @@ public class CTFCommands implements CommandExecutor {
                         }
 
                         if (team != null) {
-                            Main.CTFPlayers.get(t2).setTeam(team);
-                            player.sendMessage(ChatColor.GREEN + "Set " + t2.getName() + " to: " + ChatColor.RESET + team.getFormattedName());
+                            Main.CTFPlayers.get(target).setTeam(team);
+                            player.sendMessage(ChatColor.GREEN + "Set " + target.getName() + " to: " + ChatColor.RESET + team.getFormattedName());
                         } else {
                             player.sendMessage(ChatColor.RED + "Please specify a team." + ChatColor.RESET);
                         }
                     } else {
-                        player.sendMessage(ChatColor.RED + t2.getName() + " is not a CTF player." + ChatColor.RESET);
+                        player.sendMessage(ChatColor.RED + target.getName() + " is not a CTF player." + ChatColor.RESET);
                     }
                 } else {
                     player.sendMessage(ChatColor.RED + "Please specify a player." + ChatColor.RESET);
                 }
                 return true;
             case "ctfteamleave":
-                Player t3 = null;
                 if (args.length > 0) {
-                    t3 = Bukkit.getPlayer(args[0]);
+                    target = Bukkit.getPlayer(args[0]);
                 }
-                if (t3 != null) {
-                    if (Main.CTFPlayers.containsKey(t3)) {
-                        Main.CTFPlayers.get(t3).leaveTeam();
-                        player.sendMessage(ChatColor.GREEN + "Removed " + t3.getName() + " from their team." + ChatColor.RESET);
+                if (target != null) {
+                    if (Main.CTFPlayers.containsKey(target)) {
+                        Main.CTFPlayers.get(target).leaveTeam();
+                        player.sendMessage(ChatColor.GREEN + "Removed " + target.getName() + " from their team." + ChatColor.RESET);
                     } else {
-                        player.sendMessage(ChatColor.RED + t3.getName() + " is not a CTF player." + ChatColor.RESET);
+                        player.sendMessage(ChatColor.RED + target.getName() + " is not a CTF player." + ChatColor.RESET);
                     }
                 } else {
                     player.sendMessage(ChatColor.RED + "Please specify a player." + ChatColor.RESET);
@@ -234,12 +230,11 @@ public class CTFCommands implements CommandExecutor {
                 }
                 return true;
             case "ctfsetclass":
-                Player t5 = null;
                 if (args.length > 0) {
-                    t5 = Bukkit.getPlayer(args[0]);
+                    target = Bukkit.getPlayer(args[0]);
                 }
-                if (t5 != null) {
-                    if (Main.CTFPlayers.containsKey(t5)) {
+                if (target != null) {
+                    if (Main.CTFPlayers.containsKey(target)) {
                         if (args.length > 1) {
                             String className = args[1];
                             Class<?> cClass = null;
@@ -254,9 +249,9 @@ public class CTFCommands implements CommandExecutor {
                             if (cClass != null) {
                                 try {
                                     Constructor<?> constructor = cClass.getConstructor(CTFPlayer.class, Main.class);
-                                    CTFClass c = (CTFClass) constructor.newInstance(Main.CTFPlayers.get(t5),plugin);
-                                    Main.CTFPlayers.get(t5).setClass(c);
-                                    player.sendMessage(ChatColor.GREEN + "Set " + t5.getName() + " to: " + ChatColor.RESET + c.getFormattedName());
+                                    CTFClass c = (CTFClass) constructor.newInstance(Main.CTFPlayers.get(target),plugin);
+                                    Main.CTFPlayers.get(target).setClass(c);
+                                    player.sendMessage(ChatColor.GREEN + "Set " + target.getName() + " to: " + ChatColor.RESET + c.getFormattedName());
                                 } catch (Exception ignored) {}
                             } else {
                                 player.sendMessage(ChatColor.RED + "Please specify a class." + ChatColor.RESET);
@@ -265,23 +260,22 @@ public class CTFCommands implements CommandExecutor {
                             player.sendMessage(ChatColor.RED + "Please specify a class." + ChatColor.RESET);
                         }
                     } else {
-                        player.sendMessage(ChatColor.RED + t5.getName() + " is not a CTF player." + ChatColor.RESET);
+                        player.sendMessage(ChatColor.RED + target.getName() + " is not a CTF player." + ChatColor.RESET);
                     }
                 } else {
                     player.sendMessage(ChatColor.RED + "Please specify a player." + ChatColor.RESET);
                 }
                 return true;
             case "ctfleaveclass":
-                Player t4 = null;
                 if (args.length > 0) {
-                    t4 = Bukkit.getPlayer(args[0]);
+                    target = Bukkit.getPlayer(args[0]);
                 }
-                if (t4 != null) {
-                    if (Main.CTFPlayers.containsKey(t4)) {
-                        Main.CTFPlayers.get(t4).leaveClass();
-                        player.sendMessage(ChatColor.GREEN + "Removed " + t4.getName() + " from their class." + ChatColor.RESET);
+                if (target != null) {
+                    if (Main.CTFPlayers.containsKey(target)) {
+                        Main.CTFPlayers.get(target).leaveClass();
+                        player.sendMessage(ChatColor.GREEN + "Removed " + target.getName() + " from their class." + ChatColor.RESET);
                     } else {
-                        player.sendMessage(ChatColor.RED + t4.getName() + " is not a CTF player." + ChatColor.RESET);
+                        player.sendMessage(ChatColor.RED + target.getName() + " is not a CTF player." + ChatColor.RESET);
                     }
                 } else {
                     player.sendMessage(ChatColor.RED + "Please specify a player." + ChatColor.RESET);
@@ -353,13 +347,13 @@ public class CTFCommands implements CommandExecutor {
 ////            packet.getItemSlots().write(0, EnumWrappers.ItemSlot.HEAD);
 ////                packet.getItemModifier().write(0,new ItemStack(Material.RED_BANNER));
 //
-            PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_EQUIPMENT);
+//            PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_EQUIPMENT);
 
-			try {
-		        ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
-		    } catch (Exception e) {
-		        e.printStackTrace();
-		    }
+//			try {
+//		        ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
+//		    } catch (Exception e) {
+//		        e.printStackTrace();
+//		    }
 
 //                player.setCooldown(Material.DIRT, 120);
 
