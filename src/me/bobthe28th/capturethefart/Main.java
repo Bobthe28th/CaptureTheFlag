@@ -8,6 +8,7 @@ import java.util.Objects;
 import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import me.bobthe28th.capturethefart.ctf.*;
+import me.bobthe28th.capturethefart.ctf.classes.Builder;
 import me.bobthe28th.capturethefart.ctf.classes.Demo;
 import me.bobthe28th.capturethefart.ctf.classes.Paladin;
 import me.bobthe28th.capturethefart.ctf.classes.Wizard;
@@ -37,8 +38,8 @@ public class Main extends JavaPlugin implements Listener {
 
     public static CTFTeam[] CTFTeams;
     public static CTFFlag[] CTFFlags;
-    public static Class<?>[] CTFClasses = new Class<?>[]{Wizard.class, Paladin.class, Demo.class};
-    public static String[] CTFClassNames = new String[]{"Wizard","Paladin","Demo"};
+    public static Class<?>[] CTFClasses = new Class<?>[]{Wizard.class, Paladin.class, Demo.class, Builder.class};
+    public static String[] CTFClassNames = new String[]{"Wizard","Paladin","Demo","Builder"};
     public static HashMap<Player,CTFPlayer> CTFPlayers;
 
     CTFDeathMessages deathMessages;
