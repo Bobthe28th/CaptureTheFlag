@@ -66,6 +66,10 @@ public class WizBookIce extends CTFDoubleCooldownItem {
                                 startCooldown(1);
                                 this.cancel();
                             }
+                            
+                            if (t == 0) {
+                                p.setVelocity(p.getVelocity.setY(0.0));
+                            }
 
                             if (t % 10 == 1) {
                                 p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, (float) 1000.0, (float) t / 60);
