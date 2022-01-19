@@ -276,6 +276,21 @@ public class Main extends JavaPlugin implements Listener {
         }
 
     }
+    
+    public static Entity getLookedAtPlayer(Player player) {
+
+        Entity target = null;
+        for (Entity other : Objects.requireNonNull(player.getPlayer()).getWorld().getPlayers()) {
+
+            final Vector n = other.getLocation().toVector().subtract(player.getPlayer().getLocation().toVector());
+            if (player.getPlayer().getLocation().getDirection().normalize().crossProduct(n).lengthSquared() < 1 && n.normalize().dot(player.getPlayer().getLocation().getDirection().normalize()) >= 0) {
+                if (target == null || target.getLocation().distanceSquared(player.getPlayer().getLocation()) > other.getLocation().distanceSquared(player.getPlayer().getLocation())) {
+                    target = other;
+                }
+            }
+        }
+        return target;
+    }
 
     public static void createFadingBlock(Location pos, Material m1, Material m2, Integer ageMax, Integer freq, Main plugin) {
         pos.getBlock().setType(m1);
