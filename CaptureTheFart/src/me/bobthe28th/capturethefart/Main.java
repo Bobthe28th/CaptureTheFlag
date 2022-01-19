@@ -277,7 +277,8 @@ public class Main extends JavaPlugin implements Listener {
 
     }
     
-    public Entity getLookedAtPlayer(Player player) {
+    public static Entity getLookedAtPlayer(Player player) {
+
         Entity target = null;
         for (Entity other : player.getPlayer().getWorld().getPlayers()) {
             final Vector n = other.getLocation().toVector().subtract(player.getPlayer().getLocation().toVector());
