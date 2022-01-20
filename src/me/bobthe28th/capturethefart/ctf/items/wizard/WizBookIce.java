@@ -1,6 +1,7 @@
 package me.bobthe28th.capturethefart.ctf.items.wizard;
 
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFDoubleCooldownItem;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -57,6 +58,8 @@ public class WizBookIce extends CTFDoubleCooldownItem {
             case RIGHT_CLICK_AIR:
                 if (getCooldown(1) == 0) {
                     startAction(1);
+                    Vector pvS = p.getVelocity().clone().setY(0.0);
+
                     new BukkitRunnable() {
                         int t = 0;
                         final double y = p.getLocation().getY() - 1.0;
@@ -66,12 +69,14 @@ public class WizBookIce extends CTFDoubleCooldownItem {
                                 startCooldown(1);
                                 this.cancel();
                             }
-                            
-                            if (t == 0) {
-                                p.setVelocity(p.getVelocity().setY(0.0));
-                            }
 
                             if (t % 10 == 1) {
+                                if (t == 1) {
+                                    Location tLoc = p.getLocation().clone();
+                                    tLoc.setY(y + 1.0);
+                                    p.teleport(tLoc);
+                                    p.setVelocity(pvS);
+                                }
                                 p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, (float) 1000.0, (float) t / 60);
                             }
 
