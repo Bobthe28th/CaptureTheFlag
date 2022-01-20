@@ -9,6 +9,7 @@ import org.bukkit.Material;
 public class BuiWood extends CTFBuildUpItem {
 
     public BuiWood(CTFPlayer player_, Main plugin_) {
+        super("Wood", Material.OAK_PLANKS, 7, 16, 0, player_, plugin_);
         Material tMat = Material.OAK_PLANKS;
         if (player_.getTeam().getColor() == ChatColor.RED) {
             tMat = Material.CRIMSON_PLANKS;
@@ -17,6 +18,6 @@ public class BuiWood extends CTFBuildUpItem {
                 tMat = Material.WARPED_PLANKS;
             }
         }
-        super("Wood", tMat, 7, 16, 0, player_, plugin_);
+        setItem(tMat);
     }
 }
