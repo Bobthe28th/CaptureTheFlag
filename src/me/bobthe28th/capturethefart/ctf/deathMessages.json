@@ -1,6 +1,6 @@
 {
   "death": {
-    "default": ["$1 died"],
+    "default": ["$1 died","$1 farted"],
     "wizardZap": ["$1 got zapped"]
   },
   "deathbe": {
