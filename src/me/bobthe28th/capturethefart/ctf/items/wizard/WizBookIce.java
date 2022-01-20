@@ -68,7 +68,7 @@ public class WizBookIce extends CTFDoubleCooldownItem {
                             }
                             
                             if (t == 0) {
-                                p.setVelocity(p.getVelocity.setY(0.0));
+                                p.setVelocity(p.getVelocity().setY(0.0));
                             }
 
                             if (t % 10 == 1) {
