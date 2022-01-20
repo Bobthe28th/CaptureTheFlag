@@ -11,14 +11,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import me.bobthe28th.capturethefart.Main;
-import org.bukkit.entity.Pose;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
-import java.sql.Array;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class CTFCommands implements CommandExecutor {
