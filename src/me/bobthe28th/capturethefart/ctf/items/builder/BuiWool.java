@@ -9,7 +9,7 @@ import org.bukkit.Material;
 public class BuiWool extends CTFBuildUpItem {
 
     public BuiWool(CTFPlayer player_, Main plugin_) {
-        super("Wood", Material.WHITE_WOOL, 3, 32, 0, player_, plugin_);
+        super("Wool", Material.WHITE_WOOL, 3, 32, 0, player_, plugin_);
         Material tMat = Material.WHITE_WOOL;
         if (player_.getTeam().getColor() == ChatColor.RED) {
             tMat = Material.RED_WOOL;
