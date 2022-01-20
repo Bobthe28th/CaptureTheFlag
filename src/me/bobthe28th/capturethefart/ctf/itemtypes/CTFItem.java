@@ -39,6 +39,10 @@ public abstract class CTFItem {
         player.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
     }
 
+    public void setItem(Material nItem) {
+        item = nItem;
+    }
+
     public ItemStack getItem() {
         ItemStack it = new ItemStack(item,amount);
         ItemMeta meta = it.getItemMeta();
