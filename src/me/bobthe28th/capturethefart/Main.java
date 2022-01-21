@@ -13,6 +13,7 @@ import me.bobthe28th.capturethefart.ctf.classes.Demo;
 import me.bobthe28th.capturethefart.ctf.classes.Paladin;
 import me.bobthe28th.capturethefart.ctf.classes.Wizard;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -35,6 +36,7 @@ public class Main extends JavaPlugin implements Listener {
     public static HashMap<Snowball, Integer> snowBallEffect = new HashMap<>();
     public static ArrayList<Player> disableFall = new ArrayList<>();
     public static HashMap<Player,String> customDamageCause = new HashMap<>();
+    public static ArrayList<Block> breakableBlocks = new ArrayList<>();
 
     public static CTFTeam[] CTFTeams;
     public static CTFFlag[] CTFFlags;
