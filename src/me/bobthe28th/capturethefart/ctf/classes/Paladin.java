@@ -11,13 +11,11 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
 public class Paladin extends CTFClass implements Listener {
-    Main plugin;
-    CTFPlayer player;
+
     String name = "Paladin";
+
     public Paladin(CTFPlayer player_, Main plugin_) {
-        super("Paladin",plugin_);
-        player = player_;
-        plugin = plugin_;
+        super("Paladin",plugin_,player_);
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 

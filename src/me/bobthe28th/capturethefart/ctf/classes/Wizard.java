@@ -17,15 +17,11 @@ import org.bukkit.potion.PotionEffectType;
 
 public class Wizard extends CTFClass implements Listener {
 
-
     Integer slowFallEffect;
-    Main plugin;
-    CTFPlayer player;
     String name = "Wizard";
+
     public Wizard(CTFPlayer player_, Main plugin_) {
-        super("Wizard",plugin_);
-        player = player_;
-        plugin = plugin_;
+        super("Wizard",plugin_,player_);
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 

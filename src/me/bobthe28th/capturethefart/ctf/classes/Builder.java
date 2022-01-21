@@ -13,14 +13,11 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
 public class Builder extends CTFClass implements Listener {
-    Main plugin;
-    CTFPlayer player;
+
     String name = "Builder";
 
     public Builder(CTFPlayer player_, Main plugin_) {
-        super("Builder",plugin_);
-        player = player_;
-        plugin = plugin_;
+        super("Builder",plugin_,player_);
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
