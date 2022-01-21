@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="CaptureTheFart">
+    <output-path>$PROJECT_DIR$/../mcServerCTF/plugins</output-path>
+    <root id="archive" name="CaptureTheFart.jar">
+      <element id="module-output" name="CaptureTheFart" />
+    </root>
+  </artifact>
+</component>
