@@ -50,6 +50,7 @@ public abstract class CTFItem {
             meta.setDisplayName(ChatColor.RESET + itemName);
             meta.setCustomModelData(customModel);
             meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE, (byte) 1);
+            meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfname"), PersistentDataType.STRING, itemName);
             it.setItemMeta(meta);
             return it;
         } else {
