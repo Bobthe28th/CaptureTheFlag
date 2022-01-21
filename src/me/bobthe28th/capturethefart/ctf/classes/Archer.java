@@ -5,6 +5,7 @@ import me.bobthe28th.capturethefart.ctf.CTFClass;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.items.archer.ArcBow;
 import me.bobthe28th.capturethefart.ctf.items.archer.ArcGhostArrow;
+import me.bobthe28th.capturethefart.ctf.itemtypes.CTFBuildUpItem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
@@ -21,6 +22,7 @@ import java.util.Objects;
 public class Archer extends CTFClass implements Listener {
 
     String name = "Archer";
+    CTFBuildUpItem ghostArrow;
 
     public Archer(CTFPlayer player_, Main plugin_) {
         super("Archer",plugin_,player_);
@@ -41,7 +43,8 @@ public class Archer extends CTFClass implements Listener {
     public void giveItems() {
         player.removeItems();
         player.giveItem(new ArcBow(player,plugin),0);
-        player.giveItem(new ArcGhostArrow(player,plugin),1);
+        ghostArrow = new ArcGhostArrow(player,plugin);
+        player.giveItem(ghostArrow,1);
     }
 
     @EventHandler
@@ -49,8 +52,25 @@ public class Archer extends CTFClass implements Listener {
         if (event.getEntity() instanceof Player p) {
             if (p != player.getPlayer()) return;
         }
-        if (event.getConsumable() != null && event.getConsumable().getItemMeta() != null && event.getConsumable().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(plugin,"ctfname"),  PersistentDataType.BYTE)) {
-            //TODO
+        if (event.getEntity() instanceof Player && event.getConsumable() != null && event.getConsumable().getItemMeta() != null && event.getConsumable().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(plugin,"ctfname"),  PersistentDataType.STRING)) {
+            String name = event.getConsumable().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,"ctfname"),  PersistentDataType.STRING);
+            if (name != null) {
+                switch (name) {
+                    case "Ghost Arrow":
+                        if (!ghostArrow.isOnCooldown()) {
+                            ghostArrow.startCooldown();
+                        }
+                        event.getProjectile().setMetadata("ghostArrow", new FixedMetadataValue(plugin, true));
+                        event.getProjectile().setMetadata("playerSent", new FixedMetadataValue(plugin, Objects.requireNonNull(player.getPlayer()).getName()));
+                        break;
+                    case "Glow Arrow":
+                        event.getProjectile().setMetadata("glowArrow", new FixedMetadataValue(plugin, true));
+                        event.getProjectile().setMetadata("playerSent", new FixedMetadataValue(plugin, Objects.requireNonNull(player.getPlayer()).getName()));
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
     }
 
