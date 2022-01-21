@@ -5,6 +5,7 @@ import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFBuildUpItem;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.event.block.BlockPlaceEvent;
 
 public class BuiWood extends CTFBuildUpItem {
 
@@ -19,5 +20,13 @@ public class BuiWood extends CTFBuildUpItem {
             }
         }
         setItem(tMat);
+    }
+
+    @Override
+    public void onblockPlace(BlockPlaceEvent event) {
+        Main.breakableBlocks.add(event.getBlock());
+        if (!isOnCooldown()) {
+            startCooldown();
+        }
     }
 }

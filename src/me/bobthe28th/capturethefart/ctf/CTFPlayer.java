@@ -243,7 +243,12 @@ public class CTFPlayer implements Listener {
     public void onPlayerBreakBlock(BlockBreakEvent event) {
         if (event.getPlayer() != player) return;
         if (player.getGameMode() != GameMode.CREATIVE) {
-            event.setCancelled(true);
+            if (Main.breakableBlocks.contains(event.getBlock())) {
+                event.setDropItems(false);
+                Main.breakableBlocks.remove(event.getBlock());
+            } else {
+                event.setCancelled(true);
+            }
         }
     }
 

@@ -36,13 +36,6 @@ public abstract class CTFBuildUpItem extends CTFItem {
         player.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(text));
     }
 
-    @Override
-    public void onblockPlace(BlockPlaceEvent event) {
-        if (!onCooldown) {
-            startCooldown();
-        }
-    }
-
     public boolean isOnCooldown() {
         return onCooldown;
     }
