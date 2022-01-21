@@ -9,7 +9,9 @@ import me.bobthe28th.capturethefart.ctf.itemtypes.CTFBuildUpItem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -22,7 +24,7 @@ import java.util.Objects;
 public class Archer extends CTFClass implements Listener {
 
     String name = "Archer";
-    CTFBuildUpItem ghostArrow;
+    ArcGhostArrow ghostArrow;
 
     public Archer(CTFPlayer player_, Main plugin_) {
         super("Archer",plugin_,player_);
@@ -52,16 +54,16 @@ public class Archer extends CTFClass implements Listener {
         if (event.getEntity() instanceof Player p) {
             if (p != player.getPlayer()) return;
         }
-        if (event.getEntity() instanceof Player && event.getConsumable() != null && event.getConsumable().getItemMeta() != null && event.getConsumable().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(plugin,"ctfname"),  PersistentDataType.STRING)) {
+        if (event.getEntity() instanceof Player && event.getProjectile() instanceof Arrow && event.getConsumable() != null && event.getConsumable().getItemMeta() != null && event.getConsumable().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(plugin,"ctfname"),  PersistentDataType.STRING)) {
             String name = event.getConsumable().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,"ctfname"),  PersistentDataType.STRING);
             if (name != null) {
                 switch (name) {
                     case "Ghost Arrow":
+                        ghostArrow.shoot((Arrow) event.getProjectile(),player);
                         if (!ghostArrow.isOnCooldown()) {
                             ghostArrow.startCooldown();
                         }
-                        event.getProjectile().setMetadata("ghostArrow", new FixedMetadataValue(plugin, true));
-                        event.getProjectile().setMetadata("playerSent", new FixedMetadataValue(plugin, Objects.requireNonNull(player.getPlayer()).getName()));
+
                         break;
                     case "Glow Arrow":
                         event.getProjectile().setMetadata("glowArrow", new FixedMetadataValue(plugin, true));
