@@ -24,15 +24,11 @@ import java.util.Objects;
 
 public class Demo extends CTFClass implements Listener {
 
-    Main plugin;
-    CTFPlayer player;
     String name = "Demolitionist";
     CTFBuildUpItem arrow;
 
     public Demo(CTFPlayer player_, Main plugin_) {
-        super("Demolitionist",plugin_);
-        player = player_;
-        plugin = plugin_;
+        super("Demolitionist",plugin_,player_);
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
