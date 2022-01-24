@@ -220,7 +220,7 @@ public class Main extends JavaPlugin implements Listener {
                             int xPos = player.getLocation().getBlockX() - tnt.getLocation().getBlockX();
                             int yPos = player.getLocation().getBlockY() + 1 - tnt.getLocation().getBlockY();
                             int zPos = player.getLocation().getBlockZ() - tnt.getLocation().getBlockZ();
-                            int div = 1;
+                            int div = 2;
                             player.setVelocity(player.getVelocity().add(new Vector(xPos/div, yPos/div, zPos/div)));
                             event.setDamage(event.getFinalDamage()/5.0);
                         } else {
