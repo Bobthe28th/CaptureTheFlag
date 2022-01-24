@@ -4,7 +4,7 @@
     "wizardZap": ["$1 got zapped"]
   },
   "deathbe": {
-    "default": ["$1 was killed by $2","$1 could not handle the awesomeness of $2"],
+    "default": ["$1 was killed by $2","$1 could not handle the awesomeness of $2","$1 got fuccking died by $2"]
     "wizardZap": ["$1 got zapped by $2"],
     "demoTNT": ["$1 got blown into a million pieces by $2"],
     "ENTITY_ATTACK": ["$1 was slain by $2","$1 got destroyed by $2"]
