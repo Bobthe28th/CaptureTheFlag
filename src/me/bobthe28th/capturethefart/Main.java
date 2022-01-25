@@ -217,10 +217,10 @@ public class Main extends JavaPlugin implements Listener {
                 if (CTFPlayers.containsKey(pS) && CTFPlayers.containsKey(player)) {
                     if (CTFPlayers.get(pS).getTeam() == CTFPlayers.get(player).getTeam()) {
                         if (player == pS) {
-                            int xPos = player.getLocation().getBlockX() - tnt.getLocation().getBlockX();
-                            int yPos = player.getLocation().getBlockY() + 1 - tnt.getLocation().getBlockY();
-                            int zPos = player.getLocation().getBlockZ() - tnt.getLocation().getBlockZ();
-                            int div = 2;
+                            double xPos = player.getLocation().getBlockX() - tnt.getLocation().getBlockX();
+                            double yPos = player.getLocation().getBlockY() + 1.0 - tnt.getLocation().getBlockY();
+                            double zPos = player.getLocation().getBlockZ() - tnt.getLocation().getBlockZ();
+                            double div = 1.5;
                             player.setVelocity(player.getVelocity().add(new Vector(xPos/div, yPos/div, zPos/div)));
                             event.setDamage(event.getFinalDamage()/5.0);
                         } else {

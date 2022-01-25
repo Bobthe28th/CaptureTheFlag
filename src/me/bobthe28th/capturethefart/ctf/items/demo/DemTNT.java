@@ -4,6 +4,7 @@ import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFBuildUpItem;
 import org.bukkit.Material;
+import org.bukkit.event.block.BlockPlaceEvent;
 
 public class DemTNT extends CTFBuildUpItem {
 
@@ -11,4 +12,10 @@ public class DemTNT extends CTFBuildUpItem {
         super("TNT", Material.TNT, 10, 3, 0, player_, plugin_);
     }
 
+    @Override
+    public void onblockPlace(BlockPlaceEvent event) {
+        if (!isOnCooldown()) {
+            startCooldown();
+        }
+    }
 }
