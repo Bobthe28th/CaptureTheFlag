@@ -147,6 +147,7 @@ public class CTFPlayer implements Listener {
 		if (pClass != null) {
             pClass.deselect();
         }
+	removeItems();
         pClass = cl;
         pClass.giveItems();
 	}
