@@ -7,6 +7,9 @@ public class CTFDeathMessages {
     private Map<String, String[]> death;
     private Map<String, String[]> deathbe;
 
+    public CTFDeathMessages(){
+    }
+
     public String getMessage(boolean byPlayer, String type) {
         String out;
         if (byPlayer) {
