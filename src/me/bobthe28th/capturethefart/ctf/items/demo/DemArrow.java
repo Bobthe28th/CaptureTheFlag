@@ -8,7 +8,7 @@ import org.bukkit.Material;
 public class DemArrow extends CTFBuildUpItem {
 
     public DemArrow(CTFPlayer player_, Main plugin_) {
-        super("Rocket", Material.ARROW, 8, 1, 0, player_, plugin_);
+        super("Rocket", Material.ARROW, 8, 1, 1, player_, plugin_);
     }
 
 }
