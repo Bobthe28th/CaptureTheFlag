@@ -20,7 +20,7 @@ import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 public class WizStickFire extends CTFDoubleCooldownItem {
 
     public WizStickFire(CTFPlayer player_, Main plugin_) {
-        super("Fire Staff", Material.STICK, 3, "Solar Blast", 0.2, "Ballz", 69, player_, plugin_);
+        super("Fire Staff", Material.STICK, 3, "Solar Blast", 1.5, "Ballz", 69, player_, plugin_);
         plugin = plugin_;
         player = player_;
     }
@@ -34,8 +34,8 @@ public class WizStickFire extends CTFDoubleCooldownItem {
             case LEFT_CLICK_BLOCK:
             case LEFT_CLICK_AIR:
                 if (getCooldown(0) == 0) {
-                    double coneHeight = 2.0;
-                    double coneRadius = 1.0;
+                    double coneHeight = 5.0;
+                    double coneRadius = 3.0;
                     Vector shotP = p.getLocation().toVector().add(new Vector(0.0,1.0,0.0));
                     Vector dir = p.getEyeLocation().getDirection().normalize();
                     for (Entity entity : p.getNearbyEntities(10,10,10)) {
@@ -51,7 +51,7 @@ public class WizStickFire extends CTFDoubleCooldownItem {
                                 if (orthDist < cRad && cDist >= 0 && cDist <= coneHeight) {
                                     pN.setFireTicks(70);
                                     Main.customDamageCause.put(pN,"wizardShotty");
-                                    pN.damage(2);
+                                    pN.damage(2,p);
                                 }
 
                             }
@@ -67,7 +67,7 @@ public class WizStickFire extends CTFDoubleCooldownItem {
                     for (int i = 0; i < 20; i++) {
                         Vector pDirR = pDir.clone();
                         pDirR.add(new Vector((rand.nextFloat()*maxRandomDistance*2)-maxRandomDistance,(rand.nextFloat()*maxRandomDistance*2)-maxRandomDistance,(rand.nextFloat()*maxRandomDistance*2)-maxRandomDistance));
-                        pDirR.multiply(0.5);
+                        pDirR.multiply(0.9);
                         Objects.requireNonNull(pOrgin.getWorld()).spawnParticle(Particle.FLAME, pOrgin, 0, pDirR.getX(), pDirR.getY(), pDirR.getZ(), 5.0);
                     }
 
