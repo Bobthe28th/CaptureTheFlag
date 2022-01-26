@@ -7,6 +7,6 @@ import org.bukkit.Material;
 
 public class DemBow extends CTFItem {
     public DemBow(CTFPlayer player_, Main plugin_) {
-        super("Bazooka", Material.CROSSBOW, 0, player_, plugin_);
+        super("Bazooka", Material.CROSSBOW, 1, player_, plugin_);
     }
 }
