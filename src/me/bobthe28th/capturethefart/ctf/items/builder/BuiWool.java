@@ -12,10 +12,10 @@ public class BuiWool extends CTFBuildUpItem {
     public BuiWool(CTFPlayer player_, Main plugin_) {
         super("Wool", Material.WHITE_WOOL, 3, 32, 0, player_, plugin_);
         Material tMat = Material.WHITE_WOOL;
-        if (player_.getTeam().getColor() == ChatColor.RED) {
+        if (player_.getTeam().getChatColor() == ChatColor.RED) {
             tMat = Material.RED_WOOL;
         } else {
-            if (player_.getTeam().getColor() == ChatColor.BLUE) {
+            if (player_.getTeam().getChatColor() == ChatColor.BLUE) {
                 tMat = Material.BLUE_WOOL;
             }
         }

@@ -6,10 +6,7 @@ import java.util.List;
 import java.util.Objects;
 
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFItem;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.NamespacedKey;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -22,8 +19,10 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import me.bobthe28th.capturethefart.Main;
@@ -63,6 +62,7 @@ public class CTFPlayer implements Listener {
     public void setTeam(CTFTeam t) {
         team = t;
         t.getTeam().addEntry(player.getName());
+        giveDefaultArmor();
     }
 
     public void leaveTeam() {
@@ -76,7 +76,7 @@ public class CTFPlayer implements Listener {
 
     public String getFormattedName() {
         if (team != null) {
-            return team.getColor() + player.getName() + ChatColor.RESET;
+            return team.getChatColor() + player.getName() + ChatColor.RESET;
         } else {
             return player.getName();
         }
@@ -120,6 +120,17 @@ public class CTFPlayer implements Listener {
         Main.CTFPlayers.remove(player);
     }
 
+    public void giveDefaultArmor() {
+        ItemStack chestPlate = new ItemStack(Material.LEATHER_CHESTPLATE);
+        LeatherArmorMeta lam = (LeatherArmorMeta) chestPlate.getItemMeta();
+        if (lam != null) {
+            lam.setColor(team.getColor());
+            lam.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE, (byte) 1);
+            chestPlate.setItemMeta(lam);
+        }
+        player.getInventory().setItem(EquipmentSlot.CHEST,chestPlate);
+    }
+
     public void removeItems() {
         for (int i = 0; i <= 35; i ++) {
             ItemStack invItem = player.getInventory().getItem(i);
@@ -136,6 +147,20 @@ public class CTFPlayer implements Listener {
                 }
             }
         }
+        if (player.getEquipment() != null) {
+            for (ItemStack eq : player.getEquipment().getArmorContents()) {
+                if (eq != null) {
+                    ItemMeta meta = eq.getItemMeta();
+                    if (meta != null) {
+                        Byte ctfitemData = meta.getPersistentDataContainer().get(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE);
+                        if (ctfitemData != null && ctfitemData == (byte) 1) {
+                            eq.setAmount(0);
+                        }
+                    }
+                }
+            }
+        }
+
         player.updateInventory();
     }
 
@@ -147,9 +172,10 @@ public class CTFPlayer implements Listener {
 		if (pClass != null) {
             pClass.deselect();
         }
-	removeItems();
+	    removeItems();
         pClass = cl;
         pClass.giveItems();
+        giveDefaultArmor();
 	}
 
     public void leaveClass() {
