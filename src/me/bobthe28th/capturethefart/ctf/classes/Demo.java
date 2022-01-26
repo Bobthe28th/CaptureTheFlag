@@ -7,9 +7,8 @@ import me.bobthe28th.capturethefart.ctf.items.demo.DemArrow;
 import me.bobthe28th.capturethefart.ctf.items.demo.DemBow;
 import me.bobthe28th.capturethefart.ctf.items.demo.DemTNT;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFBuildUpItem;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import org.bukkit.*;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
@@ -18,6 +17,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.Objects;
@@ -67,11 +67,27 @@ public class Demo extends CTFClass implements Listener {
         if (event.getEntity() instanceof Player p) {
             if (p != player.getPlayer()) return;
         }
-        if (!arrow.isOnCooldown()) {
-            arrow.startCooldown();
+        if (event.getProjectile() instanceof Arrow) {
+            if (!arrow.isOnCooldown()) {
+                arrow.startCooldown();
+            }
+            ((Arrow) event.getProjectile()).setCritical(false);
+            event.getProjectile().setMetadata("bombArrow", new FixedMetadataValue(plugin, true));
+            event.getProjectile().setMetadata("playerSent", new FixedMetadataValue(plugin, Objects.requireNonNull(player.getPlayer()).getName()));
+
+            new BukkitRunnable() {
+                final Arrow a = (Arrow) event.getProjectile();
+                public void run() {
+                    if (a.isDead()) {
+                        this.cancel();
+                    }
+                    for(Player p : Bukkit.getOnlinePlayers()){
+                        p.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE,a.getLocation(),1,0.0,0.0,0.0,0.0);
+                    }
+                }
+            }.runTaskTimer(plugin,0,1);
+
         }
-        event.getProjectile().setMetadata("bombArrow", new FixedMetadataValue(plugin, true));
-        event.getProjectile().setMetadata("playerSent", new FixedMetadataValue(plugin, Objects.requireNonNull(player.getPlayer()).getName()));
     }
 
 }
