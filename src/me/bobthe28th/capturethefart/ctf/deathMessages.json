@@ -1,7 +1,8 @@
 {
   "death": {
-    "default": ["$1 died","$1 farted"],
-    "wizardZap": ["$1 got zapped"]
+    "default": ["$1 died","$1 farted","/killed $1"],
+    "wizardZap": ["$1 got zapped"],
+    "FALL": ["$1 fell and didn't get up","$1 went splat","$1 falled","$1 is malding"]
   },
   "deathbe": {
     "default": ["$1 was killed by $2","$1 could not handle the awesomeness of $2","$1 got fuccking died by $2"],
