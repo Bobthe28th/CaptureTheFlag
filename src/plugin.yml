@@ -3,7 +3,7 @@ version: 0.6
 author: Bobthe28th
 main: me.bobthe28th.capturethefart.Main
 description: Capture the flag but funnie
-api-version: 1.13
+api-version: 1.18
 depend: [ProtocolLib]
 commands:
   ctfjoin:
