@@ -32,7 +32,7 @@ public class Main extends JavaPlugin implements Listener {
     public static ArrayList<Integer> tornado = new ArrayList<>();
     public static HashMap<Snowball, Integer> snowBallEffect = new HashMap<>();
     public static ArrayList<Player> disableFall = new ArrayList<>();
-    public static HashMap<Player,String> customDamageCause = new HashMap<>();
+    public static HashMap<Player,Object[]> customDamageCause = new HashMap<>();
     public static ArrayList<Block> breakableBlocks = new ArrayList<>();
 
     public static CTFTeam[] CTFTeams;
@@ -117,8 +117,8 @@ public class Main extends JavaPlugin implements Listener {
                         if (CTFPlayers.containsKey(pS) && CTFPlayers.containsKey(pd)) {
                             if (CTFPlayers.get(pS).getTeam() != CTFPlayers.get(pd).getTeam()) {
                                 if (pd.getGameMode() != GameMode.SPECTATOR && pd.getGameMode() != GameMode.CREATIVE) {
-                                    customDamageCause.put(pd,"wizardShowChunk");
-                                    pd.damage(1.0);
+                                    customDamageCause.put(pd,new Object[]{"wizardShowChunk",pS});
+                                    pd.damage(1.0,pS);
                                     pd.setNoDamageTicks(0);
                                 }
                                 pd.setFreezeTicks(pd.getFreezeTicks() + 80);
@@ -171,7 +171,7 @@ public class Main extends JavaPlugin implements Listener {
             if (p.getShooter() instanceof Player shooter && event.getHitEntity() instanceof Player player) {
                 if (CTFPlayers.containsKey(shooter) && CTFPlayers.containsKey(player)) {
                     if (CTFPlayers.get(shooter).getTeam() != CTFPlayers.get(player).getTeam()) {
-                        customDamageCause.put(player,"wizardSnowball");
+                        customDamageCause.put(player,new Object[]{"wizardSnowball",shooter});
                         player.damage(1.0, shooter);
                         player.setFreezeTicks(Math.min(player.getFreezeTicks() + 50,p.getMaxFreezeTicks() + 60));
                     }
@@ -209,8 +209,13 @@ public class Main extends JavaPlugin implements Listener {
             }
         }
 
-        if (event.getEntity() instanceof Player player && event instanceof EntityDamageByEntityEvent && ((EntityDamageByEntityEvent)event).getDamager().getType() == EntityType.PRIMED_TNT && event.getCause() == DamageCause.ENTITY_EXPLOSION) {
-            TNTPrimed tnt = (TNTPrimed)(((EntityDamageByEntityEvent) event).getDamager());
+        EntityDamageByEntityEvent eventE = null;
+        if (event instanceof EntityDamageByEntityEvent) {
+            eventE = (EntityDamageByEntityEvent) event;
+        }
+
+        if (event.getEntity() instanceof Player player && eventE != null && eventE.getDamager().getType() == EntityType.PRIMED_TNT && event.getCause() == DamageCause.ENTITY_EXPLOSION) {
+            TNTPrimed tnt = (TNTPrimed) eventE.getDamager();
             String pSent = tnt.getMetadata("playerSent").get(0).asString();
             Player pS = Bukkit.getPlayer(pSent);
             if (pS != null) {
@@ -222,15 +227,13 @@ public class Main extends JavaPlugin implements Listener {
                             double zPos = player.getLocation().getBlockZ() - tnt.getLocation().getBlockZ();
                             double div = 1.5;
                             player.setVelocity(player.getVelocity().add(new Vector(xPos/div, yPos/div, zPos/div)));
+                            customDamageCause.put(player,new Object[]{"demoTNT",pS});
                             event.setDamage(event.getFinalDamage()/5.0);
                         } else {
                             event.setCancelled(true);
                         }
                     } else {
-                        player.setLastDamageCause(new EntityDamageByEntityEvent(pS,player,DamageCause.ENTITY_EXPLOSION,event.getFinalDamage()));
-                        customDamageCause.put(player,"demoTNT");
-                        player.damage(event.getFinalDamage(), pS);
-                        event.setDamage(0.0);
+                        customDamageCause.put(player,new Object[]{"demoTNT",pS});
                     }
                 }
             }
@@ -238,7 +241,7 @@ public class Main extends JavaPlugin implements Listener {
 
         if (!event.isCancelled() && event.getEntity() instanceof Player player) {
             if (player.getHealth() - event.getFinalDamage() <= 0) {
-                boolean byEntity = event instanceof EntityDamageByEntityEvent;
+                boolean byEntity = eventE != null;
                 if (CTFPlayers.containsKey(player)) {
                     CTFPlayers.get(player).death(byEntity);
                 }
@@ -247,15 +250,20 @@ public class Main extends JavaPlugin implements Listener {
                 player.setGameMode(GameMode.SPECTATOR);
                 player.setFreezeTicks(0);
                 String damageType;
+                Entity damager = null;
+
                 if (customDamageCause.containsKey(player)) {
-                    damageType = customDamageCause.get(player);
+                    damageType = (String) customDamageCause.get(player)[0];
+                    damager = (Entity) customDamageCause.get(player)[1];
                 } else {
                     damageType = event.getCause().toString();
                 }
 
                 if (byEntity) {
-                    Bukkit.broadcastMessage(deathMessages.getMessage(true,damageType).replace("$1",ChatColor.RED + event.getEntity().getName() + ChatColor.RESET).replace("$2",ChatColor.BLUE + ((EntityDamageByEntityEvent)event).getDamager().getName() + ChatColor.RESET));
-
+                    if (damager == null) {
+                        damager = eventE.getDamager();
+                    }
+                    Bukkit.broadcastMessage(deathMessages.getMessage(true,damageType).replace("$1",ChatColor.RED + event.getEntity().getName() + ChatColor.RESET).replace("$2",ChatColor.BLUE + damager.getName() + ChatColor.RESET));
                 } else {
                     Bukkit.broadcastMessage(deathMessages.getMessage(false,damageType).replace("$1",ChatColor.RED + event.getEntity().getName() + ChatColor.RESET));
                 }
