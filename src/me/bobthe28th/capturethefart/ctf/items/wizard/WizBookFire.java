@@ -15,8 +15,8 @@ public class WizBookFire extends CTFDoubleCooldownItem {
 
 
 
-    public WizBookFire(CTFPlayer player_, Main plugin_) {
-        super("Fire Tome", Material.BOOK, 3, "Fire Wall", 13, "FUCK YOU", 69, player_, plugin_);
+    public WizBookFire(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
+        super("Fire Tome", Material.BOOK, 3, "Fire Wall", 13, "FUCK YOU", 69, player_, plugin_, defaultSlot_);
     }
 
     @Override

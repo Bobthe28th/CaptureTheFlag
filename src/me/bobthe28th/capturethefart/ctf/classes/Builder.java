@@ -34,9 +34,9 @@ public class Builder extends CTFClass implements Listener {
     @Override
     public void giveItems() {
         player.removeItems();
-        player.giveItem(new BuiAxe(player,plugin),0);
-        player.giveItem(new BuiShears(player,plugin),1);
-        player.giveItem(new BuiWood(player,plugin),2);
-        player.giveItem(new BuiWool(player,plugin),3);
+        player.giveItem(new BuiAxe(player,plugin,0));
+        player.giveItem(new BuiShears(player,plugin,1));
+        player.giveItem(new BuiWood(player,plugin,2));
+        player.giveItem(new BuiWool(player,plugin,3));
     }
 }

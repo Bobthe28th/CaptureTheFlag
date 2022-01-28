@@ -7,7 +7,7 @@ import org.bukkit.Material;
 
 public class BuiAxe extends CTFItem {
 
-    public BuiAxe(CTFPlayer player_, Main plugin_) {
-        super("Builder's Axe",Material.IRON_AXE,1,player_,plugin_);
+    public BuiAxe(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
+        super("Builder's Axe",Material.IRON_AXE,1,player_,plugin_, defaultSlot_);
     }
 }

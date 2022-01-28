@@ -15,10 +15,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemDamageEvent;
-import org.bukkit.event.player.PlayerPickupArrowEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
@@ -55,8 +52,8 @@ public class CTFPlayer implements Listener {
 
         cooldownTask = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
             int slot = player.getInventory().getHeldItemSlot();
-            if (hotbar[slot] != null) {
-                hotbar[slot].displayCooldowns();
+            if (getItem(slot) != null) {
+                getItem(slot).displayCooldowns();
             } else {
                 Objects.requireNonNull(player.getPlayer()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
             }
@@ -148,14 +145,29 @@ public class CTFPlayer implements Listener {
                 if (meta != null) {
                     Byte ctfitemData = meta.getPersistentDataContainer().get(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE);
                     if (ctfitemData != null && ctfitemData == (byte) 1) {
-                        if (i < 9) {
-                            hotbar[i] = null;
+                        if (getItem(i) != null) {
+                            hotbar[getItem(i).getDefaultSlot()] = null;
                         }
                         invItem.setAmount(0);
                     }
                 }
             }
         }
+        //offhand
+        ItemStack invItem = player.getInventory().getItem(40);
+        if (invItem != null) {
+            ItemMeta meta = invItem.getItemMeta();
+            if (meta != null) {
+                Byte ctfitemData = meta.getPersistentDataContainer().get(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE);
+                if (ctfitemData != null && ctfitemData == (byte) 1) {
+                    if (getItem(40) != null) {
+                        hotbar[getItem(40).getDefaultSlot()] = null;
+                    }
+                    invItem.setAmount(0);
+                }
+            }
+        }
+
         player.updateInventory();
     }
 
@@ -178,41 +190,50 @@ public class CTFPlayer implements Listener {
         pClass = null;
     }
 
-    public <I extends CTFItem> void giveItem(I it, Integer slot) {
-        hotbar[slot] = it;
-        player.getInventory().setItem(slot,it.getItem());
+    public <I extends CTFItem> void giveItem(I it) {
+        hotbar[it.getDefaultSlot()] = it;
+        player.getInventory().setItem(it.getDefaultSlot(),it.getItem());
     }
 
     public <I extends CTFItem> ItemStack getItemStack(I it) {
-        int index = Arrays.asList(hotbar).indexOf(it);
-        if (index == -1) {
-            return null;
-        }
-        return player.getInventory().getItem(index);
+        return player.getInventory().getItem(getItemSlot(it));
     }
 
     public <I extends CTFItem> int getItemSlot(I it) {
-        return Arrays.asList(hotbar).indexOf(it);
+        for (CTFItem cit : hotbar) {
+            if (cit == it) {
+                return cit.getSlot();
+            }
+        }
+        return -1;
     }
 
     public CTFItem getItem(Integer slot) {
-        return hotbar[slot];
-    }
-
-    public void removeItem(Integer slot) {
-        hotbar[slot] = null;
-    }
-
-    public int getHeldItemSlot() {
-        return player.getInventory().getHeldItemSlot();
+        for (CTFItem cit : hotbar) {
+            if (cit != null) {
+                if (cit.getSlot() == slot) {
+                    return cit;
+                }
+            }
+        }
+        return null;
     }
 
     @EventHandler
     public void onPlayerClick(PlayerInteractEvent event) {
         if (event.getPlayer() != player) return;
         int slot = player.getInventory().getHeldItemSlot();
-        if (hotbar[slot] != null) {
-            hotbar[slot].onclickAction(event);
+        if (getItem(slot) != null) {
+            getItem(slot).onclickAction(event);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerItemHeldEvent(PlayerItemHeldEvent event) {
+        if (event.getPlayer() != player) return;
+        int slot = event.getNewSlot();
+        if (getItem(slot) != null) {
+            getItem(slot).onHold(event);
         }
     }
 
@@ -220,8 +241,8 @@ public class CTFPlayer implements Listener {
     public void onPlayerPlaceBlock(BlockPlaceEvent event) {
         if (event.getPlayer() != player) return;
         int slot = player.getInventory().getHeldItemSlot();
-        if (hotbar[slot] != null) {
-            hotbar[slot].onblockPlace(event);
+        if (getItem(slot) != null) {
+            getItem(slot).onblockPlace(event);
         }
     }
 
@@ -247,6 +268,12 @@ public class CTFPlayer implements Listener {
                 }
             }
         }
+    }
+
+    @EventHandler
+    public void onPlayerSwapHandItems(PlayerSwapHandItemsEvent event) {
+        if (event.getPlayer() != player) return;
+        event.setCancelled(true);
     }
 
     @EventHandler

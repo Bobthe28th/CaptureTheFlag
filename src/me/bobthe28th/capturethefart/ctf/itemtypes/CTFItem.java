@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -22,18 +23,24 @@ public abstract class CTFItem {
     public Main plugin;
     public CTFPlayer player;
     public int amount = 1;
+    public int defaultSlot;
+    public int slot;
 
-    public CTFItem(String itemName_, Material item_, Integer customModel_, CTFPlayer player_, Main plugin_) {
+    public CTFItem(String itemName_, Material item_, Integer customModel_, CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
         itemName = itemName_;
         item = item_;
         customModel = customModel_;
         plugin = plugin_;
         player = player_;
+        defaultSlot = defaultSlot_;
+        slot = defaultSlot;
     }
 
     public void onclickAction(PlayerInteractEvent event) {}
 
     public void onblockPlace(BlockPlaceEvent event) {}
+
+    public void onHold(PlayerItemHeldEvent event) {}
 
     public void displayCooldowns() {
         player.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
@@ -56,5 +63,29 @@ public abstract class CTFItem {
         } else {
             return null;
         }
+    }
+
+    public void setSlot(int newSlot) {
+
+        if (player.getItem(newSlot) != null) {
+            player.getItem(newSlot).setSlot(player.getItem(newSlot).getDefaultSlot());
+        }
+
+        ItemStack oldItem = player.getPlayer().getInventory().getItem(slot);
+
+        if (oldItem != null) {
+            player.getPlayer().getInventory().setItem(newSlot, oldItem);
+            oldItem.setAmount(0);
+        }
+        player.getPlayer().updateInventory();
+        slot = newSlot;
+    }
+
+    public int getDefaultSlot() {
+        return defaultSlot;
+    }
+
+    public int getSlot() {
+        return slot;
     }
 }

@@ -9,8 +9,8 @@ import org.bukkit.event.block.BlockPlaceEvent;
 
 public class BuiWool extends CTFBuildUpItem {
 
-    public BuiWool(CTFPlayer player_, Main plugin_) {
-        super("Wool", Material.WHITE_WOOL, 3, 32, 0, player_, plugin_);
+    public BuiWool(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
+        super("Wool", Material.WHITE_WOOL, 3, 32, 0, player_, plugin_, defaultSlot_);
         Material tMat = Material.WHITE_WOOL;
         if (player_.getTeam().getColor() == ChatColor.RED) {
             tMat = Material.RED_WOOL;

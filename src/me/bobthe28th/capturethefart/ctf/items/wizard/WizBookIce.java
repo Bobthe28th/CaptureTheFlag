@@ -17,8 +17,8 @@ import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 
 public class WizBookIce extends CTFDoubleCooldownItem {
 
-    public WizBookIce(CTFPlayer player_, Main plugin_) {
-        super("Ice Tome",Material.BOOK, 2,"Ice Wall", 10,"Ice Skate", 20, player_,plugin_);
+    public WizBookIce(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
+        super("Ice Tome",Material.BOOK, 2,"Ice Wall", 10,"Ice Skate", 20, player_,plugin_, defaultSlot_);
         plugin = plugin_;
         player = player_;
     }

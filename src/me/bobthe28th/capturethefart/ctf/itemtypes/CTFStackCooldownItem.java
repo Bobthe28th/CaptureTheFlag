@@ -15,8 +15,8 @@ public abstract class CTFStackCooldownItem extends CTFItem {
     String cooldownName;
     Material cooldownItem;
 
-    public CTFStackCooldownItem(String itemName_, Material item_, Integer customModel_, String cooldownName_, double cooldownMax_, Material cooldownItem_, CTFPlayer player_, Main plugin_) {
-        super(itemName_,item_,customModel_,player_,plugin_);
+    public CTFStackCooldownItem(String itemName_, Material item_, Integer customModel_, String cooldownName_, double cooldownMax_, Material cooldownItem_, CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
+        super(itemName_,item_,customModel_,player_,plugin_,defaultSlot_);
         cooldownName = cooldownName_;
         cooldownMax = cooldownMax_;
         cooldownItem = cooldownItem_;

@@ -19,8 +19,8 @@ import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 
 public class WizStickFire extends CTFDoubleCooldownItem {
 
-    public WizStickFire(CTFPlayer player_, Main plugin_) {
-        super("Fire Staff", Material.STICK, 3, "Solar Blast", 1.5, "Ballz", 69, player_, plugin_);
+    public WizStickFire(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
+        super("Fire Staff", Material.STICK, 3, "Solar Blast", 1.5, "Ballz", 69, player_, plugin_, defaultSlot_);
         plugin = plugin_;
         player = player_;
     }

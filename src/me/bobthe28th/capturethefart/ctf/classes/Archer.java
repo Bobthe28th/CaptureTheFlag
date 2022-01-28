@@ -5,26 +5,25 @@ import me.bobthe28th.capturethefart.ctf.CTFClass;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.items.archer.ArcBow;
 import me.bobthe28th.capturethefart.ctf.items.archer.ArcGhostArrow;
-import me.bobthe28th.capturethefart.ctf.itemtypes.CTFBuildUpItem;
+import me.bobthe28th.capturethefart.ctf.items.archer.testarrow;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityShootBowEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataType;
-
-import java.util.Objects;
 
 public class Archer extends CTFClass implements Listener {
 
     String name = "Archer";
+    ArcBow bow;
     ArcGhostArrow ghostArrow;
+    testarrow testarrow;
+    testarrow testarrow2;
 
     public Archer(CTFPlayer player_, Main plugin_) {
         super("Archer",plugin_,player_);
@@ -44,9 +43,15 @@ public class Archer extends CTFClass implements Listener {
     @Override
     public void giveItems() {
         player.removeItems();
-        player.giveItem(new ArcBow(player,plugin),0);
-        ghostArrow = new ArcGhostArrow(player,plugin);
-        player.giveItem(ghostArrow,1);
+
+        bow = new ArcBow(player,plugin,0);
+        ghostArrow = new ArcGhostArrow(bow,player,plugin,1);
+        testarrow = new testarrow(bow,player,plugin,2);
+        testarrow2 = new testarrow(bow,player,plugin,3);
+        player.giveItem(bow);
+        player.giveItem(ghostArrow);
+        player.giveItem(testarrow);
+        player.giveItem(testarrow2);
     }
 
     @EventHandler
@@ -60,14 +65,9 @@ public class Archer extends CTFClass implements Listener {
                 switch (name) {
                     case "Ghost Arrow":
                         ghostArrow.shoot((Arrow) event.getProjectile(),player);
-                        if (!ghostArrow.isOnCooldown()) {
-                            ghostArrow.startCooldown();
-                        }
-
                         break;
-                    case "Glow Arrow":
-                        event.getProjectile().setMetadata("glowArrow", new FixedMetadataValue(plugin, true));
-                        event.getProjectile().setMetadata("playerSent", new FixedMetadataValue(plugin, Objects.requireNonNull(player.getPlayer()).getName()));
+                    case "testarrow":
+                        testarrow.shoot((Arrow) event.getProjectile(),player);
                         break;
                     default:
                         break;

@@ -16,8 +16,8 @@ public abstract class CTFDoubleCooldownItem extends CTFItem {
     String leftActionName;
     String rightActionName;
 
-    public CTFDoubleCooldownItem(String itemName_, Material item_, Integer customModel_, String leftActionName_, double leftCooldown_, String rightActionName_, double rightCooldown_, CTFPlayer player_, Main plugin_) {
-        super(itemName_,item_,customModel_,player_,plugin_);
+    public CTFDoubleCooldownItem(String itemName_, Material item_, Integer customModel_, String leftActionName_, double leftCooldown_, String rightActionName_, double rightCooldown_, CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
+        super(itemName_,item_,customModel_,player_,plugin_,defaultSlot_);
         leftActionName = leftActionName_;
         rightActionName = rightActionName_;
         leftCooldown = leftCooldown_;

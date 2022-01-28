@@ -9,8 +9,8 @@ import org.bukkit.event.block.BlockPlaceEvent;
 
 public class BuiWood extends CTFBuildUpItem {
 
-    public BuiWood(CTFPlayer player_, Main plugin_) {
-        super("Wood", Material.OAK_PLANKS, 7, 16, 0, player_, plugin_);
+    public BuiWood(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
+        super("Wood", Material.OAK_PLANKS, 7, 16, 0, player_, plugin_, defaultSlot_);
         Material tMat = Material.OAK_PLANKS;
         if (player_.getTeam().getColor() == ChatColor.RED) {
             tMat = Material.CRIMSON_PLANKS;

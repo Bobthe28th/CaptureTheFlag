@@ -11,8 +11,8 @@ import org.bukkit.util.Vector;
 
 public class PalSword extends CTFStackCooldownItem {
 
-    public PalSword(CTFPlayer player_, Main plugin_) {
-        super("Paladins Sword", Material.IRON_SWORD, 0, "Fortify", 13.0, Material.WOODEN_SWORD, player_, plugin_);
+    public PalSword(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
+        super("Paladins Sword", Material.IRON_SWORD, 0, "Fortify", 13.0, Material.WOODEN_SWORD, player_, plugin_, defaultSlot_);
     }
 
     @Override

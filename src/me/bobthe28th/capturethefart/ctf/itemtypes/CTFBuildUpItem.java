@@ -17,8 +17,8 @@ public abstract class CTFBuildUpItem extends CTFItem {
     int itemMax;
     boolean onCooldown = false;
 
-    public CTFBuildUpItem(String itemName_, Material item_, double cooldownMax_, int itemMax_, Integer customModel_, CTFPlayer player_, Main plugin_) {
-        super(itemName_, item_, customModel_, player_, plugin_);
+    public CTFBuildUpItem(String itemName_, Material item_, double cooldownMax_, int itemMax_, Integer customModel_, CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
+        super(itemName_, item_, customModel_, player_, plugin_,defaultSlot_);
         cooldownMax = cooldownMax_;
         itemMax = itemMax_;
         amount = itemMax;

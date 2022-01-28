@@ -32,7 +32,7 @@ public class Paladin extends CTFClass implements Listener {
     @Override
     public void giveItems() {
         player.removeItems();
-        player.giveItem(new PalSword(player,plugin),3);
-        player.giveItem(new PalIron(player,plugin),5);
+        player.giveItem(new PalSword(player,plugin,3));
+        player.giveItem(new PalIron(player,plugin,5));
     }
 }

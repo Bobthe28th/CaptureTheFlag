@@ -8,8 +8,8 @@ import org.bukkit.event.block.BlockPlaceEvent;
 
 public class DemTNT extends CTFBuildUpItem {
 
-    public DemTNT(CTFPlayer player_, Main plugin_) {
-        super("TNT", Material.TNT, 10, 3, 0, player_, plugin_);
+    public DemTNT(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
+        super("TNT", Material.TNT, 10, 3, 0, player_, plugin_, defaultSlot_);
     }
 
     @Override

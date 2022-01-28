@@ -8,8 +8,8 @@ import org.bukkit.event.block.BlockPlaceEvent;
 
 public class PalIron extends CTFBuildUpItem {
 
-    public PalIron(CTFPlayer player_, Main plugin_) {
-        super("Paladin Iron", Material.IRON_BLOCK, 3, 16, 0, player_, plugin_);
+    public PalIron(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
+        super("Paladin Iron", Material.IRON_BLOCK, 3, 16, 0, player_, plugin_, defaultSlot_);
     }
 
     @Override
