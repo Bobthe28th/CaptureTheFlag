@@ -48,7 +48,7 @@ public class WizStickWind extends CTFDoubleCooldownItem {
                                 if (Main.CTFPlayers.containsKey(pd)) {
                                     if (pd != p && Main.CTFPlayers.get(pd).getTeam() != player.getTeam()) {
                                         ArrayList<Player> playersChained = new ArrayList<>();
-                                        Main.customDamageCause.put(pd, "wizardZap");
+                                        Main.customDamageCause.put(pd, new Object[]{"wizardZap",p});
                                         pd.damage(1.0, p);
                                         pd.getWorld().playSound(pd.getLocation(), Sound.ENTITY_BEE_DEATH, 1.0F, 2.0F);
                                         playersChained.add(p);
@@ -91,7 +91,7 @@ public class WizStickWind extends CTFDoubleCooldownItem {
                             Player pd = (Player) entity;
                             if (Main.CTFPlayers.containsKey(pd)) {
                                 if (Main.CTFPlayers.get(pd).getTeam() != player.getTeam()) {
-                                    Main.customDamageCause.put(pd, "wizardLightning");
+                                    Main.customDamageCause.put(pd, new Object[]{"wizardLightning",p});
                                     pd.damage(6.0);
                                     break;
                                 }
@@ -129,7 +129,7 @@ public class WizStickWind extends CTFDoubleCooldownItem {
 
             result.getWorld().playSound(result.getLocation(), Sound.ENTITY_BEE_HURT, 1.0F, 2.0F);
 
-            Main.customDamageCause.put(result,"wizardZap");
+            Main.customDamageCause.put(result,new Object[]{"wizardZap",pChained.get(0)});
             result.damage(1.0, pChained.get(0));
 
             Location start = loc.add(new Vector(0.0,1.0,0.0));

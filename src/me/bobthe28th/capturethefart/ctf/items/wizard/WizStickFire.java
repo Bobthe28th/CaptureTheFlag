@@ -50,7 +50,7 @@ public class WizStickFire extends CTFDoubleCooldownItem {
 
                                 if (orthDist < cRad && cDist >= 0 && cDist <= coneHeight) {
                                     pN.setFireTicks(70);
-                                    Main.customDamageCause.put(pN,"wizardShotty");
+                                    Main.customDamageCause.put(pN,new Object[]{"wizardShotty",p});
                                     pN.damage(2,p);
                                 }
 
