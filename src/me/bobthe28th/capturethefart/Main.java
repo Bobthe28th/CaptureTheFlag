@@ -233,10 +233,7 @@ public class Main extends JavaPlugin implements Listener {
                             event.setCancelled(true);
                         }
                     } else {
-//                        player.setLastDamageCause(new EntityDamageByEntityEvent(pS,player,DamageCause.ENTITY_EXPLOSION,event.getFinalDamage()));
                         customDamageCause.put(player,new Object[]{"demoTNT",pS});
-//                        player.damage(event.getFinalDamage(), pS);
-//                        event.setDamage(0.0);
                     }
                 }
             }

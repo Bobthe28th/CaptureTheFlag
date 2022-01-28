@@ -99,7 +99,7 @@ public class CTFPlayer implements Listener {
         }
 
         flag.getTeam().getTeam().addEntry(flagOnHead.getUniqueId().toString());
-        flagOnHead.setGlowing(true);
+        flagOnHead.setGlowing(true); //set to false to make flag not glow
 
         player.addPassenger(flagOnHead);
 
