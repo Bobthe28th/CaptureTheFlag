@@ -4,6 +4,7 @@ import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFBuildUpItem;
 import org.bukkit.Material;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -27,14 +28,16 @@ public class ArcGhostArrow extends CTFBuildUpItem {
             startCooldown();
         }
 
-        arrow.setMetadata("ghostArrow", new FixedMetadataValue(plugin, true));
-        arrow.setMetadata("playerSent", new FixedMetadataValue(plugin, Objects.requireNonNull(player.getPlayer()).getName()));
-        arrow.setMetadata("velocity", new FixedMetadataValue(plugin, arrow.getVelocity()));
-        arrow.setShooter(player.getPlayer());
+        arrow.remove();
 
-        arrow.setGravity(false);
-        arrow.setPierceLevel(100);
-        arrow.setCritical(false);
+//        arrow.setMetadata("ghostArrow", new FixedMetadataValue(plugin, true));
+//        arrow.setMetadata("playerSent", new FixedMetadataValue(plugin, Objects.requireNonNull(player.getPlayer()).getName()));
+//        arrow.setMetadata("velocity", new FixedMetadataValue(plugin, arrow.getVelocity()));
+//        arrow.setShooter(player.getPlayer());
+//
+//        arrow.setGravity(false);
+//        arrow.setPierceLevel(100);
+//        arrow.setCritical(false);
 
 
 //        arrow.setVelocity(arrow.getVelocity().normalize().multiply(2));

@@ -59,6 +59,11 @@ public class Archer extends CTFClass implements Listener {
         if (event.getEntity() instanceof Player p) {
             if (p != player.getPlayer()) return;
         }
+        if (event.getConsumable() != null) {
+            event.getConsumable().setAmount(event.getConsumable().getAmount() - 1);
+            event.setConsumeItem(false);
+        }
+
         if (event.getEntity() instanceof Player && event.getProjectile() instanceof Arrow && event.getConsumable() != null && event.getConsumable().getItemMeta() != null && event.getConsumable().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(plugin,"ctfname"),  PersistentDataType.STRING)) {
             String name = event.getConsumable().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,"ctfname"),  PersistentDataType.STRING);
             if (name != null) {
