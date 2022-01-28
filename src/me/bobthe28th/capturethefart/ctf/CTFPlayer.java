@@ -6,11 +6,8 @@ import java.util.List;
 import java.util.Objects;
 
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFItem;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.NamespacedKey;
-import org.bukkit.entity.Player;
+import org.bukkit.*;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -24,11 +21,13 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.material.MaterialData;
 import org.bukkit.persistence.PersistentDataType;
 
 import me.bobthe28th.capturethefart.Main;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.util.EulerAngle;
 
 public class CTFPlayer implements Listener {
 
@@ -39,6 +38,7 @@ public class CTFPlayer implements Listener {
     int cooldownTask;
 	CTFClass pClass;
     CTFFlag carriedFlag = null;
+    ArmorStand flagOnHead = null;
 
     public CTFPlayer(Main plugin_, Player p) {
         player = p;
@@ -48,6 +48,10 @@ public class CTFPlayer implements Listener {
         player.setLevel(0);
         player.setExp(0.0F);
         player.setGlowing(false);
+        for (Entity e : player.getPassengers()) {
+            player.removePassenger(e);
+            e.remove();
+        }
 
         cooldownTask = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
             int slot = player.getInventory().getHeldItemSlot();
@@ -85,6 +89,20 @@ public class CTFPlayer implements Listener {
     public void pickupFlag(CTFFlag flag) {
         player.setGlowing(true);
         carriedFlag = flag;
+        flagOnHead = player.getWorld().spawn(player.getLocation(), ArmorStand.class);
+        flagOnHead.setInvisible(true);
+        flagOnHead.setInvulnerable(true);
+        flagOnHead.setMarker(true);
+        flagOnHead.setSmall(true);
+        if (flagOnHead.getEquipment() != null) {
+            flagOnHead.getEquipment().setHelmet(new ItemStack(flag.getTeam().getBanner()));
+        }
+
+        flag.getTeam().getTeam().addEntry(flagOnHead.getUniqueId().toString());
+        flagOnHead.setGlowing(true);
+
+        player.addPassenger(flagOnHead);
+
     }
 
     public boolean isCarringFlag() {
@@ -95,12 +113,14 @@ public class CTFPlayer implements Listener {
         carriedFlag.capture(this);
         player.setGlowing(false);
         carriedFlag = null;
+        flagOnHead.remove();
     }
 
     public void dropFlag() {
         player.setGlowing(false);
         carriedFlag.fall(player.getLocation());
         carriedFlag = null;
+        flagOnHead.remove();
     }
 
     public void death(boolean byEntity) {
