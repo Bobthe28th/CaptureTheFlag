@@ -1,0 +1,13 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "meme/trollface"
+  },
+  "display": {
+    "head": {
+      "rotation": [ 0, 0, 0 ],
+      "translation": [ 0, 0, -6 ],
+      "scale": [ 1.2, 1.2, 1.0 ]
+    }
+  }
+}

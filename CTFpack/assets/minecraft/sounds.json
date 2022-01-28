@@ -1,0 +1,7 @@
+{
+
+  "boom": {
+    "category": "master",
+    "sounds": [ "custom/boom" ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "item/totem_of_undying"
+  },
+  "overrides": [
+    {
+      "predicate": { "custom_model_data": 1 },
+      "model": "meme/heheheha"
+    },
+    {
+      "predicate": { "custom_model_data": 2 },
+      "model": "meme/trollface"
+    }
+  ]
+}
