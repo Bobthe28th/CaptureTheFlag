@@ -1,0 +1,11 @@
+{
+  "providers": [
+    {
+      "file": "font/liam.png",
+      "chars": [ "\ue238" ],
+      "height": 250,
+      "ascent": 5,
+      "type": "bitmap"
+    }
+  ]
+}
