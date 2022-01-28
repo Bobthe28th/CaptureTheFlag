@@ -1,0 +1,13 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "demolitionist/bazooka_loading_2"
+  },
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [ -105, -90, -60 ],
+      "translation": [ 1, 0.1, -3 ],
+      "scale": [ 0.9, 0.9, 0.9 ]
+    }
+  }
+}
