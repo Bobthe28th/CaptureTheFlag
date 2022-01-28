@@ -17,8 +17,8 @@ import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 
 public class WizStickWind extends CTFDoubleCooldownItem {
 
-    public WizStickWind(CTFPlayer player_, Main plugin_) {
-        super("Lightning Staff",Material.STICK,1,"Zap",0.5,"Lightning Strike",20,player_,plugin_);
+    public WizStickWind(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
+        super("Lightning Staff",Material.STICK,1,"Zap",0.5,"Lightning Strike",20,player_,plugin_, defaultSlot_);
     }
 
     @Override

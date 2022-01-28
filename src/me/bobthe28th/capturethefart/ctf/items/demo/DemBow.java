@@ -7,7 +7,7 @@ import me.bobthe28th.capturethefart.ctf.itemtypes.CTFOtherItem;
 import org.bukkit.Material;
 
 public class DemBow extends CTFOtherItem {
-    public DemBow(CTFItem otherItem_, CTFPlayer player_, Main plugin_) {
-        super("Bazooka", Material.CROSSBOW, otherItem_, 1, player_, plugin_);
+    public DemBow(CTFItem otherItem_, CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
+        super("Bazooka", Material.CROSSBOW, otherItem_, 1, player_, plugin_, defaultSlot_);
     }
 }

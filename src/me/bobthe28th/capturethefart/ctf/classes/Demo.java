@@ -45,10 +45,10 @@ public class Demo extends CTFClass implements Listener {
     @Override
     public void giveItems() {
         player.removeItems();
-        player.giveItem(new DemTNT(player,plugin),3);
-        arrow = new DemArrow(player,plugin);
-        player.giveItem(arrow,5);
-        player.giveItem(new DemBow(arrow,player,plugin),4);
+        player.giveItem(new DemTNT(player,plugin,3));
+        arrow = new DemArrow(player,plugin,5);
+        player.giveItem(arrow);
+        player.giveItem(new DemBow(arrow,player,plugin,4));
     }
 
     @EventHandler

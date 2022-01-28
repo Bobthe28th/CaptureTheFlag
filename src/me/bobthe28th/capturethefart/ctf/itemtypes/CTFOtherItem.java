@@ -8,8 +8,8 @@ public class CTFOtherItem extends CTFItem {
 
     CTFItem otherCooldown;
 
-    public CTFOtherItem(String itemName_, Material item_, CTFItem otherCooldown_, Integer customModel_, CTFPlayer player_, Main plugin_) {
-        super(itemName_, item_, customModel_, player_, plugin_);
+    public CTFOtherItem(String itemName_, Material item_, CTFItem otherCooldown_, Integer customModel_, CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
+        super(itemName_, item_, customModel_, player_, plugin_,defaultSlot_);
         otherCooldown=otherCooldown_;
     }
 

@@ -12,12 +12,12 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Objects;
 
-public class ArcGhostArrow extends CTFBuildUpItem {
+public class testarrow extends CTFBuildUpItem {
 
     ArcBow bow;
 
-    public ArcGhostArrow(ArcBow bow_, CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("Ghost Arrow", Material.ARROW, 3, 12, 0, player_, plugin_, defaultSlot_);
+    public testarrow(ArcBow bow_, CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
+        super("testarrow", Material.ARROW, 3, 12, 1, player_, plugin_, defaultSlot_);
         bow = bow_;
     }
 
@@ -27,17 +27,9 @@ public class ArcGhostArrow extends CTFBuildUpItem {
             startCooldown();
         }
 
-        arrow.setMetadata("ghostArrow", new FixedMetadataValue(plugin, true));
+        arrow.setMetadata("testarrow", new FixedMetadataValue(plugin, true));
         arrow.setMetadata("playerSent", new FixedMetadataValue(plugin, Objects.requireNonNull(player.getPlayer()).getName()));
-        arrow.setMetadata("velocity", new FixedMetadataValue(plugin, arrow.getVelocity()));
         arrow.setShooter(player.getPlayer());
-
-        arrow.setGravity(false);
-        arrow.setPierceLevel(100);
-        arrow.setCritical(false);
-
-
-//        arrow.setVelocity(arrow.getVelocity().normalize().multiply(2));
     }
 
     @Override

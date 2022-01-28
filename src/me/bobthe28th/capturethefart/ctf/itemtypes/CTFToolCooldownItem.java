@@ -16,8 +16,8 @@ public abstract class CTFToolCooldownItem extends CTFItem {
     double cooldownMax;
     String cooldownName;
 
-    public CTFToolCooldownItem(String itemName_, Material item_, Integer customModel_, String cooldownName_, double cooldownMax_, CTFPlayer player_, Main plugin_) {
-        super(itemName_,item_,customModel_,player_,plugin_);
+    public CTFToolCooldownItem(String itemName_, Material item_, Integer customModel_, String cooldownName_, double cooldownMax_, CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
+        super(itemName_,item_,customModel_,player_,plugin_,defaultSlot_);
         cooldownName = cooldownName_;
         cooldownMax = cooldownMax_;
     }

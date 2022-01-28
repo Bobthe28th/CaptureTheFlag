@@ -19,8 +19,8 @@ import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 
 public class WizBookWind extends CTFDoubleCooldownItem {
 
-    public WizBookWind(CTFPlayer player_, Main plugin_) {
-        super("Wind Tome",Material.BOOK,1,"Wind Blast",15,"Wind Jump",15,player_,plugin_);
+    public WizBookWind(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
+        super("Wind Tome",Material.BOOK,1,"Wind Blast",15,"Wind Jump",15,player_,plugin_, defaultSlot_);
         plugin = plugin_;
         player = player_;
     }

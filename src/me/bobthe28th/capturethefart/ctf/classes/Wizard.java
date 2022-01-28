@@ -28,12 +28,12 @@ public class Wizard extends CTFClass implements Listener {
     @Override
     public void giveItems() {
         player.removeItems();
-        player.giveItem(new WizBookWind(player,plugin),1);
-        player.giveItem(new WizStickWind(player,plugin),0);
-        player.giveItem(new WizBookIce(player,plugin),8);
-        player.giveItem(new WizStickIce(player,plugin),7);
-        player.giveItem(new WizStickFire(player,plugin),3);
-        player.giveItem(new WizBookFire(player,plugin),5);
+        player.giveItem(new WizBookWind(player,plugin,1));
+        player.giveItem(new WizStickWind(player,plugin,0));
+        player.giveItem(new WizBookIce(player,plugin,8));
+        player.giveItem(new WizStickIce(player,plugin,7));
+        player.giveItem(new WizStickFire(player,plugin,3));
+        player.giveItem(new WizBookFire(player,plugin,5));
     }
 
     @Override
