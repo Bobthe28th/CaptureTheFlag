@@ -71,7 +71,7 @@ public class Wizard extends CTFClass implements Listener {
                 public void run() {
                     if (p != null) {
                         if (!((Entity) p).isOnGround()) {
-                            p.addPotionEffect((new PotionEffect(PotionEffectType.SLOW_FALLING, Integer.MAX_VALUE, 1, true, false, true)));
+                            p.addPotionEffect((new PotionEffect(PotionEffectType.SLOW_FALLING, Integer.MAX_VALUE, 0, true, false, true)));
                             Location l = p.getLocation();
                             for (int i = 0; i < particleAmount; i++) {
                                 double x = radius * Math.sin((angle + i * (360.0 / particleAmount)) * (Math.PI / 180));

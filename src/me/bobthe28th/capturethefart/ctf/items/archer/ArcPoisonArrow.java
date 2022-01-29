@@ -6,6 +6,7 @@ import me.bobthe28th.capturethefart.ctf.itemtypes.CTFBuildUpItem;
 import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
@@ -23,6 +24,7 @@ public class ArcPoisonArrow extends CTFBuildUpItem {
         if (!isOnCooldown()) {
             startCooldown();
         }
+        arrow.setMetadata("dontKillOnLand", new FixedMetadataValue(plugin, true));
     }
 
     @Override

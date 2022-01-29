@@ -24,6 +24,8 @@ import org.bukkit.persistence.PersistentDataType;
 import me.bobthe28th.capturethefart.Main;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.EulerAngle;
 
 public class CTFPlayer implements Listener {
@@ -104,7 +106,7 @@ public class CTFPlayer implements Listener {
     }
 
     public void addGlow(String reason) {
-        player.setGlowing(true);
+        player.addPotionEffect((new PotionEffect(PotionEffectType.GLOWING, Integer.MAX_VALUE, 0, true, false, true)));
         if (!glowReason.contains(reason)) {
             glowReason.add(reason);
         }
@@ -113,7 +115,7 @@ public class CTFPlayer implements Listener {
     public void removeGlow(String reason) {
         glowReason.remove(reason);
         if (glowReason.isEmpty()) {
-            player.setGlowing(false);
+            player.removePotionEffect(PotionEffectType.GLOWING);
         }
     }
 
