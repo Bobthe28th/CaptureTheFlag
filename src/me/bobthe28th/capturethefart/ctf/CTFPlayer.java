@@ -36,6 +36,7 @@ public class CTFPlayer implements Listener {
 	CTFClass pClass;
     CTFFlag carriedFlag = null;
     ArmorStand flagOnHead = null;
+    ArrayList<String> glowReason = new ArrayList<>();
 
     public CTFPlayer(Main plugin_, Player p) {
         player = p;
@@ -84,7 +85,7 @@ public class CTFPlayer implements Listener {
     }
 
     public void pickupFlag(CTFFlag flag) {
-        player.setGlowing(true);
+        addGlow("flag");
         carriedFlag = flag;
         flagOnHead = player.getWorld().spawn(player.getLocation(), ArmorStand.class);
         flagOnHead.setInvisible(true);
@@ -102,19 +103,33 @@ public class CTFPlayer implements Listener {
 
     }
 
+    public void addGlow(String reason) {
+        player.setGlowing(true);
+        if (!glowReason.contains(reason)) {
+            glowReason.add(reason);
+        }
+    }
+
+    public void removeGlow(String reason) {
+        glowReason.remove(reason);
+        if (glowReason.isEmpty()) {
+            player.setGlowing(false);
+        }
+    }
+
     public boolean isCarringFlag() {
         return carriedFlag != null;
     }
 
     public void captureFlag() {
         carriedFlag.capture(this);
-        player.setGlowing(false);
+        removeGlow("flag");
         carriedFlag = null;
         flagOnHead.remove();
     }
 
     public void dropFlag() {
-        player.setGlowing(false);
+        removeGlow("flag");
         carriedFlag.fall(player.getLocation());
         carriedFlag = null;
         flagOnHead.remove();

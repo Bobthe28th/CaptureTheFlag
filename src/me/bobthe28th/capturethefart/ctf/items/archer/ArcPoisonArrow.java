@@ -4,6 +4,7 @@ import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFBuildUpItem;
 import org.bukkit.Material;
+import org.bukkit.entity.Arrow;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
@@ -16,6 +17,12 @@ public class ArcPoisonArrow extends CTFBuildUpItem {
         super("Poison Arrow", Material.TIPPED_ARROW, 3, 12, 0, player_, plugin_, defaultSlot_);
         setPotionEffect(new PotionData(PotionType.POISON));
         bow = bow_;
+    }
+
+    public void shoot(Arrow arrow, CTFPlayer player) {
+        if (!isOnCooldown()) {
+            startCooldown();
+        }
     }
 
     @Override

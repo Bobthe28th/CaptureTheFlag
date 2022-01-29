@@ -3,10 +3,7 @@ package me.bobthe28th.capturethefart.ctf.classes;
 import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFClass;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
-import me.bobthe28th.capturethefart.ctf.items.archer.ArcBow;
-import me.bobthe28th.capturethefart.ctf.items.archer.ArcGhostArrow;
-import me.bobthe28th.capturethefart.ctf.items.archer.ArcPoisonArrow;
-import me.bobthe28th.capturethefart.ctf.items.archer.testarrow;
+import me.bobthe28th.capturethefart.ctf.items.archer.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
@@ -24,7 +21,7 @@ public class Archer extends CTFClass implements Listener {
     ArcBow bow;
     ArcGhostArrow ghostArrow;
     ArcPoisonArrow poisonArrow;
-    testarrow testarrow;
+    ArcSonicArrow sonicArrow;
 
     public Archer(CTFPlayer player_, Main plugin_) {
         super("Archer",plugin_,player_);
@@ -48,11 +45,11 @@ public class Archer extends CTFClass implements Listener {
         bow = new ArcBow(player,plugin,0);
         ghostArrow = new ArcGhostArrow(bow,player,plugin,1);
         poisonArrow = new ArcPoisonArrow(bow,player,plugin,2);
-        testarrow = new testarrow(bow,player,plugin,3);
+        sonicArrow = new ArcSonicArrow(bow,player,plugin,3);
         player.giveItem(bow);
         player.giveItem(ghostArrow);
         player.giveItem(poisonArrow);
-        player.giveItem(testarrow);
+        player.giveItem(sonicArrow);
     }
 
     @EventHandler
@@ -72,8 +69,11 @@ public class Archer extends CTFClass implements Listener {
                     case "Ghost Arrow":
                         ghostArrow.shoot((Arrow) event.getProjectile(),player);
                         break;
-                    case "testarrow":
-                        testarrow.shoot((Arrow) event.getProjectile(),player);
+                    case "Poison Arrow":
+                        poisonArrow.shoot((Arrow) event.getProjectile(),player);
+                        break;
+                    case "Sonic Arrow":
+                        sonicArrow.shoot((Arrow) event.getProjectile(),player);
                         break;
                     default:
                         break;
