@@ -5,6 +5,7 @@ import me.bobthe28th.capturethefart.ctf.CTFClass;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.items.archer.ArcBow;
 import me.bobthe28th.capturethefart.ctf.items.archer.ArcGhostArrow;
+import me.bobthe28th.capturethefart.ctf.items.archer.ArcPoisonArrow;
 import me.bobthe28th.capturethefart.ctf.items.archer.testarrow;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -22,8 +23,8 @@ public class Archer extends CTFClass implements Listener {
     String name = "Archer";
     ArcBow bow;
     ArcGhostArrow ghostArrow;
+    ArcPoisonArrow poisonArrow;
     testarrow testarrow;
-    testarrow testarrow2;
 
     public Archer(CTFPlayer player_, Main plugin_) {
         super("Archer",plugin_,player_);
@@ -46,12 +47,12 @@ public class Archer extends CTFClass implements Listener {
 
         bow = new ArcBow(player,plugin,0);
         ghostArrow = new ArcGhostArrow(bow,player,plugin,1);
-        testarrow = new testarrow(bow,player,plugin,2);
-        testarrow2 = new testarrow(bow,player,plugin,3);
+        poisonArrow = new ArcPoisonArrow(bow,player,plugin,2);
+        testarrow = new testarrow(bow,player,plugin,3);
         player.giveItem(bow);
         player.giveItem(ghostArrow);
+        player.giveItem(poisonArrow);
         player.giveItem(testarrow);
-        player.giveItem(testarrow2);
     }
 
     @EventHandler
