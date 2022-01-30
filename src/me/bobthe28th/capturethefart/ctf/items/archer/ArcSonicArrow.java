@@ -57,7 +57,9 @@ public class ArcSonicArrow extends CTFBuildUpItem {
                                 @Override
                                 public void run() {
                                     if (Main.CTFPlayers.containsKey(pg)) {
-                                        Main.CTFPlayers.get(pg).removeGlow("sonic");
+                                        if (Main.CTFPlayers.get(pg).getTeam() != player.getTeam()) {
+                                            Main.CTFPlayers.get(pg).removeGlow("sonic");
+                                        }
                                     }
                                     if (!arrow.isDead()) {
                                         arrow.remove();
