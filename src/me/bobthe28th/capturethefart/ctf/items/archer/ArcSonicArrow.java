@@ -45,21 +45,26 @@ public class ArcSonicArrow extends CTFBuildUpItem {
     }
 
     public void land(Location loc, Arrow arrow) {
+
+        for(Player p : Bukkit.getOnlinePlayers()){
+            p.spawnParticle(Particle.GLOW_SQUID_INK,loc,1,0.0,0.0,0.0,0.0);
+        }
+
         double radius = 5.0;
         if (loc.getWorld() != null) {
             for (Entity e : loc.getWorld().getNearbyEntities(loc, radius, radius, radius)) {
                 if (e instanceof Player p) {
                     if (p.getLocation().distance(loc) <= radius) {
                         if (Main.CTFPlayers.containsKey(p)) {
-                            Main.CTFPlayers.get(p).addGlow("sonic");
+                            if (Main.CTFPlayers.get(p).getTeam() != player.getTeam()) {
+                                Main.CTFPlayers.get(p).addGlow("sonic");
+                            }
                             Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                                 final Player pg = p;
                                 @Override
                                 public void run() {
                                     if (Main.CTFPlayers.containsKey(pg)) {
-                                        if (Main.CTFPlayers.get(pg).getTeam() != player.getTeam()) {
-                                            Main.CTFPlayers.get(pg).removeGlow("sonic");
-                                        }
+                                        Main.CTFPlayers.get(pg).removeGlow("sonic");
                                     }
                                     if (!arrow.isDead()) {
                                         arrow.remove();

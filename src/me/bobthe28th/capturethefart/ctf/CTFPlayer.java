@@ -47,6 +47,7 @@ public class CTFPlayer implements Listener {
 
         player.setLevel(0);
         player.setExp(0.0F);
+        player.removePotionEffect(PotionEffectType.GLOWING);
         player.setGlowing(false);
         for (Entity e : player.getPassengers()) {
             player.removePassenger(e);

@@ -42,10 +42,10 @@ public class Archer extends CTFClass implements Listener {
     public void giveItems() {
         player.removeItems();
 
-        bow = new ArcBow(player,plugin,0);
-        ghostArrow = new ArcGhostArrow(bow,player,plugin,1);
-        poisonArrow = new ArcPoisonArrow(bow,player,plugin,2);
-        sonicArrow = new ArcSonicArrow(bow,player,plugin,3);
+        bow = new ArcBow(player,plugin,4);
+        ghostArrow = new ArcGhostArrow(bow,player,plugin,0);
+        poisonArrow = new ArcPoisonArrow(bow,player,plugin,1);
+        sonicArrow = new ArcSonicArrow(bow,player,plugin,2);
         player.giveItem(bow);
         player.giveItem(ghostArrow);
         player.giveItem(poisonArrow);
