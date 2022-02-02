@@ -4,18 +4,13 @@ import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFBuildUpItem;
 import org.bukkit.*;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import java.util.Objects;
 
 public class ArcGhostArrow extends CTFBuildUpItem {
 
@@ -26,7 +21,7 @@ public class ArcGhostArrow extends CTFBuildUpItem {
         bow = bow_;
     }
 
-    public void shoot(Arrow arrow) {
+    public void shoot(Arrow arrow, Float force) {
 
         if (!isOnCooldown()) {
             startCooldown();
@@ -36,7 +31,7 @@ public class ArcGhostArrow extends CTFBuildUpItem {
 
         new BukkitRunnable() {
             final Location loc = arrow.getLocation();
-            final Vector dir = player.getPlayer().getEyeLocation().getDirection().normalize().multiply(0.5);
+            final Vector dir = player.getPlayer().getEyeLocation().getDirection().normalize().multiply(force);
             int t = 0;
             public void run() {
                 if (t >= 200) {
@@ -89,11 +84,4 @@ public class ArcGhostArrow extends CTFBuildUpItem {
             player.getPlayer().getInventory().setHeldItemSlot(player.getItemSlot(bow));
         }
     }
-
-//    @Override
-//    public void onHold(PlayerItemHeldEvent event) {
-//        setSlot(40);
-//        player.getPlayer().getInventory().setHeldItemSlot(player.getItemSlot(bow));
-//    }
-
 }

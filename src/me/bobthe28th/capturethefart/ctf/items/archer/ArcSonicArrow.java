@@ -12,10 +12,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class ArcSonicArrow extends CTFBuildUpItem {
@@ -36,7 +33,7 @@ public class ArcSonicArrow extends CTFBuildUpItem {
         new BukkitRunnable() {
             public void run() {
                 if (arrow.isDead() || arrow.isOnGround()) {
-                    if (arrow.isOnGround()) {
+                    if (arrow.isOnGround() || arrow.isDead()) {
                         land(arrow.getLocation(), arrow);
                     }
                     this.cancel();
@@ -55,21 +52,21 @@ public class ArcSonicArrow extends CTFBuildUpItem {
         }
 
         double radius = 5.0;
-        long time = 20L;
+        long time = 80L;
         if (loc.getWorld() != null) {
             for (Entity e : loc.getWorld().getNearbyEntities(loc, radius, radius, radius)) {
                 if (e instanceof Player p) {
                     if (p.getLocation().distance(loc) <= radius) {
                         if (Main.CTFPlayers.containsKey(p)) {
                             if (Main.CTFPlayers.get(p).getTeam() != player.getTeam()) {
-                                Main.CTFPlayers.get(p).addGlow("sonic");
+                                Main.CTFPlayers.get(p).addGlow("sonic" + arrow.getUniqueId());
                             }
                             Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                                 final Player pg = p;
                                 @Override
                                 public void run() {
                                     if (Main.CTFPlayers.containsKey(pg)) {
-                                        Main.CTFPlayers.get(pg).removeGlow("sonic");
+                                        Main.CTFPlayers.get(pg).removeGlow("sonic" + arrow.getUniqueId());
                                     }
                                 }
                             }, time);
@@ -89,10 +86,4 @@ public class ArcSonicArrow extends CTFBuildUpItem {
             player.getPlayer().getInventory().setHeldItemSlot(player.getItemSlot(bow));
         }
     }
-
-//    @Override
-//    public void onHold(PlayerItemHeldEvent event) {
-//        setSlot(40);
-//        player.getPlayer().getInventory().setHeldItemSlot(player.getItemSlot(bow));
-//    }
 }

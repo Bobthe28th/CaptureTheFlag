@@ -7,7 +7,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
 
 public class ArcArrow extends CTFBuildUpItem {
 
@@ -32,10 +31,4 @@ public class ArcArrow extends CTFBuildUpItem {
             player.getPlayer().getInventory().setHeldItemSlot(player.getItemSlot(bow));
         }
     }
-
-//    @Override
-//    public void onHold(PlayerItemHeldEvent event) {
-//        setSlot(40);
-//        player.getPlayer().getInventory().setHeldItemSlot(player.getItemSlot(bow));
-//    }
 }
