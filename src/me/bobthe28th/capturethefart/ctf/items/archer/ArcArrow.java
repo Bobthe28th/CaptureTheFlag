@@ -8,17 +8,13 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionType;
 
-public class ArcPoisonArrow extends CTFBuildUpItem {
+public class ArcArrow extends CTFBuildUpItem {
 
     ArcBow bow;
 
-    public ArcPoisonArrow(ArcBow bow_, CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("Poison Arrow", Material.TIPPED_ARROW, 5, 4, 0, player_, plugin_, defaultSlot_);
-        setPotionEffect(new PotionData(PotionType.POISON));
+    public ArcArrow(ArcBow bow_, CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
+        super("Arrow", Material.ARROW, 2, 16, 0, player_, plugin_, defaultSlot_);
         bow = bow_;
     }
 

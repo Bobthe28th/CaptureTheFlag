@@ -10,7 +10,10 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -20,14 +23,15 @@ public class ArcSonicArrow extends CTFBuildUpItem {
     ArcBow bow;
 
     public ArcSonicArrow(ArcBow bow_, CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("Sonic Arrow", Material.ARROW, 3, 12, 0, player_, plugin_, defaultSlot_);
+        super("Sonic Arrow", Material.ARROW, 5, 2, 0, player_, plugin_, defaultSlot_);
         bow = bow_;
     }
 
-    public void shoot(Arrow arrow, CTFPlayer player) {
+    public void shoot(Arrow arrow) {
         if (!isOnCooldown()) {
             startCooldown();
         }
+        arrow.setMetadata("dontKillOnLand", new FixedMetadataValue(plugin, true));
         arrow.setCritical(false);
         new BukkitRunnable() {
             public void run() {
@@ -51,6 +55,7 @@ public class ArcSonicArrow extends CTFBuildUpItem {
         }
 
         double radius = 5.0;
+        long time = 20L;
         if (loc.getWorld() != null) {
             for (Entity e : loc.getWorld().getNearbyEntities(loc, radius, radius, radius)) {
                 if (e instanceof Player p) {
@@ -66,21 +71,28 @@ public class ArcSonicArrow extends CTFBuildUpItem {
                                     if (Main.CTFPlayers.containsKey(pg)) {
                                         Main.CTFPlayers.get(pg).removeGlow("sonic");
                                     }
-                                    if (!arrow.isDead()) {
-                                        arrow.remove();
-                                    }
                                 }
-                            }, 20L);
+                            }, time);
                         }
                     }
                 }
             }
+            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, arrow::remove, time);
         }
     }
 
     @Override
-    public void onHold(PlayerItemHeldEvent event) {
-        setSlot(40);
-        player.getPlayer().getInventory().setHeldItemSlot(player.getItemSlot(bow));
+    public void onclickAction(PlayerInteractEvent event) {
+        Action action = event.getAction();
+        if (action == Action.RIGHT_CLICK_BLOCK || action == Action.RIGHT_CLICK_AIR) {
+            setSlot(40);
+            player.getPlayer().getInventory().setHeldItemSlot(player.getItemSlot(bow));
+        }
     }
+
+//    @Override
+//    public void onHold(PlayerItemHeldEvent event) {
+//        setSlot(40);
+//        player.getPlayer().getInventory().setHeldItemSlot(player.getItemSlot(bow));
+//    }
 }

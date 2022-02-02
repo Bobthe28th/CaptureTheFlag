@@ -198,7 +198,8 @@ public class Main extends JavaPlugin implements Listener {
                 p.remove();
             }
         }
-        if (p instanceof Arrow && p.hasMetadata("dontKillOnLand")) {
+
+        if (p instanceof Arrow && !p.hasMetadata("dontKillOnLand")) {
             p.remove();
         }
     }
