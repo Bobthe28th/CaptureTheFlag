@@ -32,7 +32,7 @@ public class Demo extends CTFClass implements Listener {
         super("Demolitionist",plugin_,player_);
         Bukkit.getPluginManager().registerEvents(this, plugin);
         setArmor(new Material[]{Material.LEATHER_HELMET,Material.LEATHER_LEGGINGS,Material.IRON_BOOTS});
-        setEnchantments(new Enchantment[][]{null, null, new Enchantment[]{Enchantment.PROTECTION_FALL}}, new Integer[][]{null, null, new Integer[]{1}});
+        setEnchantments(new Enchantment[][]{null, null, new Enchantment[]{Enchantment.PROTECTION_FALL}}, new Integer[][]{null, null, new Integer[]{4}});
     }
 
     @Override
