@@ -3,10 +3,10 @@ package me.bobthe28th.capturethefart.ctf;
 import me.bobthe28th.capturethefart.Main;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 public abstract class CTFClass {
@@ -15,6 +15,8 @@ public abstract class CTFClass {
     public Main plugin;
     public CTFPlayer player;
     Material[] armor = null;
+    Enchantment[][] enchantments = null;
+    Integer[][] enchantmentLevels = null;
     Integer helmetModel = null;
 
     public CTFClass(String className_, Main plugin_, CTFPlayer player_) {
@@ -33,6 +35,11 @@ public abstract class CTFClass {
         armor = armor_;
     }
 
+    public void setEnchantments(Enchantment[][] enchantments_, Integer[][] enchantmentLevels_) {
+        enchantments = enchantments_;
+        enchantmentLevels = enchantmentLevels_;
+    }
+
     public void setHelmetCustomModel(int id) {
         helmetModel = id;
     }
@@ -47,6 +54,15 @@ public abstract class CTFClass {
                     if (meta != null) {
                         if (i == 0) {
                             meta.setCustomModelData(helmetModel);
+                        }
+                        if (enchantments != null && enchantmentLevels != null) {
+                            if (enchantments[i] != null && enchantmentLevels[i] != null) {
+                                for (int j = 0; j < enchantments[i].length; j++) {
+                                    if (enchantments[i][j] != null && enchantmentLevels[i][j] != null) {
+                                        meta.addEnchant(enchantments[i][j],enchantmentLevels[i][j], true);
+                                    }
+                                }
+                            }
                         }
                         meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE, (byte) 1);
                         armorItem[i].setItemMeta(meta);
