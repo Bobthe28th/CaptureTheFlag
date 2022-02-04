@@ -23,7 +23,8 @@ public class Wizard extends CTFClass implements Listener {
     public Wizard(CTFPlayer player_, Main plugin_) {
         super("Wizard",plugin_,player_);
         Bukkit.getPluginManager().registerEvents(this, plugin);
-        setArmor(new Material[]{Material.LEATHER_HELMET,null,null});
+        setArmor(new Material[]{Material.LEATHER,null,null});
+        setHelmetCustomModel(1);
     }
 
     @Override
