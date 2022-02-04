@@ -14,7 +14,7 @@ public class PalIron extends CTFBuildUpItem {
 
     @Override
     public void onblockPlace(BlockPlaceEvent event) {
-        Main.breakableBlocks.add(event.getBlock());
+        Main.breakableBlocks.put(event.getBlock(),player.getTeam());
         if (!isOnCooldown()) {
             startCooldown();
         }

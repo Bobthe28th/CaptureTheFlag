@@ -3,6 +3,7 @@ package me.bobthe28th.capturethefart.ctf;
 import me.bobthe28th.capturethefart.Main;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -30,6 +31,8 @@ public abstract class CTFClass {
     public abstract String getFormattedName();
 
     public abstract void giveItems();
+
+    public void breakBlock(Block b) {}
 
     public void setArmor(Material[] armor_) {
         armor = armor_;

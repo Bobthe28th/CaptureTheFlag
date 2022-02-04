@@ -33,7 +33,7 @@ public class Main extends JavaPlugin implements Listener {
     public static HashMap<Snowball, Integer> snowBallEffect = new HashMap<>();
     public static ArrayList<Player> disableFall = new ArrayList<>();
     public static HashMap<Player,Object[]> customDamageCause = new HashMap<>();
-    public static ArrayList<Block> breakableBlocks = new ArrayList<>();
+    public static HashMap<Block,CTFTeam> breakableBlocks = new HashMap<>();
 
     public static CTFTeam[] CTFTeams;
     public static CTFFlag[] CTFFlags;

@@ -40,6 +40,15 @@ public abstract class CTFBuildUpItem extends CTFItem {
         return onCooldown;
     }
 
+    public void add(Integer add) {
+        int currentA = player.getItemStack(this).getAmount();
+        add = Math.min(add, itemMax - currentA);
+        player.getItemStack(this).setAmount(currentA + add);
+        if (player.getItemStack(this).getAmount() >= itemMax) {
+            onCooldown = false;
+        }
+    }
+
     public void startCooldown() {
         CTFBuildUpItem t = this;
         onCooldown = true;
@@ -47,7 +56,7 @@ public abstract class CTFBuildUpItem extends CTFItem {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (player.getItemSlot(t) != -1) {
+                if (player.getItemSlot(t) != -1 && onCooldown) {
                     cooldown -= 0.1;
                     cooldown = Math.round(cooldown * 10.0) / 10.0;
 
@@ -60,7 +69,6 @@ public abstract class CTFBuildUpItem extends CTFItem {
                             it.setAmount(1);
                             player.getPlayer().getInventory().setItem(player.getItemSlot(t), it);
                         }
-
                         onCooldown = false;
                         if (player.getItemStack(t).getAmount() < itemMax) {
                             startCooldown();
@@ -68,6 +76,7 @@ public abstract class CTFBuildUpItem extends CTFItem {
                         this.cancel();
                     }
                 } else {
+                    cooldown = 0;
                     this.cancel();
                 }
             }
