@@ -58,6 +58,8 @@ public abstract class CTFItem {
         item = nItem;
     }
 
+    public Material getMat() { return item; }
+
     public ItemStack getItem() {
         ItemStack it = new ItemStack(item,amount);
         ItemMeta meta = it.getItemMeta();
