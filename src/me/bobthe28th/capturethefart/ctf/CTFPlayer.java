@@ -16,9 +16,10 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.material.MaterialData;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import me.bobthe28th.capturethefart.Main;
@@ -26,7 +27,6 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.EulerAngle;
 
 public class CTFPlayer implements Listener {
 
@@ -68,6 +68,7 @@ public class CTFPlayer implements Listener {
     public void setTeam(CTFTeam t) {
         team = t;
         t.getTeam().addEntry(player.getName());
+        giveArmor();
     }
 
     public void leaveTeam() {
@@ -155,6 +156,22 @@ public class CTFPlayer implements Listener {
         Main.CTFPlayers.remove(player);
     }
 
+    public void giveArmor() {
+        if (team != null) {
+            ItemStack chestPlate = new ItemStack(Material.LEATHER_CHESTPLATE);
+            LeatherArmorMeta lam = (LeatherArmorMeta) chestPlate.getItemMeta();
+            if (lam != null) {
+                lam.setColor(team.getColor());
+                lam.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE, (byte) 1);
+                chestPlate.setItemMeta(lam);
+            }
+            player.getInventory().setItem(EquipmentSlot.CHEST, chestPlate);
+            if (pClass != null) {
+                pClass.giveArmor();
+            }
+        }
+    }
+
     public void removeItems() {
         for (int i = 0; i <= 35; i ++) {
             ItemStack invItem = player.getInventory().getItem(i);
@@ -185,6 +202,20 @@ public class CTFPlayer implements Listener {
                 }
             }
         }
+        //armor
+        if (player.getEquipment() != null) {
+            for (ItemStack eq : player.getEquipment().getArmorContents()) {
+                if (eq != null) {
+                    ItemMeta meta = eq.getItemMeta();
+                    if (meta != null) {
+                        Byte ctfitemData = meta.getPersistentDataContainer().get(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE);
+                        if (ctfitemData != null && ctfitemData == (byte) 1) {
+                            eq.setAmount(0);
+                        }
+                    }
+                }
+            }
+        }
 
         player.updateInventory();
     }
@@ -197,9 +228,10 @@ public class CTFPlayer implements Listener {
 		if (pClass != null) {
             pClass.deselect();
         }
-	removeItems();
+	    removeItems();
         pClass = cl;
         pClass.giveItems();
+        giveArmor();
 	}
 
     public void leaveClass() {

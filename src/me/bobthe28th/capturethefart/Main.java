@@ -72,7 +72,7 @@ public class Main extends JavaPlugin implements Listener {
             }
         }
 
-        CTFTeams = new CTFTeam[]{new CTFTeam(0,"Blue Team",ChatColor.BLUE,Material.BLUE_BANNER), new CTFTeam(1,"Red Team",ChatColor.RED,Material.RED_BANNER)};
+        CTFTeams = new CTFTeam[]{new CTFTeam(0,"Blue Team",ChatColor.BLUE,Color.BLUE,Material.BLUE_BANNER), new CTFTeam(1,"Red Team",ChatColor.RED,Color.RED,Material.RED_BANNER)};
         World w = Bukkit.getServer().getWorld("world");
         CTFFlags = new CTFFlag[]{new CTFFlag(CTFTeams[0],this, new Location(w,109.0, 66.0, -199.0)), new CTFFlag(CTFTeams[1],this, new Location(w, 118.0, 66.0, -199.0))};
         CTFPlayers = new HashMap<>();

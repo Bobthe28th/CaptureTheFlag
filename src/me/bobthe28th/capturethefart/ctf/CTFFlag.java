@@ -53,7 +53,7 @@ public class CTFFlag implements Listener {
                                         if (pickUpTimer.get(cp) <= 0.0) {
 
                                             for (Player player : Bukkit.getOnlinePlayers()) {
-                                                player.sendTitle(" ", cp.getFormattedName() + " picked up the " + team.getFormattedName() + team.getColor() + "'s " + "Flag" + ChatColor.RESET, 10, 20, 5);
+                                                player.sendTitle(" ", cp.getFormattedName() + " picked up the " + team.getFormattedName() + team.getChatColor() + "'s " + "Flag" + ChatColor.RESET, 10, 20, 5);
                                             }
                                             p.setLevel(0);
                                             p.setExp(0.0F);
@@ -80,7 +80,7 @@ public class CTFFlag implements Listener {
                                             if (pickUpTimer.get(cp) <= 0.0) {
 
                                                 for (Player player : Bukkit.getOnlinePlayers()) {
-                                                    player.sendTitle(" ", cp.getFormattedName() + " returned the " + team.getFormattedName() + team.getColor() + "'s " + "Flag" + ChatColor.RESET, 10, 20, 5);
+                                                    player.sendTitle(" ", cp.getFormattedName() + " returned the " + team.getFormattedName() + team.getChatColor() + "'s " + "Flag" + ChatColor.RESET, 10, 20, 5);
                                                 }
                                                 p.setLevel(0);
                                                 p.setExp(0.0F);
@@ -154,7 +154,7 @@ public class CTFFlag implements Listener {
         carriedPlayer = null;
         setPos(home);
         for (Player player : Bukkit.getOnlinePlayers()) {
-            player.sendTitle(" ", cp.getFormattedName() + " captured the " + team.getFormattedName() + team.getColor() + "'s " + "Flag" + ChatColor.RESET, 10, 20, 5);
+            player.sendTitle(" ", cp.getFormattedName() + " captured the " + team.getFormattedName() + team.getChatColor() + "'s " + "Flag" + ChatColor.RESET, 10, 20, 5);
         }
     }
 

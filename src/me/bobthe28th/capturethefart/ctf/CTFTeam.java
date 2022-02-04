@@ -2,6 +2,7 @@ package me.bobthe28th.capturethefart.ctf;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -12,20 +13,22 @@ public class CTFTeam {
 
     int id;
     String name;
-    ChatColor color;
+    ChatColor chatColor;
+    Color color;
     Team team;
     Material banner;
 
-    public CTFTeam(Integer id_, String name_, ChatColor color_, Material banner_) {
+    public CTFTeam(Integer id_, String name_, ChatColor chatColor_, Color color_, Material banner_) {
         id = id_;
         name = name_;
+        chatColor = chatColor_;
         color = color_;
         banner = banner_;
 
         Scoreboard s = Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard();
         Team t = s.registerNewTeam("ctf" + id);
         t.setDisplayName(name);
-        t.setColor(color);
+        t.setColor(chatColor);
         t.setAllowFriendlyFire(false);
         t.setCanSeeFriendlyInvisibles(true);
         t.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.FOR_OTHER_TEAMS);
@@ -37,7 +40,7 @@ public class CTFTeam {
     }
 
     public String getFormattedName() {
-        return color + name + ChatColor.RESET;
+        return chatColor + name + ChatColor.RESET;
     }
 
     public String getName() {
@@ -52,5 +55,7 @@ public class CTFTeam {
         return team;
     }
 
-    public ChatColor getColor() { return color; }
+    public ChatColor getChatColor() { return chatColor; }
+
+    public Color getColor() { return color; }
 }

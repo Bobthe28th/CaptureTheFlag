@@ -8,6 +8,7 @@ import me.bobthe28th.capturethefart.ctf.items.demo.DemBow;
 import me.bobthe28th.capturethefart.ctf.items.demo.DemTNT;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFBuildUpItem;
 import org.bukkit.*;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
@@ -30,6 +31,8 @@ public class Demo extends CTFClass implements Listener {
     public Demo(CTFPlayer player_, Main plugin_) {
         super("Demolitionist",plugin_,player_);
         Bukkit.getPluginManager().registerEvents(this, plugin);
+        setArmor(new Material[]{Material.LEATHER_HELMET,Material.LEATHER_LEGGINGS,Material.IRON_BOOTS});
+        setEnchantments(new Enchantment[][]{null, null, new Enchantment[]{Enchantment.PROTECTION_FALL}}, new Integer[][]{null, null, new Integer[]{4}});
     }
 
     @Override
