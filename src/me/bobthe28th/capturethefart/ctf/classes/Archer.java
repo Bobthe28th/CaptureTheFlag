@@ -37,7 +37,7 @@ public class Archer extends CTFClass implements Listener {
 
     @Override
     public String getFormattedName() {
-        return ChatColor.GREEN + name + ChatColor.RESET;
+        return ChatColor.DARK_GREEN + name + ChatColor.RESET;
     }
 
     @Override
