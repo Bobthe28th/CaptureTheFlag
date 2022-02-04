@@ -2,12 +2,18 @@
   "death": {
     "default": ["$1 died","$1 farted","/killed $1"],
     "wizardZap": ["$1 got zapped"],
-    "FALL": ["$1 fell and didn't get up","$1 went splat","$1 falled","$1 is malding"]
+    "FALL": ["$1 fell and didn't get up","$1 went splat","$1 falled","$1 is malding","$1 fucking fell over","$1 "]
   },
   "deathbe": {
     "default": ["$1 was killed by $2","$1 could not handle the awesomeness of $2","$1 got fuccking died by $2"],
-    "wizardZap": ["$1 got zapped by $2"],
-    "demoTNT": ["$1 got blown into a million pieces by $2"],
+    "wizardZap": ["$1 got zapped by $2","$1 got electrocuted to fucking death by $2","$1 got absolutely smited to death by $2"],
+
+    "wizardFire": ["$1 was incinerated by $2","$1 got fucking scorched by $2","$1 burnt to a crisp due to $2"],
+    "wizardFreeze": ["$1 frozed to death by $2","$1 god frostbitted by $2","$1 hit absolute zero from $2"],
+    "builderAxe": ["$1 got hella 90s built on them by $2","$1 lost the build battle to $2","$1 could not escape maze built by $2"],
+
+    "builderSheers": ["$1 fucking died to sheers from $2"],
+    "demoTNT": ["$1 got blown into a million pieces by $2", "$1 got fucking blown up by $2","$1 bit za dusto due to $2"],
     "ENTITY_ATTACK": ["$1 was slain by $2","$1 got destroyed by $2"]
   }
 }
