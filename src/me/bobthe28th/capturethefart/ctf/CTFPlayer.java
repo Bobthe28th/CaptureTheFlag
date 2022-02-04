@@ -16,9 +16,9 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.material.MaterialData;
 import org.bukkit.persistence.PersistentDataType;
@@ -145,6 +145,20 @@ public class CTFPlayer implements Listener {
                         }
                         invItem.setAmount(0);
                     }
+                }
+            }
+        }
+        //offhand
+        ItemStack invItem = player.getInventory().getItem(40);
+        if (invItem != null) {
+            ItemMeta meta = invItem.getItemMeta();
+            if (meta != null) {
+                Byte ctfitemData = meta.getPersistentDataContainer().get(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE);
+                if (ctfitemData != null && ctfitemData == (byte) 1) {
+                    if (getItem(40) != null) {
+                        hotbar[getItem(40).getDefaultSlot()] = null;
+                    }
+                    invItem.setAmount(0);
                 }
             }
         }
