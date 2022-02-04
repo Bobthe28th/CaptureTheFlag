@@ -68,7 +68,7 @@ public class CTFPlayer implements Listener {
     public void setTeam(CTFTeam t) {
         team = t;
         t.getTeam().addEntry(player.getName());
-        giveDefaultArmor();
+        giveArmor();
     }
 
     public void leaveTeam() {
@@ -156,7 +156,7 @@ public class CTFPlayer implements Listener {
         Main.CTFPlayers.remove(player);
     }
 
-    public void giveDefaultArmor() {
+    public void giveArmor() {
         if (team != null) {
             ItemStack chestPlate = new ItemStack(Material.LEATHER_CHESTPLATE);
             LeatherArmorMeta lam = (LeatherArmorMeta) chestPlate.getItemMeta();
@@ -166,6 +166,9 @@ public class CTFPlayer implements Listener {
                 chestPlate.setItemMeta(lam);
             }
             player.getInventory().setItem(EquipmentSlot.CHEST, chestPlate);
+            if (pClass != null) {
+                pClass.giveArmor();
+            }
         }
     }
 
@@ -228,7 +231,7 @@ public class CTFPlayer implements Listener {
 	    removeItems();
         pClass = cl;
         pClass.giveItems();
-        giveDefaultArmor();
+        giveArmor();
 	}
 
     public void leaveClass() {

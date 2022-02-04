@@ -9,6 +9,7 @@ import me.bobthe28th.capturethefart.ctf.items.builder.BuiWood;
 import me.bobthe28th.capturethefart.ctf.items.builder.BuiWool;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
@@ -19,6 +20,7 @@ public class Builder extends CTFClass implements Listener {
     public Builder(CTFPlayer player_, Main plugin_) {
         super("Builder",plugin_,player_);
         Bukkit.getPluginManager().registerEvents(this, plugin);
+        setArmor(new Material[]{Material.IRON_HELMET,Material.LEATHER_LEGGINGS,Material.LEATHER_BOOTS});
     }
 
     @Override

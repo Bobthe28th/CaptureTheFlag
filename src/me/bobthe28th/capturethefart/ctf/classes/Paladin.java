@@ -7,6 +7,7 @@ import me.bobthe28th.capturethefart.ctf.items.paladin.PalIron;
 import me.bobthe28th.capturethefart.ctf.items.paladin.PalSword;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
@@ -17,6 +18,7 @@ public class Paladin extends CTFClass implements Listener {
     public Paladin(CTFPlayer player_, Main plugin_) {
         super("Paladin",plugin_,player_);
         Bukkit.getPluginManager().registerEvents(this, plugin);
+        setArmor(new Material[]{Material.IRON_HELMET,Material.IRON_LEGGINGS,Material.IRON_BOOTS});
     }
 
     @Override

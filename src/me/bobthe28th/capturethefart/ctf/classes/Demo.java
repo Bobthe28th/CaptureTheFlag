@@ -30,6 +30,7 @@ public class Demo extends CTFClass implements Listener {
     public Demo(CTFPlayer player_, Main plugin_) {
         super("Demolitionist",plugin_,player_);
         Bukkit.getPluginManager().registerEvents(this, plugin);
+        setArmor(new Material[]{Material.LEATHER_HELMET,Material.LEATHER_LEGGINGS,Material.IRON_BOOTS});
     }
 
     @Override
