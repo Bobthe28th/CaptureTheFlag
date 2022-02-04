@@ -11,14 +11,18 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import me.bobthe28th.capturethefart.Main;
+import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionEffect;
 
 public abstract class CTFItem {
 
     String itemName;
     Material item;
+    PotionData pData;
     int customModel;
     public Main plugin;
     public CTFPlayer player;
@@ -46,6 +50,10 @@ public abstract class CTFItem {
         player.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
     }
 
+    public void setPotionEffect(PotionData pD) {
+        pData = pD;
+    }
+
     public void setItem(Material nItem) {
         item = nItem;
     }
@@ -53,7 +61,13 @@ public abstract class CTFItem {
     public ItemStack getItem() {
         ItemStack it = new ItemStack(item,amount);
         ItemMeta meta = it.getItemMeta();
+
         if (meta != null) {
+
+            if (meta instanceof PotionMeta pMeta) {
+                pMeta.setBasePotionData(pData);
+            }
+
             meta.setDisplayName(ChatColor.RESET + itemName);
             meta.setCustomModelData(customModel);
             meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE, (byte) 1);
