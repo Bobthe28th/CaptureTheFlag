@@ -41,9 +41,15 @@ public abstract class CTFBuildUpItem extends CTFItem {
     }
 
     public void add(Integer add) {
-        int currentA = player.getItemStack(this).getAmount();
-        add = Math.min(add, itemMax - currentA);
-        player.getItemStack(this).setAmount(currentA + add);
+        if (player.getItemStack(this) != null) {
+            int currentA = player.getItemStack(this).getAmount();
+            add = Math.min(add, itemMax - currentA);
+            player.getItemStack(this).setAmount(currentA + add);
+        } else {
+            ItemStack it = getItem();
+            it.setAmount(Math.min(add,itemMax));
+            player.getPlayer().getInventory().setItem(player.getItemSlot(this), it);
+        }
         if (player.getItemStack(this).getAmount() >= itemMax) {
             onCooldown = false;
         }
