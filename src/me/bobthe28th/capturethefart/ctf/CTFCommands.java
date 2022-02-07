@@ -281,7 +281,13 @@ public class CTFCommands implements CommandExecutor {
                 player.setSaturation(20.0F);
                 return true;
             case "test":
-
+//                WorldCreator wc = new WorldCreator("hell");
+//                wc.environment(World.Environment.NORMAL);
+//                wc.type(WorldType.NORMAL);
+//                World wo = wc.createWorld();
+//                for (Player pl : Bukkit.getOnlinePlayers()) {
+//                    pl.teleport(new Location(wo, 0, 70, 0));
+//                }
 //                Main.CTFFlags[0].fall(player.getLocation());
 
 //                PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_METADATA);
