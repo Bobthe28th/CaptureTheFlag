@@ -31,7 +31,8 @@ public class Demo extends CTFClass implements Listener {
     public Demo(CTFPlayer player_, Main plugin_) {
         super("Demolitionist",plugin_,player_);
         Bukkit.getPluginManager().registerEvents(this, plugin);
-        setArmor(new Material[]{Material.LEATHER_HELMET,Material.LEATHER_LEGGINGS,Material.IRON_BOOTS});
+        setArmor(new Material[]{Material.IRON_INGOT,Material.LEATHER_LEGGINGS,Material.IRON_BOOTS});
+        setHelmetCustomModel(2);
         setEnchantments(new Enchantment[][]{null, null, new Enchantment[]{Enchantment.PROTECTION_FALL}}, new Integer[][]{null, null, new Integer[]{4}});
     }
 
