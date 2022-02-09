@@ -357,12 +357,13 @@ public class CTFPlayer implements Listener {
     @EventHandler
     public void onFoodLevelChange(FoodLevelChangeEvent event) {
         if (event.getEntity() instanceof Player pf) {
-	    if (p != player) return;
-	    player.setFoodLevel(20);
-	    player.setSaturation(0F);
-	    event.setCancelled(true);
-	}
+            if (p != player) return;
+            player.setFoodLevel(20);
+            player.setSaturation(0F);
+            event.setCancelled(true);
+        }
     }
+
     @EventHandler
     public void onPlayerItemDamage(PlayerItemDamageEvent event) {
         if (event.getPlayer() != player) return;
