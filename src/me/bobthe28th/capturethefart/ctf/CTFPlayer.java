@@ -9,6 +9,7 @@ import me.bobthe28th.capturethefart.ctf.itemtypes.CTFItem;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -353,6 +354,15 @@ public class CTFPlayer implements Listener {
         }
     }
 
+    @EventHandler
+    public void onFoodLevelChange(FoodLevelChangeEvent event) {
+        if (event.getEntity() instanceof Player pf) {
+	    if (p != player) return;
+	    player.setFoodLevel(20);
+	    player.setSaturation(0F);
+	    event.setCancelled(true);
+	}
+    }
     @EventHandler
     public void onPlayerItemDamage(PlayerItemDamageEvent event) {
         if (event.getPlayer() != player) return;
