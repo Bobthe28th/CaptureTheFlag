@@ -37,8 +37,8 @@ public class Main extends JavaPlugin implements Listener {
 
     public static CTFTeam[] CTFTeams;
     public static CTFFlag[] CTFFlags;
-    public static Class<?>[] CTFClasses = new Class<?>[]{Wizard.class, Paladin.class, Demo.class, Builder.class, Archer.class};
-    public static String[] CTFClassNames = new String[]{"Wizard","Paladin","Demo","Builder","Archer"};
+    public static Class<?>[] CTFClasses = new Class<?>[]{WizardFire.class, WizardIce.class, WizardWind.class, Paladin.class, Demo.class, Builder.class, Archer.class};
+    public static String[] CTFClassNames = new String[]{"WizardFire","WizardIce","WizardWind","Paladin","Demo","Builder","Archer"};
     public static HashMap<Player,CTFPlayer> CTFPlayers;
 
     CTFDeathMessages deathMessages;
