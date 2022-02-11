@@ -340,6 +340,13 @@ public class CTFPlayer implements Listener {
         if (getItem(slot) != null) {
             getItem(slot).onHold(event);
         }
+
+        //display cooldowns
+        if (getItem(slot) != null) {
+            getItem(slot).displayCooldowns();
+        } else {
+            Objects.requireNonNull(player.getPlayer()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
+        }
     }
 
     @EventHandler
