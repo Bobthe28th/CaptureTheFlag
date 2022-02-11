@@ -361,7 +361,7 @@ public class CTFPlayer implements Listener {
         if (event.getEntity() instanceof Player pf) {
             if (p != player) return;
             healCooldown = 7.0;
-	}
+        }
     }
 
     @EventHandler
