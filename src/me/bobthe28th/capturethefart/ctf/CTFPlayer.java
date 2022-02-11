@@ -10,6 +10,7 @@ import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -36,10 +37,11 @@ public class CTFPlayer implements Listener {
     CTFItem[] hotbar = new CTFItem[9];
     Main plugin;
     int cooldownTask;
-	CTFClass pClass;
+    CTFClass pClass;
     CTFFlag carriedFlag = null;
     ArmorStand flagOnHead = null;
     ArrayList<String> glowReason = new ArrayList<>();
+    double healCooldown = 0.0;
 
     public CTFPlayer(Main plugin_, Player p) {
         player = p;
@@ -352,6 +354,14 @@ public class CTFPlayer implements Listener {
                 event.setCancelled(true);
             }
         }
+    }
+
+    @EventHandler
+    public void onEntityDamage(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player pf) {
+            if (p != player) return;
+            healCooldown = 7.0;
+	}
     }
 
     @EventHandler
