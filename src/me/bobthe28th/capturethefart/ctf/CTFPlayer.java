@@ -1,14 +1,18 @@
 package me.bobthe28th.capturethefart.ctf;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.PacketContainer;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFItem;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.HandlerList;
@@ -29,6 +33,7 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class CTFPlayer implements Listener {
 
@@ -42,6 +47,8 @@ public class CTFPlayer implements Listener {
     ArmorStand flagOnHead = null;
     ArrayList<String> glowReason = new ArrayList<>();
     double healCooldown = 0.0;
+    boolean onHealCooldown = false;
+
 
     public CTFPlayer(Main plugin_, Player p) {
         player = p;
@@ -50,6 +57,7 @@ public class CTFPlayer implements Listener {
 
         player.setLevel(0);
         player.setExp(0.0F);
+        player.setSaturation(0F);
         player.removePotionEffect(PotionEffectType.GLOWING);
         player.setGlowing(false);
         for (Entity e : player.getPassengers()) {
@@ -272,6 +280,50 @@ public class CTFPlayer implements Listener {
         return null;
     }
 
+    public void regen() {
+        long rate = 16L;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (onHealCooldown) {
+                    this.cancel();
+                } else {
+                    if (player.getHealth() < Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getDefaultValue()) {
+                        PacketContainer packet = new PacketContainer(PacketType.Play.Server.UPDATE_HEALTH);
+                        double healAmout = Math.min(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getDefaultValue(),player.getHealth() + 1);
+                        packet.getFloat().write(0, (float)healAmout);
+                        packet.getIntegers().write(0,20);
+                        try {
+                            ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        player.setHealth(healAmout);
+                    } else {
+                        this.cancel();
+                    }
+                }
+            }
+        }.runTaskTimer(plugin, 0L, rate);
+    }
+
+    public void startHealCooldown() {
+        onHealCooldown = true;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                healCooldown -= 0.1;
+                healCooldown = Math.round(healCooldown*10.0)/10.0;
+                if (healCooldown <= 0) {
+                    healCooldown = 0;
+                    onHealCooldown = false;
+                    regen();
+                    this.cancel();
+                }
+            }
+        }.runTaskTimer(plugin, 2L, 2L);
+    }
+
     @EventHandler
     public void onPlayerClick(PlayerInteractEvent event) {
         if (event.getPlayer() != player) return;
@@ -359,15 +411,28 @@ public class CTFPlayer implements Listener {
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player pf) {
-            if (p != player) return;
+            if (pf != player) return;
             healCooldown = 7.0;
+            if (!onHealCooldown) {
+                startHealCooldown();
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEntityRegainHealth(EntityRegainHealthEvent event) {
+        if (event.getEntity() instanceof Player pf) {
+            if (pf != player) return;
+            if (event.getRegainReason() == EntityRegainHealthEvent.RegainReason.SATIATED) {
+                event.setCancelled(true);
+            }
         }
     }
 
     @EventHandler
     public void onFoodLevelChange(FoodLevelChangeEvent event) {
         if (event.getEntity() instanceof Player pf) {
-            if (p != player) return;
+            if (pf != player) return;
             player.setFoodLevel(20);
             player.setSaturation(0F);
             event.setCancelled(true);
