@@ -60,7 +60,9 @@ public class CTFPlayer implements Listener {
         player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getDefaultValue());
         player.setFoodLevel(20);
         player.setSaturation(0F);
-        player.removePotionEffect(PotionEffectType.GLOWING);
+        for (PotionEffect pEffect : player.getActivePotionEffects()) {
+            player.removePotionEffect(pEffect.getType());
+        }
         player.setGlowing(false);
         for (Entity e : player.getPassengers()) {
             player.removePassenger(e);
