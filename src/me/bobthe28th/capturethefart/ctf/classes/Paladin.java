@@ -3,13 +3,17 @@ package me.bobthe28th.capturethefart.ctf.classes;
 import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFClass;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
-import me.bobthe28th.capturethefart.ctf.items.paladin.PalIron;
-import me.bobthe28th.capturethefart.ctf.items.paladin.PalSword;
+import me.bobthe28th.capturethefart.ctf.items.paladin.PalHammer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class Paladin extends CTFClass implements Listener {
 
@@ -34,7 +38,16 @@ public class Paladin extends CTFClass implements Listener {
     @Override
     public void giveItems() {
         player.removeItems();
-        player.giveItem(new PalSword(player,plugin,3));
-        player.giveItem(new PalIron(player,plugin,5));
+        player.giveItem(new PalHammer(player,plugin,0));
+    }
+
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent event) {
+        if (event.getPlayer() != player.getPlayer()) return;
+        if (((Entity) player.getPlayer()).isOnGround()) {
+            player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,Integer.MAX_VALUE,0,true,false,true));
+        } else if (player.getPlayer().hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
+            player.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+        }
     }
 }

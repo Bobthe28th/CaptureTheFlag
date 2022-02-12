@@ -51,14 +51,14 @@ public class WizardWind extends CTFClass implements Listener {
     public void onPlayerSneak(PlayerToggleSneakEvent event) {
         if (event.getPlayer() != player.getPlayer()) return;
 
-        Player player = event.getPlayer();
+        Player pE = event.getPlayer();
 
-        if(!player.isSneaking()) {
-            if (player.getVelocity().getY() <= 0) {
-                player.setVelocity(player.getVelocity().setY(0.0));
+        if(!pE.isSneaking()) {
+            if (pE.getVelocity().getY() <= 0) {
+                pE.setVelocity(pE.getVelocity().setY(0.0));
             }
             slowFallEffect = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-                final Player p = player.getPlayer();
+                final Player p = pE.getPlayer();
                 int ticks = 0;
                 float angle = 0;
                 final int time = 2;
@@ -100,9 +100,9 @@ public class WizardWind extends CTFClass implements Listener {
             if (slowFallEffect != null) {
                 Bukkit.getScheduler().cancelTask(slowFallEffect);
                 slowFallEffect = null;
-                PotionEffect effect = player.getPotionEffect(PotionEffectType.SLOW_FALLING);
+                PotionEffect effect = pE.getPotionEffect(PotionEffectType.SLOW_FALLING);
                 if (effect != null && effect.getDuration() >= 500) {
-                    player.removePotionEffect(PotionEffectType.SLOW_FALLING);
+                    pE.removePotionEffect(PotionEffectType.SLOW_FALLING);
                 }
             }
         }
