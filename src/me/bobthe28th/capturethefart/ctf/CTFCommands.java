@@ -278,7 +278,7 @@ public class CTFCommands implements CommandExecutor {
             case "heal":
                 player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue());
                 player.setFoodLevel(20);
-                player.setSaturation(20.0F);
+//                player.setSaturation(20.0F);
                 return true;
             case "test":
 //                WorldCreator wc = new WorldCreator("hell");
