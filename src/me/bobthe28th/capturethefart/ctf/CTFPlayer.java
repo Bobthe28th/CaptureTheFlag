@@ -95,7 +95,7 @@ public class CTFPlayer implements Listener {
 
     public String getFormattedName() {
         if (team != null) {
-            return team.getColor() + player.getName() + ChatColor.RESET;
+            return team.getChatColor() + player.getName() + ChatColor.RESET;
         } else {
             return player.getName();
         }
