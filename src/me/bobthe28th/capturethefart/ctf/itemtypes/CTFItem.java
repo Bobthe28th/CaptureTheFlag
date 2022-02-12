@@ -7,7 +7,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -46,6 +48,8 @@ public abstract class CTFItem {
 
     public void onHold(PlayerItemHeldEvent event) {}
 
+    public void onConsume(PlayerItemConsumeEvent event) {}
+
     public void displayCooldowns() {
         player.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
     }
@@ -56,6 +60,10 @@ public abstract class CTFItem {
 
     public void setItem(Material nItem) {
         item = nItem;
+    }
+
+    public void setCustomModel(Integer customModel_) {
+        customModel = customModel_;
     }
 
     public Material getMat() { return item; }

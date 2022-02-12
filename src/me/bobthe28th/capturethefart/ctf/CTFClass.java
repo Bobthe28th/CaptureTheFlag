@@ -5,6 +5,8 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -31,6 +33,10 @@ public abstract class CTFClass {
     public abstract String getFormattedName();
 
     public abstract void giveItems();
+
+    public void onPotion(EntityPotionEffectEvent event) {}
+
+    public void attackPlayer(EntityDamageByEntityEvent event) {}
 
     public void breakBlock(Block b) {}
 
