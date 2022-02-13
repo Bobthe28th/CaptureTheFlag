@@ -1,0 +1,28 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "item/leather"
+  },
+  "overrides": [
+    {
+      "predicate": { "custom_model_data": 1 },
+      "model": "wizard/firehat"
+    },
+    {
+      "predicate": { "custom_model_data": 2 },
+      "model": "wizard/icehat"
+    },
+    {
+      "predicate": { "custom_model_data": 3 },
+      "model": "wizard/windhat"
+    },
+    {
+      "predicate": { "custom_model_data": 4 },
+      "model": "wizard/endhat"
+    },
+    {
+      "predicate": { "custom_model_data": 5 },
+      "model": "assassin/assassinhat"
+    }
+  ]
+}
