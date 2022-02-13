@@ -8,9 +8,12 @@ import me.bobthe28th.capturethefart.ctf.items.assassin.AssPotion;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.potion.PotionEffectType;
 
@@ -37,19 +40,6 @@ public class Assassin extends CTFClass implements Listener {
     }
 
     @Override
-    public void onPotion(EntityPotionEffectEvent event) {
-        potion.onPotion(event);
-    }
-
-    @Override
-    public void attackPlayer(EntityDamageByEntityEvent event) {
-        if (player.getPlayer().hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-            event.setDamage(event.getFinalDamage() * 2);
-            player.getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
-        }
-    }
-
-    @Override
     public void deselect() {
         HandlerList.unregisterAll(this);
     }
@@ -59,4 +49,30 @@ public class Assassin extends CTFClass implements Listener {
         return ChatColor.DARK_PURPLE + name + ChatColor.RESET;
     }
 
+    @EventHandler
+    public void onEntityPotionEffect(EntityPotionEffectEvent event) {
+        if (event.getEntity() instanceof Player pf) {
+            if (pf != player.getPlayer()) return;
+            potion.onPotion(event);
+        }
+    }
+
+    @EventHandler
+    public void onEntityDamage(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player pf) {
+            if (event instanceof EntityDamageByEntityEvent eEvent) {
+                if (eEvent.getDamager() instanceof Player pA) {
+                    if (pA != player.getPlayer()) return;
+                    if (player.getPlayer().hasPotionEffect(PotionEffectType.INVISIBILITY)) {
+                        event.setDamage(event.getFinalDamage() * 2);
+                        player.getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
+                    }
+                }
+            }
+            if (pf != player.getPlayer()) return;
+            if (player.getPlayer().hasPotionEffect(PotionEffectType.INVISIBILITY)) {
+                player.getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
+            }
+        }
+    }
 }

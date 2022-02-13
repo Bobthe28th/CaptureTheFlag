@@ -34,10 +34,6 @@ public abstract class CTFClass {
 
     public abstract void giveItems();
 
-    public void onPotion(EntityPotionEffectEvent event) {}
-
-    public void attackPlayer(EntityDamageByEntityEvent event) {}
-
     public void breakBlock(Block b) {}
 
     public void setArmor(Material[] armor_) {
