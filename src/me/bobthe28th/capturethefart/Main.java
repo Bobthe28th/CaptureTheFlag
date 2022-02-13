@@ -2,6 +2,7 @@ package me.bobthe28th.capturethefart;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -9,6 +10,8 @@ import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import me.bobthe28th.capturethefart.ctf.*;
 import me.bobthe28th.capturethefart.ctf.classes.*;
+import net.md_5.bungee.api.chat.*;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
@@ -22,6 +25,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
@@ -41,6 +45,14 @@ public class Main extends JavaPlugin implements Listener {
     public static String[] CTFClassNames = new String[]{"WizardFire","WizardIce","WizardWind","Paladin","Demo","Builder","Archer","Assassin","Alchemist"};
     public static HashMap<Player,CTFPlayer> CTFPlayers;
 
+    public static String[] musicTitle = new String[]{"Halland / Dalarna - Smash Ultimate OST","Glide - Smash Ultimate OST"};
+    public static String[] musicLink = new String[]{"https://youtu.be/qa0LLO8xz9g","https://youtu.be/TFAfyMc-W3w"};
+    public static String[] music = new String[]{"halland","glide"};
+    public static Long[] musicLength = new Long[]{3440L,3360L};
+    static String currentMusic;
+    static boolean musicPlaying = false;
+    static BukkitTask musicRunnable;
+
     CTFDeathMessages deathMessages;
 
     public static String[] getTeamNames() {
@@ -57,7 +69,7 @@ public class Main extends JavaPlugin implements Listener {
         CTFTabCompletion tabCompleter = new CTFTabCompletion();
         getServer().getPluginManager().registerEvents(this, this);
 
-        String[] commandNames = new String[]{"ctfjoin","ctfleave","ctffulljoin","ctfteamjoin","ctfteamleave","ctfteams","ctfsetclass","ctfleaveclass","fly","heal","test"};
+        String[] commandNames = new String[]{"ctfjoin","ctfleave","ctffulljoin","ctfteamjoin","ctfteamleave","ctfteams","ctfsetclass","ctfleaveclass","fly","heal","test","music"};
 
         for (String commandName : commandNames) {
             Objects.requireNonNull(getCommand(commandName)).setExecutor(commands);
@@ -90,6 +102,9 @@ public class Main extends JavaPlugin implements Listener {
 
         for(Player player : Bukkit.getOnlinePlayers()) {
             player.setPlayerListHeader("capture the FART!\n\uE238");
+            for (String song : music) {
+                player.stopSound(song,SoundCategory.MUSIC);
+            }
         }
 
         Bukkit.broadcastMessage("farted (vine boom sound effect)");
@@ -316,6 +331,58 @@ public class Main extends JavaPlugin implements Listener {
                 }
             }
         }.runTaskTimer(plugin,freq,freq);
+    }
+
+    public static void playMusic(String song,Main plugin, boolean announce) {
+        if (!Arrays.asList(music).contains(song)) return;
+        if (currentMusic != null) {
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.stopSound(currentMusic,SoundCategory.MUSIC);
+            }
+        }
+        currentMusic = song;
+        musicPlaying = true;
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.playSound(p.getLocation(),song,SoundCategory.MUSIC,1F,1F);
+        }
+        if (announce) {
+            for (Player pM : Bukkit.getOnlinePlayers()) {
+                TextComponent text = new TextComponent(ChatColor.YELLOW + "Now Playing: ");
+                TextComponent link = new TextComponent(ChatColor.RED + musicTitle[Arrays.asList(music).indexOf(song)]);
+                link.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, musicLink[Arrays.asList(music).indexOf(song)]));
+                link.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Music Link")));
+                text.addExtra(link);
+                pM.spigot().sendMessage(text);
+            }
+        }
+        if (musicRunnable != null) musicRunnable.cancel();
+        musicRunnable = new BukkitRunnable() {
+            @Override
+            public void run() {
+                playMusic(song,plugin,false);
+            }
+        }.runTaskLater(plugin,musicLength[Arrays.asList(music).indexOf(song)]);
+    }
+
+    public static void stopMusic(boolean announce) {
+        musicPlaying = false;
+        musicRunnable.cancel();
+        if (currentMusic != null) {
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.stopSound(currentMusic,SoundCategory.MUSIC);
+            }
+        }
+        if (announce) {
+            for (Player pM : Bukkit.getOnlinePlayers()) {
+                TextComponent text = new TextComponent(ChatColor.YELLOW + "Stopped Playing: ");
+                TextComponent link = new TextComponent(ChatColor.RED + musicTitle[Arrays.asList(music).indexOf(currentMusic)]);
+                link.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, musicLink[Arrays.asList(music).indexOf(currentMusic)]));
+                link.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Music Link")));
+                text.addExtra(link);
+                pM.spigot().sendMessage(text);
+            }
+        }
+        currentMusic = null;
     }
 
 }

@@ -14,6 +14,7 @@ import me.bobthe28th.capturethefart.Main;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class CTFCommands implements CommandExecutor {
@@ -279,6 +280,30 @@ public class CTFCommands implements CommandExecutor {
                 player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue());
                 player.setFoodLevel(20);
 //                player.setSaturation(20.0F);
+                return true;
+            case "music":
+                if (args.length > 0) {
+                    switch (args[0]) {
+                        case "play":
+                            if (args.length > 1) {
+                                if (Arrays.asList(Main.music).contains(args[1])) {
+                                    Main.playMusic(args[1],plugin,true);
+                                } else {
+                                    player.sendMessage(ChatColor.RED + "Please specify a REAL song." + ChatColor.RESET);
+                                }
+                            } else {
+                                player.sendMessage(ChatColor.RED + "Please specify a song." + ChatColor.RESET);
+                            }
+                            return true;
+                        case "stop":
+                            Main.stopMusic(true);
+                            return true;
+                        default:
+                            return true;
+                    }
+                } else {
+                    player.sendMessage(ChatColor.RED + "Please specify a command." + ChatColor.RESET);
+                }
                 return true;
             case "test":
 //                WorldCreator wc = new WorldCreator("hell");
