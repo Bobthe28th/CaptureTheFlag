@@ -6,8 +6,10 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
@@ -49,6 +51,8 @@ public abstract class CTFItem {
     public void onHold(PlayerItemHeldEvent event) {}
 
     public void onConsume(PlayerItemConsumeEvent event) {}
+
+    public void onPotionLaunch(ProjectileLaunchEvent event, ThrownPotion thrownPotion) {}
 
     public void displayCooldowns() {
         player.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
