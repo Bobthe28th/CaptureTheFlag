@@ -363,16 +363,6 @@ public class CTFPlayer implements Listener {
     }
 
     @EventHandler
-    public void onEntityPotionEffect(EntityPotionEffectEvent event) {
-        if (event.getEntity() instanceof Player pf) {
-            if (pf != player) return;
-            if (pClass != null) {
-                pClass.onPotion(event);
-            }
-        }
-    }
-
-    @EventHandler
     public void onPlayerItemHeldEvent(PlayerItemHeldEvent event) {
         if (event.getPlayer() != player) return;
         int slot = event.getNewSlot();
@@ -457,12 +447,6 @@ public class CTFPlayer implements Listener {
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player pf) {
-            if (event instanceof EntityDamageByEntityEvent eEvent) {
-                if (eEvent.getDamager() instanceof Player pA) {
-                    if (pA != player) return;
-                    pClass.attackPlayer(eEvent);
-                }
-            }
             if (pf != player) return;
             healCooldown = 7.0;
             if (!onHealCooldown) {
