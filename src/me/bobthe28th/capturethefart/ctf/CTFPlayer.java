@@ -12,9 +12,7 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -235,6 +233,24 @@ public class CTFPlayer implements Listener {
         player.updateInventory();
     }
 
+    public void removeArmor() {
+        if (player.getEquipment() != null) {
+            for (ItemStack eq : player.getEquipment().getArmorContents()) {
+                if (eq != null) {
+                    ItemMeta meta = eq.getItemMeta();
+                    if (meta != null) {
+                        Byte ctfitemData = meta.getPersistentDataContainer().get(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE);
+                        if (ctfitemData != null && ctfitemData == (byte) 1) {
+                            eq.setAmount(0);
+                        }
+                    }
+                }
+            }
+        }
+
+        player.updateInventory();
+    }
+
     public Player getPlayer() {
         return player;
     }
@@ -338,6 +354,25 @@ public class CTFPlayer implements Listener {
     }
 
     @EventHandler
+    public void onPlayerItemConsume(PlayerItemConsumeEvent event) {
+        if (event.getPlayer() != player) return;
+        int slot = player.getInventory().getHeldItemSlot();
+        if (getItem(slot) != null) {
+            getItem(slot).onConsume(event);
+        }
+    }
+
+    @EventHandler
+    public void onEntityPotionEffect(EntityPotionEffectEvent event) {
+        if (event.getEntity() instanceof Player pf) {
+            if (pf != player) return;
+            if (pClass != null) {
+                pClass.onPotion(event);
+            }
+        }
+    }
+
+    @EventHandler
     public void onPlayerItemHeldEvent(PlayerItemHeldEvent event) {
         if (event.getPlayer() != player) return;
         int slot = event.getNewSlot();
@@ -422,6 +457,12 @@ public class CTFPlayer implements Listener {
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player pf) {
+            if (event instanceof EntityDamageByEntityEvent eEvent) {
+                if (eEvent.getDamager() instanceof Player pA) {
+                    if (pA != player) return;
+                    pClass.attackPlayer(eEvent);
+                }
+            }
             if (pf != player) return;
             healCooldown = 7.0;
             if (!onHealCooldown) {

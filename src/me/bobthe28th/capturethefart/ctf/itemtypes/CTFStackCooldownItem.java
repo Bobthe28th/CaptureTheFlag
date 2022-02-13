@@ -6,7 +6,10 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public abstract class CTFStackCooldownItem extends CTFItem {
@@ -31,11 +34,14 @@ public abstract class CTFStackCooldownItem extends CTFItem {
         new BukkitRunnable() {
             @Override
             public void run() {
-                cooldown -= 0.1;
-                cooldown = Math.round(cooldown*10.0)/10.0;
                 if (cooldown % 1 == 0) {
                     ItemStack cItem = new ItemStack(cooldownItem);
                     cItem.setAmount((int)(cooldown));
+                    ItemMeta cMeta = cItem.getItemMeta();
+                    if (cMeta != null) {
+                        cMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE, (byte) 1);
+                        cItem.setItemMeta(cMeta);
+                    }
                     if (player.getItemSlot(t) != -1) {
                         player.getPlayer().getInventory().setItem(player.getItemSlot(t),cItem);
                     }
@@ -46,9 +52,29 @@ public abstract class CTFStackCooldownItem extends CTFItem {
                         player.getPlayer().getInventory().setItem(player.getItemSlot(t),t.getItem());
                     }
                     this.cancel();
+                } else {
+                    cooldown -= 0.1;
+                    cooldown = Math.round(cooldown*10.0)/10.0;
                 }
             }
-        }.runTaskTimer(plugin, 2L, 2L);
+        }.runTaskTimer(plugin, 0, 2L);
+    }
+
+    public void startAction() {
+        cooldown = -1;
+
+        ItemStack cItem = new ItemStack(cooldownItem);
+        cItem.setAmount(1);
+        ItemMeta cMeta = cItem.getItemMeta();
+        if (cMeta != null) {
+            cMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE, (byte) 1);
+            cItem.setItemMeta(cMeta);
+        }
+        if (player.getItemSlot(this) != -1) {
+            player.getPlayer().getInventory().setItem(player.getItemSlot(this),cItem);
+        }
+
+        displayCooldowns();
     }
 
     @Override
