@@ -39,3 +39,6 @@ commands:
   test:
     description: for debug
     usage: /<command>
+  music:
+    description: plays music
+    usage: /<command> [play,stop] song
