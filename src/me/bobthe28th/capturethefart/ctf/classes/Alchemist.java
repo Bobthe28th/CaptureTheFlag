@@ -26,7 +26,9 @@ public class Alchemist extends CTFClass implements Listener {
 
     public Alchemist(CTFPlayer player_, Main plugin_) {
         super("Alchemist",plugin_,player_);
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        if (player_ != null) {
+            Bukkit.getPluginManager().registerEvents(this, plugin);
+        }
         setArmor(new Material[]{Material.LEATHER_HELMET,Material.LEATHER_LEGGINGS,Material.LEATHER_BOOTS});
     }
 

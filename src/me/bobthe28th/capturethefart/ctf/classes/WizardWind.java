@@ -22,7 +22,9 @@ public class WizardWind extends CTFClass implements Listener {
 
     public WizardWind(CTFPlayer player_, Main plugin_) {
         super("Wind Wizard",plugin_,player_);
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        if (player_ != null) {
+            Bukkit.getPluginManager().registerEvents(this, plugin);
+        }
         setArmor(new Material[]{Material.LEATHER,null,null});
         setHelmetCustomModel(3);
     }

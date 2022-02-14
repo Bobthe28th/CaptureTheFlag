@@ -25,7 +25,9 @@ public class Builder extends CTFClass implements Listener {
 
     public Builder(CTFPlayer player_, Main plugin_) {
         super("Builder",plugin_,player_);
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        if (player_ != null) {
+            Bukkit.getPluginManager().registerEvents(this, plugin);
+        }
         setArmor(new Material[]{Material.IRON_INGOT,Material.LEATHER_LEGGINGS,Material.LEATHER_BOOTS});
         setHelmetCustomModel(1);
     }

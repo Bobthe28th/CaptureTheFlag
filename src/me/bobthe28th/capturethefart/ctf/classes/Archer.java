@@ -28,7 +28,9 @@ public class Archer extends CTFClass implements Listener {
 
     public Archer(CTFPlayer player_, Main plugin_) {
         super("Archer",plugin_,player_);
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        if (player_ != null) {
+            Bukkit.getPluginManager().registerEvents(this, plugin);
+        }
         setArmor(new Material[]{Material.LEATHER_HELMET,Material.LEATHER_LEGGINGS,Material.LEATHER_BOOTS});
     }
 

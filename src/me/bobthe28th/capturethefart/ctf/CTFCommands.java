@@ -3,19 +3,31 @@ package me.bobthe28th.capturethefart.ctf;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.wrappers.*;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import me.bobthe28th.capturethefart.ctf.classes.Demo;
+import me.bobthe28th.capturethefart.ctf.classes.Paladin;
+import me.bobthe28th.capturethefart.ctf.classes.WizardFire;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.*;
 
 import me.bobthe28th.capturethefart.Main;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.*;
+
 
 public class CTFCommands implements CommandExecutor {
     Main plugin;
@@ -306,6 +318,132 @@ public class CTFCommands implements CommandExecutor {
                 }
                 return true;
             case "test":
+
+                Main.fakeClass(player,UUID.fromString("00000000-0000-0000-0000-000000000000"),70,new Demo(null,plugin),plugin);
+
+//                UUID uuid = UUID.fromString("00000000-0000-0000-0000-000000000000");
+//
+//                CTFClass cClass = new Paladin(null,plugin);
+//
+//                PacketContainer add = new PacketContainer(PacketType.Play.Server.PLAYER_INFO);
+//
+//                add.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.ADD_PLAYER);
+//
+//                WrappedGameProfile profile = new WrappedGameProfile(uuid, cClass.getFormattedName());
+//
+//                profile.getProperties().put("textures", WrappedGameProfile.fromPlayer(player).getProperties().get("textures").iterator().next());
+//
+//                WrappedChatComponent name = WrappedChatComponent.fromText(profile.getName());
+//
+//                List<PlayerInfoData> pd = new ArrayList<>();
+//
+//                pd.add(new PlayerInfoData(profile, 0, EnumWrappers.NativeGameMode.CREATIVE, name));
+//
+//                add.getPlayerInfoDataLists().write(0,pd);
+//
+//                try {
+//                    ProtocolLibrary.getProtocolManager().sendServerPacket(player, add);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//
+//
+//                PacketContainer spawn = new PacketContainer(PacketType.Play.Server.NAMED_ENTITY_SPAWN);
+//
+//                spawn.getIntegers().write(0,70);
+//
+//                spawn.getUUIDs().write(0, uuid);
+//
+//                spawn.getBytes().write(0,(byte)0).write(1,(byte)0);
+//
+//                Location pLoc = player.getLocation();
+//                spawn.getDoubles().write(0,pLoc.getX()).write(1,pLoc.getY()).write(2,pLoc.getZ());
+//
+//                try {
+//                    ProtocolLibrary.getProtocolManager().sendServerPacket(player, spawn);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//
+//                PacketContainer outerSkin = new PacketContainer(PacketType.Play.Server.ENTITY_METADATA);
+//
+//                outerSkin.getIntegers().write(0,70);
+//
+//                WrappedDataWatcher watcher = new WrappedDataWatcher(player);
+//
+//                watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(17, WrappedDataWatcher.Registry.get(Byte.class)), (byte)127);
+//
+//                outerSkin.getWatchableCollectionModifier().write(0,watcher.getWatchableObjects());
+//
+//                try {
+//                    ProtocolLibrary.getProtocolManager().sendServerPacket(player, outerSkin);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//
+//                PacketContainer equipment = new PacketContainer(PacketType.Play.Server.ENTITY_EQUIPMENT);
+//
+//                equipment.getIntegers().write(0,70);
+//
+//                List<Pair<EnumWrappers.ItemSlot, ItemStack>> pairList = new ArrayList<>();
+//
+//
+//                Material[] armor = cClass.getArmor();
+//                Integer helmetM = cClass.getHelmetModel();
+//                Enchantment[][] armorE = cClass.getEnchantments();
+//                Integer[][] armorEL = cClass.getEnchantmentLevels();
+//
+//                cClass.deselect();
+//
+//                ItemStack[] armorItem = new ItemStack[3];
+//                for (int i = 0; i < armor.length; i++) {
+//                    if (armor[i] != null) {
+//                        armorItem[i] = new ItemStack(armor[i]);
+//                        ItemMeta meta = armorItem[i].getItemMeta();
+//                        if (meta != null) {
+//                            if (i == 0) {
+//                                meta.setCustomModelData(helmetM);
+//                            }
+//                            if (armorE != null && armorEL != null) {
+//                                if (armorE[i] != null && armorEL[i] != null) {
+//                                    for (int j = 0; j < armorE[i].length; j++) {
+//                                        if (armorE[i][j] != null && armorEL[i][j] != null) {
+//                                            meta.addEnchant(armorE[i][j],armorEL[i][j], true);
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                            meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE, (byte) 1);
+//                            armorItem[i].setItemMeta(meta);
+//                        }
+//                        switch (i) {
+//                            case 0 -> pairList.add(new Pair<>(EnumWrappers.ItemSlot.HEAD, armorItem[i]));
+//                            case 1 -> pairList.add(new Pair<>(EnumWrappers.ItemSlot.LEGS, armorItem[i]));
+//                            case 2 -> pairList.add(new Pair<>(EnumWrappers.ItemSlot.FEET, armorItem[i]));
+//                        }
+//                    }
+//                }
+//
+//                ItemStack chestPlate = new ItemStack(Material.LEATHER_CHESTPLATE);
+//                LeatherArmorMeta lam = (LeatherArmorMeta) chestPlate.getItemMeta();
+//                if (Main.CTFPlayers.containsKey(player)) {
+//                    CTFPlayer cPlayer = Main.CTFPlayers.get(player);
+//                    if (lam != null) {
+//                        lam.setColor(cPlayer.getTeam().getColor());
+//                        lam.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE, (byte) 1);
+//                        chestPlate.setItemMeta(lam);
+//                    }
+//                }
+//                pairList.add(new Pair<>(EnumWrappers.ItemSlot.CHEST, chestPlate));
+//                equipment.getSlotStackPairLists().write(0, pairList);
+//
+//
+//                try {
+//                    ProtocolLibrary.getProtocolManager().sendServerPacket(player, equipment);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+
 //                WorldCreator wc = new WorldCreator("hell");
 //                wc.environment(World.Environment.NORMAL);
 //                wc.type(WorldType.NORMAL);
@@ -368,13 +506,13 @@ public class CTFCommands implements CommandExecutor {
 ////            packet.getItemSlots().write(0, EnumWrappers.ItemSlot.HEAD);
 ////                packet.getItemModifier().write(0,new ItemStack(Material.RED_BANNER));
 //
-            PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_EQUIPMENT);
-
-			try {
-		        ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
-		    } catch (Exception e) {
-		        e.printStackTrace();
-		    }
+//            PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_EQUIPMENT);
+//
+//			try {
+//		        ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
+//		    } catch (Exception e) {
+//		        e.printStackTrace();
+//		    }
 
 //                player.setCooldown(Material.DIRT, 120);
 
