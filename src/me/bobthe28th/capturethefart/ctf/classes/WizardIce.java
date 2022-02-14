@@ -19,7 +19,9 @@ public class WizardIce extends CTFClass implements Listener {
 
     public WizardIce(CTFPlayer player_, Main plugin_) {
         super("Ice Wizard",plugin_,player_);
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        if (player_ != null) {
+            Bukkit.getPluginManager().registerEvents(this, plugin);
+        }
         setArmor(new Material[]{Material.LEATHER,null,null});
         setHelmetCustomModel(2);
     }

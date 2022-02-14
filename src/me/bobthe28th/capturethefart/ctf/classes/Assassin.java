@@ -25,7 +25,9 @@ public class Assassin extends CTFClass implements Listener {
 
     public Assassin(CTFPlayer player_, Main plugin_) {
         super("Assassin",plugin_,player_);
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        if (player_ != null) {
+            Bukkit.getPluginManager().registerEvents(this, plugin);
+        }
         setArmor(new Material[]{Material.LEATHER,null,null});
         setHelmetCustomModel(5);
     }

@@ -1,11 +1,12 @@
 package me.bobthe28th.capturethefart;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.wrappers.*;
 import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import me.bobthe28th.capturethefart.ctf.*;
@@ -15,6 +16,7 @@ import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,6 +25,10 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -331,6 +337,95 @@ public class Main extends JavaPlugin implements Listener {
                 }
             }
         }.runTaskTimer(plugin,freq,freq);
+    }
+
+    public static void fakeClass(Player player, UUID uuid, Integer id, CTFClass ctfClass, Main plugin) {
+        //add
+        PacketContainer add = new PacketContainer(PacketType.Play.Server.PLAYER_INFO);
+        add.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.ADD_PLAYER);
+        WrappedGameProfile profile = new WrappedGameProfile(uuid, ctfClass.getName());
+        profile.getProperties().put("textures", WrappedGameProfile.fromPlayer(player).getProperties().get("textures").iterator().next());
+        WrappedChatComponent name = WrappedChatComponent.fromText(profile.getName());
+        List<PlayerInfoData> pd = new ArrayList<>();
+        pd.add(new PlayerInfoData(profile, 0, EnumWrappers.NativeGameMode.CREATIVE, name));
+        add.getPlayerInfoDataLists().write(0,pd);
+
+        //spawn
+        PacketContainer spawn = new PacketContainer(PacketType.Play.Server.NAMED_ENTITY_SPAWN);
+        spawn.getIntegers().write(0,id);
+        spawn.getUUIDs().write(0, uuid);
+        spawn.getBytes().write(0,(byte)0).write(1,(byte)0);
+        Location pLoc = player.getLocation();
+        spawn.getDoubles().write(0,pLoc.getX()).write(1,pLoc.getY()).write(2,pLoc.getZ());
+
+        //show skin outer layer
+        PacketContainer outerSkin = new PacketContainer(PacketType.Play.Server.ENTITY_METADATA);
+        outerSkin.getIntegers().write(0,id);
+        WrappedDataWatcher watcher = new WrappedDataWatcher(player);
+        watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(17, WrappedDataWatcher.Registry.get(Byte.class)), (byte)127);
+        outerSkin.getWatchableCollectionModifier().write(0,watcher.getWatchableObjects());
+
+        //give armor
+        PacketContainer equipment = new PacketContainer(PacketType.Play.Server.ENTITY_EQUIPMENT);
+        equipment.getIntegers().write(0,70);
+        List<Pair<EnumWrappers.ItemSlot, ItemStack>> pairList = new ArrayList<>();
+
+        Material[] armor = ctfClass.getArmor();
+        Integer helmetM = ctfClass.getHelmetModel();
+        Enchantment[][] armorE = ctfClass.getEnchantments();
+        Integer[][] armorEL = ctfClass.getEnchantmentLevels();
+        ctfClass.deselect();
+
+        ItemStack[] armorItem = new ItemStack[3];
+        for (int i = 0; i < armor.length; i++) {
+            if (armor[i] != null) {
+                armorItem[i] = new ItemStack(armor[i]);
+                ItemMeta meta = armorItem[i].getItemMeta();
+                if (meta != null) {
+                    if (i == 0) {
+                        meta.setCustomModelData(helmetM);
+                    }
+                    if (armorE != null && armorEL != null) {
+                        if (armorE[i] != null && armorEL[i] != null) {
+                            for (int j = 0; j < armorE[i].length; j++) {
+                                if (armorE[i][j] != null && armorEL[i][j] != null) {
+                                    meta.addEnchant(armorE[i][j],armorEL[i][j], true);
+                                }
+                            }
+                        }
+                    }
+                    meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE, (byte) 1);
+                    armorItem[i].setItemMeta(meta);
+                }
+                switch (i) {
+                    case 0 -> pairList.add(new Pair<>(EnumWrappers.ItemSlot.HEAD, armorItem[i]));
+                    case 1 -> pairList.add(new Pair<>(EnumWrappers.ItemSlot.LEGS, armorItem[i]));
+                    case 2 -> pairList.add(new Pair<>(EnumWrappers.ItemSlot.FEET, armorItem[i]));
+                }
+            }
+        }
+
+        ItemStack chestPlate = new ItemStack(Material.LEATHER_CHESTPLATE);
+        LeatherArmorMeta lam = (LeatherArmorMeta) chestPlate.getItemMeta();
+        if (Main.CTFPlayers.containsKey(player)) {
+            CTFPlayer cPlayer = Main.CTFPlayers.get(player);
+            if (lam != null) {
+                lam.setColor(cPlayer.getTeam().getColor());
+                lam.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE, (byte) 1);
+                chestPlate.setItemMeta(lam);
+            }
+        }
+        pairList.add(new Pair<>(EnumWrappers.ItemSlot.CHEST, chestPlate));
+        equipment.getSlotStackPairLists().write(0, pairList);
+
+        try {
+            ProtocolLibrary.getProtocolManager().sendServerPacket(player, add);
+            ProtocolLibrary.getProtocolManager().sendServerPacket(player, spawn);
+            ProtocolLibrary.getProtocolManager().sendServerPacket(player, outerSkin);
+            ProtocolLibrary.getProtocolManager().sendServerPacket(player, equipment);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void playMusic(String song,Main plugin, boolean announce) {

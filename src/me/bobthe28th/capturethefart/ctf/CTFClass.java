@@ -28,6 +28,8 @@ public abstract class CTFClass {
         player = player_;
     }
 
+    public String getName() { return className; }
+
     public abstract void deselect();
 
     public abstract String getFormattedName();
@@ -44,6 +46,14 @@ public abstract class CTFClass {
         enchantments = enchantments_;
         enchantmentLevels = enchantmentLevels_;
     }
+
+    public Integer getHelmetModel() { return helmetModel; }
+
+    public Material[] getArmor() { return armor; }
+
+    public Enchantment[][] getEnchantments() { return enchantments; }
+
+    public Integer[][] getEnchantmentLevels() { return enchantmentLevels; }
 
     public void setHelmetCustomModel(int id) {
         helmetModel = id;

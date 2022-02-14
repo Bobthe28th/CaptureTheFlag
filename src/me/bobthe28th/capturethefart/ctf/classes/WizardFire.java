@@ -19,7 +19,9 @@ public class WizardFire extends CTFClass implements Listener {
 
     public WizardFire(CTFPlayer player_, Main plugin_) {
         super("Fire Wizard",plugin_,player_);
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        if (player_ != null) {
+            Bukkit.getPluginManager().registerEvents(this, plugin);
+        }
         setArmor(new Material[]{Material.LEATHER,null,null});
         setHelmetCustomModel(1);
     }
