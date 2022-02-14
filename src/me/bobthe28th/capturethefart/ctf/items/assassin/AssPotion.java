@@ -28,7 +28,7 @@ public class AssPotion extends CTFStackCooldownItem {
             startAction();
             player.removeArmor();
             event.setCancelled(true);
-            player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,1200,0,true,false,true));
+            player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,1200,0,true,true,true));
             knife.setAttackState(true);
         }
     }
