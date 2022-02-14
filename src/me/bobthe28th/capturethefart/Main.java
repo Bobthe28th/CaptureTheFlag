@@ -189,12 +189,14 @@ public class Main extends JavaPlugin implements Listener {
     public void onProjectileHit(ProjectileHitEvent event) {
         Projectile p = event.getEntity();
         if (p instanceof Snowball) {
-            if (p.getShooter() instanceof Player shooter && event.getHitEntity() instanceof Player player) {
-                if (CTFPlayers.containsKey(shooter) && CTFPlayers.containsKey(player)) {
-                    if (CTFPlayers.get(shooter).getTeam() != CTFPlayers.get(player).getTeam()) {
-                        customDamageCause.put(player,new Object[]{"wizardSnowball",shooter});
-                        player.damage(1.0, shooter);
-                        player.setFreezeTicks(Math.min(player.getFreezeTicks() + 50,p.getMaxFreezeTicks() + 60));
+            if (!p.getMetadata("hammer").get(0).asBoolean()) {
+                if (p.getShooter() instanceof Player shooter && event.getHitEntity() instanceof Player player) {
+                    if (CTFPlayers.containsKey(shooter) && CTFPlayers.containsKey(player)) {
+                        if (CTFPlayers.get(shooter).getTeam() != CTFPlayers.get(player).getTeam()) {
+                            customDamageCause.put(player,new Object[]{"wizardSnowball",shooter});
+                            player.damage(1.0, shooter);
+                            player.setFreezeTicks(Math.min(player.getFreezeTicks() + 50,p.getMaxFreezeTicks() + 60));
+                        }
                     }
                 }
             }
