@@ -260,6 +260,9 @@ public class CTFPlayer implements Listener {
             pClass.deselect();
         }
 	    removeItems();
+        for (PotionEffect pEffect : player.getActivePotionEffects()) {
+            player.removePotionEffect(pEffect.getType());
+        }
         pClass = cl;
         pClass.giveItems();
         giveArmor();

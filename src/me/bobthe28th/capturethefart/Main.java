@@ -30,6 +30,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Scoreboard;
@@ -51,10 +53,10 @@ public class Main extends JavaPlugin implements Listener {
     public static String[] CTFClassNames = new String[]{"WizardFire","WizardIce","WizardWind","Paladin","Demo","Builder","Archer","Assassin","Alchemist"};
     public static HashMap<Player,CTFPlayer> CTFPlayers;
 
-    public static String[] musicTitle = new String[]{"Halland / Dalarna - Smash Ultimate OST","Glide - Smash Ultimate OST"};
-    public static String[] musicLink = new String[]{"https://youtu.be/qa0LLO8xz9g","https://youtu.be/TFAfyMc-W3w"};
-    public static String[] music = new String[]{"halland","glide"};
-    public static Long[] musicLength = new Long[]{3440L,3360L};
+    public static String[] musicTitle = new String[]{"Halland / Dalarna - Smash Ultimate OST","Glide - Smash Ultimate OST","Mick Gordon - 11. BFG Division","Chris Christodoulou - You're Gonna Need a Bigger Ukulele | Risk of Rain 2 (2020)","Plants vs. Zombies: Garden Warfare [OST] #13: Loon Skirmish","Klaus Veen - Ordinary Days V2"};
+    public static String[] musicLink = new String[]{"https://youtu.be/qa0LLO8xz9g","https://youtu.be/TFAfyMc-W3w","https://youtu.be/QHRuTYtSbJQ","https://youtu.be/r2JeL1ibBI0","https://youtu.be/372g0DPPUHY","https://youtu.be/rpGIXmaQ2Ak"};
+    public static String[] music = new String[]{"halland_dalarna","glide","bfg_division","bigger_ukulele","loon_skirmish","ordinary_days"};
+    public static Long[] musicLength = new Long[]{3440L,3360L,10120L,6040L,3500L,7120L};
     static String currentMusic;
     static boolean musicPlaying = false;
     static BukkitTask musicRunnable;
@@ -189,7 +191,25 @@ public class Main extends JavaPlugin implements Listener {
     public void onProjectileHit(ProjectileHitEvent event) {
         Projectile p = event.getEntity();
         if (p instanceof Snowball) {
-            if (!p.getMetadata("hammer").get(0).asBoolean()) {
+            if (p.getMetadata("hammer").get(0).asBoolean()) {
+                if (p.getShooter() instanceof Player shooter && Main.CTFPlayers.containsKey(shooter)) {
+                    for (Entity e : p.getWorld().getNearbyEntities(p.getLocation(), 3, 3, 3)) {
+                        if (e instanceof Player pl && p.getLocation().distance(pl.getLocation()) <= 3 && Main.CTFPlayers.containsKey(pl)) {
+                            if (Main.CTFPlayers.get(pl).getTeam() != Main.CTFPlayers.get(shooter).getTeam()) {
+                                Main.customDamageCause.put(pl, new Object[]{"hammerThrow", shooter});
+                                pl.damage(2, shooter);
+                                pl.setVelocity(new Vector(0, pl.getVelocity().getY() + 0.05, 0));
+                                pl.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 2, true, true, true));
+                                pl.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 0, true, true, true));
+                            }
+                        }
+                    }
+                }
+                for (Entity e : p.getPassengers()) {
+                    p.removePassenger(e);
+                    e.remove();
+                }
+            } else {
                 if (p.getShooter() instanceof Player shooter && event.getHitEntity() instanceof Player player) {
                     if (CTFPlayers.containsKey(shooter) && CTFPlayers.containsKey(player)) {
                         if (CTFPlayers.get(shooter).getTeam() != CTFPlayers.get(player).getTeam()) {

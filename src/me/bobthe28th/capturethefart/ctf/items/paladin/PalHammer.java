@@ -23,7 +23,7 @@ import java.util.Objects;
 public class PalHammer extends CTFToolCooldownItem {
 
     public PalHammer (CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("Paladin's Hammer", Material.IRON_AXE,2, "Earth Shatter (not stolen from overwatch)",3,player_,plugin_, defaultSlot_);
+        super("Paladin's Hammer", Material.IRON_AXE,2, "Throw",3,player_,plugin_, defaultSlot_);
     }
 
     @Override
@@ -35,6 +35,7 @@ public class PalHammer extends CTFToolCooldownItem {
             hammer.setShooter(player.getPlayer());
             hammer.setVelocity(player.getPlayer().getLocation().getDirection().multiply(0.9));
             hammer.setMetadata("hammer", new FixedMetadataValue(plugin, true));
+            hammer.setMetadata("playerSent", new FixedMetadataValue(plugin, player.getPlayer().getName()));
             ItemStack item = new ItemStack(Material.IRON_AXE);
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
@@ -52,28 +53,6 @@ public class PalHammer extends CTFToolCooldownItem {
             if (hammerStand.getEquipment() != null) {
                 hammerStand.getEquipment().setHelmet(getItem());
             }
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (!hammer.isDead()) {
-                        hammerStand.setHeadPose(hammerStand.getHeadPose().add(0.5, 0, 0));
-                    } else {
-                        for (Entity e : hammer.getWorld().getNearbyEntities(hammer.getLocation(), 3, 3, 3)) {
-                            if (e instanceof Player p && hammer.getLocation().distance(p.getLocation()) <= 3 && Main.CTFPlayers.containsKey(p)) {
-                                if (Main.CTFPlayers.get(p).getTeam() != player.getTeam()) {
-                                    Main.customDamageCause.put(p,new Object[]{"hammerThrow",player.getPlayer()});
-                                    p.damage(2,player.getPlayer());
-                                    p.setVelocity(new Vector(0,p.getVelocity().getY() + 0.05,0));
-                                    p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW,20,2,true,true,true));
-                                    p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,20,0,true,true,true));
-                                }
-                            }
-                        }
-                        hammerStand.remove();
-                        this.cancel();
-                    }
-                }
-            }.runTaskTimer(plugin,0L,1L);
         }
     }
 
