@@ -319,7 +319,8 @@ public class CTFCommands implements CommandExecutor {
                 return true;
             case "test":
 
-                Main.fakeClass(player,UUID.fromString("00000000-0000-0000-0000-000000000000"),70,new Demo(null,plugin),plugin);
+                Main.gameController.selectTeam();
+//                Main.fakeClass(player,UUID.fromString("00000000-0000-0000-0000-000000000000"),70,new Demo(null,plugin),plugin);
 
 //                UUID uuid = UUID.fromString("00000000-0000-0000-0000-000000000000");
 //

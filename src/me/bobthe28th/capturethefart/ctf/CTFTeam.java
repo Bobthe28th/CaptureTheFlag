@@ -35,6 +35,14 @@ public class CTFTeam {
         team = t;
     }
 
+    public void setNameTagVisiblity(boolean visible) {
+        if (visible) {
+            team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
+        } else {
+            team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.FOR_OTHER_TEAMS);
+        }
+    }
+
     public Material getBanner() {
         return banner;
     }

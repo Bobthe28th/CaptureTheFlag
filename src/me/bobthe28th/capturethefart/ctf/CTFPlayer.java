@@ -33,6 +33,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import javax.annotation.Nullable;
+
 public class CTFPlayer implements Listener {
 
     Player player;
@@ -85,11 +87,16 @@ public class CTFPlayer implements Listener {
     }
 
     public void leaveTeam() {
-        team.getTeam().removeEntry(player.getName());
-        team = null;
+        if (team != null) {
+            team.getTeam().removeEntry(player.getName());
+            team = null;
+        }
     }
 
     public CTFTeam getTeam() {
+//        if (team == null) {
+//            throw new IllegalArgumentException("No team");
+//        }
         return team;
     }
 
