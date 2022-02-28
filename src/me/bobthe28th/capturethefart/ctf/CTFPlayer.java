@@ -91,12 +91,14 @@ public class CTFPlayer implements Listener {
             team.getTeam().removeEntry(player.getName());
             team = null;
         }
+        if (pClass != null) {
+            giveArmor();
+        } else {
+            removeArmor();
+        }
     }
 
     public CTFTeam getTeam() {
-//        if (team == null) {
-//            throw new IllegalArgumentException("No team");
-//        }
         return team;
     }
 
@@ -276,7 +278,9 @@ public class CTFPlayer implements Listener {
 	}
 
     public void leaveClass() {
-        pClass.deselect();
+        if (pClass != null) {
+            pClass.deselect();
+        }
         removeItems();
         pClass = null;
     }
