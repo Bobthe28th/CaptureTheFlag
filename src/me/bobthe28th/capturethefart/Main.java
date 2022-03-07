@@ -50,8 +50,8 @@ public class Main extends JavaPlugin implements Listener {
 
     public static CTFTeam[] CTFTeams;
     public static CTFFlag[] CTFFlags;
-    public static Class<?>[] CTFClasses = new Class<?>[]{WizardFire.class, WizardIce.class, WizardWind.class, Paladin.class, Demo.class, Builder.class, Archer.class, Assassin.class, Alchemist.class};
-    public static String[] CTFClassNames = new String[]{"WizardFire","WizardIce","WizardWind","Paladin","Demo","Builder","Archer","Assassin","Alchemist"};
+    public static Class<?>[] CTFClasses = new Class<?>[]{WizardFire.class, WizardIce.class, WizardWind.class, WizardEnd.class, Paladin.class, Demo.class, Builder.class, Archer.class, Assassin.class, Alchemist.class};
+    public static String[] CTFClassNames = new String[]{"WizardFire","WizardIce","WizardWind","WizardEnd","Paladin","Demo","Builder","Archer","Assassin","Alchemist"};
     public static HashMap<Player,CTFPlayer> CTFPlayers;
 
     public static String[] musicTitle = new String[]{"Halland / Dalarna - Smash Ultimate OST","Glide - Smash Ultimate OST","Mick Gordon - 11. BFG Division","Chris Christodoulou - You're Gonna Need a Bigger Ukulele | Risk of Rain 2 (2020)","Plants vs. Zombies: Garden Warfare [OST] #13: Loon Skirmish","Klaus Veen - Ordinary Days V2"};

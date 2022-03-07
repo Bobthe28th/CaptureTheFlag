@@ -33,8 +33,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import javax.annotation.Nullable;
-
 public class CTFPlayer implements Listener {
 
     Player player;
@@ -42,12 +40,14 @@ public class CTFPlayer implements Listener {
     CTFItem[] hotbar = new CTFItem[9];
     Main plugin;
     int cooldownTask;
-    CTFClass pClass;
+    CTFClass pClass = null;
     CTFFlag carriedFlag = null;
     ArmorStand flagOnHead = null;
     ArrayList<String> glowReason = new ArrayList<>();
     double healCooldown = 0.0;
     boolean onHealCooldown = false;
+    boolean canUse = true;
+    boolean selectingWizard = false;
 
 
     public CTFPlayer(Main plugin_, Player p) {
@@ -101,6 +101,37 @@ public class CTFPlayer implements Listener {
     public CTFTeam getTeam() {
         return team;
     }
+
+    public CTFClass getpClass() {
+        return pClass;
+    }
+
+    public boolean getSelectingWizard() {
+        return selectingWizard;
+    }
+
+    public void setSelectingWizard(boolean selectingWizard_) {
+        if (!selectingWizard && selectingWizard_) {
+
+            String[] wizIconNames = new String[]{"Fire","Ice","Wind","End"};
+
+            for (int i = 0; i < wizIconNames.length; i++) {
+                ItemStack it = new ItemStack(Material.CLAY_BALL,1);
+                ItemMeta meta = it.getItemMeta();
+                if (meta != null) {
+                    meta.setCustomModelData(i+1);
+                    meta.setDisplayName(ChatColor.RESET + wizIconNames[i]);
+                    meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE, (byte) 1);
+                }
+                it.setItemMeta(meta);
+                player.getInventory().setItem(i,it);
+            }
+            //TODO
+        }
+        selectingWizard = selectingWizard_;
+    }
+
+    public void setCanUse(boolean canUse_) { canUse = canUse_; }
 
     public String getFormattedName() {
         if (team != null) {
@@ -361,18 +392,27 @@ public class CTFPlayer implements Listener {
     @EventHandler
     public void onPlayerClick(PlayerInteractEvent event) {
         if (event.getPlayer() != player) return;
-        int slot = player.getInventory().getHeldItemSlot();
-        if (getItem(slot) != null) {
-            getItem(slot).onclickAction(event);
+        if (!canUse) {
+            event.setCancelled(true);
+        } else {
+            int slot = player.getInventory().getHeldItemSlot();
+            if (getItem(slot) != null) {
+                getItem(slot).onclickAction(event);
+            }
         }
+        //TODO on right click and selecting wizard then select class
     }
 
     @EventHandler
     public void onPlayerItemConsume(PlayerItemConsumeEvent event) {
         if (event.getPlayer() != player) return;
-        int slot = player.getInventory().getHeldItemSlot();
-        if (getItem(slot) != null) {
-            getItem(slot).onConsume(event);
+        if (!canUse) {
+            event.setCancelled(true);
+        } else {
+            int slot = player.getInventory().getHeldItemSlot();
+            if (getItem(slot) != null) {
+                getItem(slot).onConsume(event);
+            }
         }
     }
 
@@ -395,9 +435,13 @@ public class CTFPlayer implements Listener {
     @EventHandler
     public void onPlayerPlaceBlock(BlockPlaceEvent event) {
         if (event.getPlayer() != player) return;
-        int slot = player.getInventory().getHeldItemSlot();
-        if (getItem(slot) != null) {
-            getItem(slot).onblockPlace(event);
+        if (!canUse) {
+            event.setCancelled(true);
+        } else {
+            int slot = player.getInventory().getHeldItemSlot();
+            if (getItem(slot) != null) {
+                getItem(slot).onblockPlace(event);
+            }
         }
     }
 
