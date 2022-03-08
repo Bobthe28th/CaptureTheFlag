@@ -50,8 +50,8 @@ public class Main extends JavaPlugin implements Listener {
 
     public static CTFTeam[] CTFTeams;
     public static CTFFlag[] CTFFlags;
-    public static Class<?>[] CTFClasses = new Class<?>[]{WizardFire.class, WizardIce.class, WizardWind.class, WizardEnd.class, Paladin.class, Demo.class, Builder.class, Archer.class, Assassin.class, Alchemist.class};
-    public static String[] CTFClassNames = new String[]{"WizardFire","WizardIce","WizardWind","WizardEnd","Paladin","Demo","Builder","Archer","Assassin","Alchemist"};
+    public static Class<?>[] CTFClasses = new Class<?>[]{Paladin.class, Demo.class, Builder.class, Archer.class, Assassin.class, Alchemist.class, WizardFire.class, WizardIce.class, WizardWind.class, WizardEnd.class};
+    public static String[] CTFClassNames = new String[]{"Paladin","Demo","Builder","Archer","Assassin","Alchemist","WizardFire","WizardIce","WizardWind","WizardEnd"};
     public static HashMap<Player,CTFPlayer> CTFPlayers;
 
     public static String[] musicTitle = new String[]{"Halland / Dalarna - Smash Ultimate OST","Glide - Smash Ultimate OST","Mick Gordon - 11. BFG Division","Chris Christodoulou - You're Gonna Need a Bigger Ukulele | Risk of Rain 2 (2020)","Plants vs. Zombies: Garden Warfare [OST] #13: Loon Skirmish","Klaus Veen - Ordinary Days V2"};
@@ -369,16 +369,19 @@ public class Main extends JavaPlugin implements Listener {
         //add
         CTFClass ctfClass = null;
         if (c != null) {
-            try {
-                Constructor<?> constructor = c.getConstructor(CTFPlayer.class, Main.class);
-                ctfClass = (CTFClass) constructor.newInstance(null, plugin);
-            } catch (Exception ignored) {
+            if (c.equals(TeamPreview.class)) {
+                ctfClass = new TeamPreview(team, plugin);
+            } else if (c.equals(WizardPreview.class)) {
+                ctfClass = new WizardPreview(team, plugin);
+            } else {
+                try {
+                    Constructor<?> constructor = c.getConstructor(CTFPlayer.class, Main.class);
+                    ctfClass = (CTFClass) constructor.newInstance(null, plugin);
+                } catch (Exception ignored) {}
             }
-        } else {
-            ctfClass = new TeamPreview(team, plugin);
         }
         if (ctfClass == null) {
-            ctfClass = new Paladin(null, plugin);
+            ctfClass = new TeamPreview(team, plugin);
         }
 
         PacketContainer add = new PacketContainer(PacketType.Play.Server.PLAYER_INFO);
@@ -419,6 +422,7 @@ public class Main extends JavaPlugin implements Listener {
         Enchantment[][] armorE = ctfClass.getEnchantments();
         Integer[][] armorEL = ctfClass.getEnchantmentLevels();
         ctfClass.deselect();
+//        ctfClass = null;
 
         ItemStack[] armorItem = new ItemStack[3];
         if (armor != null) {

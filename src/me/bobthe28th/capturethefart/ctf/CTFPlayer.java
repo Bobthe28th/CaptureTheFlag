@@ -1,5 +1,6 @@
 package me.bobthe28th.capturethefart.ctf;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -12,6 +13,7 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -68,6 +70,7 @@ public class CTFPlayer implements Listener {
             player.removePassenger(e);
             e.remove();
         }
+        removeItems();
 
         cooldownTask = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
             int slot = player.getInventory().getHeldItemSlot();
@@ -122,11 +125,11 @@ public class CTFPlayer implements Listener {
                     meta.setCustomModelData(i+1);
                     meta.setDisplayName(ChatColor.RESET + wizIconNames[i]);
                     meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE, (byte) 1);
+                    meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfwicon"), PersistentDataType.INTEGER, i);
                 }
                 it.setItemMeta(meta);
                 player.getInventory().setItem(i,it);
             }
-            //TODO
         }
         selectingWizard = selectingWizard_;
     }
@@ -314,6 +317,11 @@ public class CTFPlayer implements Listener {
         }
         removeItems();
         pClass = null;
+        giveArmor();
+        for (PotionEffect pEffect : player.getActivePotionEffects()) {
+            player.removePotionEffect(pEffect.getType());
+        }
+
     }
 
     public <I extends CTFItem> void giveItem(I it) {
@@ -392,6 +400,26 @@ public class CTFPlayer implements Listener {
     @EventHandler
     public void onPlayerClick(PlayerInteractEvent event) {
         if (event.getPlayer() != player) return;
+
+        if (selectingWizard && (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
+            ItemStack it = player.getInventory().getItemInMainHand();
+            ItemMeta meta = it.getItemMeta();
+            if (meta != null) {
+                Byte ctfitemData = meta.getPersistentDataContainer().get(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE);
+                if (ctfitemData != null && ctfitemData == (byte) 1) {
+                    Integer icon = meta.getPersistentDataContainer().get(new NamespacedKey(plugin, "ctfwicon"), PersistentDataType.INTEGER);
+                    if (icon != null) {
+                        try {
+                            Constructor<?> constructor = Main.CTFClasses[Main.CTFClasses.length - 4 + icon].getConstructor(CTFPlayer.class, Main.class);
+                            CTFClass c = (CTFClass) constructor.newInstance(this, plugin);
+                            setClass(c);
+                        } catch (Exception ignored) {}
+                        setCanUse(false);
+                    }
+                }
+            }
+        }
+
         if (!canUse) {
             event.setCancelled(true);
         } else {
@@ -400,7 +428,7 @@ public class CTFPlayer implements Listener {
                 getItem(slot).onclickAction(event);
             }
         }
-        //TODO on right click and selecting wizard then select class
+
     }
 
     @EventHandler

@@ -1,6 +1,8 @@
 package me.bobthe28th.capturethefart.ctf;
 
 import me.bobthe28th.capturethefart.Main;
+import me.bobthe28th.capturethefart.ctf.classes.TeamPreview;
+import me.bobthe28th.capturethefart.ctf.classes.WizardPreview;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -13,6 +15,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.lang.reflect.Constructor;
+import java.util.Arrays;
 import java.util.UUID;
 
 public class CTFGameController implements Listener {
@@ -37,11 +40,13 @@ public class CTFGameController implements Listener {
     int classSelectTimeMax = 5;
     int classSelectTime = teamSelectTimeMax;
 
+    Location[] gameStart;
+
     public CTFGameController(Main plugin_, World w) {
         plugin = plugin_;
         Bukkit.getPluginManager().registerEvents(this, plugin);
-        teamStart = new Location(w, 68.5, 81, -226.5);
-        teamStart.setYaw(-90F);
+        teamStart = new Location(w, 68.5, 81, -226.5, -90F, 0F);
+//        teamStart.setYaw(-90F);
         teamSelect = new Location[Main.CTFTeams.length];
         classStart = new Location[Main.CTFClasses.length];
         classSelect = new Location[Main.CTFTeams.length][Main.CTFClasses.length];
@@ -49,8 +54,8 @@ public class CTFGameController implements Listener {
         teamSelect[0] = new Location(w, 73.5, 81, -231.5);
         teamSelect[1] = new Location(w, 73.5, 81, -221.5);
         classSelectY = 81;
-        classStart[0] = new Location(w, 57.5, 81, -261.5);
-        classStart[1] = new Location(w, 57.5, 81, -244.5);
+        classStart[0] = new Location(w, 57.5, 81, -261.5, -90F, 0F);
+        classStart[1] = new Location(w, 57.5, 81, -244.5, -90F, 0F);
 
         //"WizardFire","WizardIce","WizardWind","Paladin","Demo","Builder","Archer","Assassin","Alchemist"
         classSelect[0] = new Location[]{
@@ -71,6 +76,10 @@ public class CTFGameController implements Listener {
                 new Location(w,68.5, 81, -239.5),
                 new Location(w,63.5, 81, -239.5)
         };
+
+        gameStart = new Location[Main.CTFTeams.length];
+        gameStart[0] = new Location(w,109.5, 66, -205.5);
+        gameStart[1] = new Location(w,112.5, 66, -205.5);
     }
 
     public void selectTeam() {
@@ -84,8 +93,8 @@ public class CTFGameController implements Listener {
             }
             p.teleport(teamStart);
             Main.CTFPlayers.put(p, new CTFPlayer(plugin, p));
-            Main.fakeClass(p, UUID.fromString("00000000-0000-0000-0000-000000000000"),70, teamSelect[0].clone().add(0.0,3.0,0.0), 0F, 90F, null,Main.CTFTeams[0],plugin);
-            Main.fakeClass(p, UUID.fromString("00000000-0000-0000-0000-000000000001"),71, teamSelect[1].clone().add(0.0,3.0,0.0), 0F, 90F, null,Main.CTFTeams[1],plugin);
+            Main.fakeClass(p, new UUID(0,0),70, teamSelect[0].clone().add(0.0,3.0,0.0), 0F, 90F, TeamPreview.class,Main.CTFTeams[0],plugin);
+            Main.fakeClass(p, new UUID(0,1),71, teamSelect[1].clone().add(0.0,3.0,0.0), 0F, 90F, TeamPreview.class,Main.CTFTeams[1],plugin);
         }
     }
 
@@ -100,7 +109,8 @@ public class CTFGameController implements Listener {
         startTeamSelectTimer();
     }
 
-    void selectClassJoin(CTFPlayer player, Class<?> ctfclass) {
+    void selectClassJoin(CTFPlayer player, Class<?> ctfclass, int index) {
+        Main.despawnFake(player.getPlayer(), new UUID(0,index), 70+index);
         if (ctfclass == null) {
             player.setSelectingWizard(true);
         } else {
@@ -202,11 +212,14 @@ public class CTFGameController implements Listener {
                     }
 
                     if (classSelectTime <= 0) {
-                        for (Player p : Main.CTFPlayers.keySet()) {
-                            p.sendTitle(" ", "", 0, 0, 0);
-                        }
                         selectingClass = false;
-                        //TODO
+                        for (CTFPlayer p : Main.CTFPlayers.values()) {
+                            p.getPlayer().sendTitle(" ", "", 0, 0, 0);
+                            if (p.getTeam() != null) {
+                                p.getPlayer().teleport(gameStart[p.getTeam().getId()]);
+                                p.setCanUse(true);
+                            }
+                        }
                         this.cancel();
                     }
 
@@ -243,12 +256,17 @@ public class CTFGameController implements Listener {
     void selectClass() {
         selectingClass = true;
         for (Player p : Bukkit.getOnlinePlayers()) {
-            Main.despawnFake(p, UUID.fromString("00000000-0000-0000-0000-000000000000"),70);
-            Main.despawnFake(p, UUID.fromString("00000000-0000-0000-0000-000000000001"),71);
+            Main.despawnFake(p, new UUID(0,0),70);
+            Main.despawnFake(p, new UUID(0,1),71);
         }
 
         for (CTFPlayer p : Main.CTFPlayers.values()) {
             if (p.getTeam() != null) {
+                for (int i = 0; i < Main.CTFClasses.length - 4; i++) {
+                    Main.fakeClass(p.getPlayer(), new UUID(0, i), 70 + i, classSelect[p.getTeam().getId()][i], 0F, 90F,Main.CTFClasses[i], p.getTeam(), plugin);
+                }
+                int index = Main.CTFClasses.length - 4;
+                Main.fakeClass(p.getPlayer(), new UUID(0, index), 70 + index, classSelect[p.getTeam().getId()][index], 0F, 90F,WizardPreview.class, p.getTeam(), plugin);
                 p.getPlayer().teleport(classStart[p.getTeam().getId()]);
             }
         }
@@ -275,7 +293,9 @@ public class CTFGameController implements Listener {
                 }
             }
             if (!inSelect) {
-                player.leaveTeam();
+                if (player.getTeam() != null) {
+                    player.leaveTeam();
+                }
                 stopTeamSelectTimer();
             }
 
@@ -286,17 +306,30 @@ public class CTFGameController implements Listener {
             boolean inSelect = false;
             for (int i = 0; i < classSelect[teamid].length; i++) {
                 if (blockPos.distance(classSelect[teamid][i]) < classSelectRadius) {
-                    if (i == 0) {
-                        selectClassJoin(player,null);
+                    if (i >= Main.CTFClasses.length - 4) {
+                        selectClassJoin(player,null,i);
                     } else {
-                        selectClassJoin(player,Main.CTFClasses[i + 3]); //+3 because wizards
+                        selectClassJoin(player,Main.CTFClasses[i],i);
                     }
                     inSelect = true;
                 }
             }
             if (!inSelect) {
-                player.setSelectingWizard(false);
-                player.leaveClass();
+                if (player.getpClass() != null || player.getSelectingWizard()) {
+                    if (player.getSelectingWizard()) {
+                        int index = Main.CTFClasses.length - 4;
+                        Main.fakeClass(player.getPlayer(), new UUID(0, index), 70 + index, classSelect[player.getTeam().getId()][index], 0F, 90F, WizardPreview.class, player.getTeam(), plugin);
+                    } else {
+                        int index = Arrays.asList(Main.CTFClasses).indexOf(player.getpClass().getClass());
+                        if (index != -1) {
+                            Main.fakeClass(player.getPlayer(), new UUID(0, index), 70 + index, classSelect[player.getTeam().getId()][index], 0F, 90F,Main.CTFClasses[index], player.getTeam(), plugin);
+                        }
+                    }
+
+                    player.setSelectingWizard(false);
+
+                    player.leaveClass();
+                }
                 stopClassSelectTimer();
             }
         }
