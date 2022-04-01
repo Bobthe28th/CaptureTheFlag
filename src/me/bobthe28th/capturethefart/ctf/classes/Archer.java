@@ -16,6 +16,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class Archer extends CTFClass implements Listener {
 
@@ -46,6 +48,8 @@ public class Archer extends CTFClass implements Listener {
 
     @Override
     public void giveItems() {
+        player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.JUMP,Integer.MAX_VALUE,1,true,false,true));
+
         player.removeItems();
 
         bow = new ArcBow(player,plugin,4);
