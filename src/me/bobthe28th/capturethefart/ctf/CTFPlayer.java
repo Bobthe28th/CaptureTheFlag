@@ -415,6 +415,7 @@ public class CTFPlayer implements Listener {
                             setClass(c);
                         } catch (Exception ignored) {}
                         setCanUse(false);
+                        Main.gameController.startClassSelectTimer();
                     }
                 }
             }

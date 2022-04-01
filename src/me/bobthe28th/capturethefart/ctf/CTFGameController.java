@@ -217,6 +217,13 @@ public class CTFGameController implements Listener {
                             p.getPlayer().sendTitle(" ", "", 0, 0, 0);
                             if (p.getTeam() != null) {
                                 p.getPlayer().teleport(gameStart[p.getTeam().getId()]);
+
+                                //TODO despawn fakes
+
+                                for (int i = 0; i < Main.CTFClasses.length - 3; i++) {
+                                    Main.despawnFake(p.getPlayer(), new UUID(0, i), 70 + i);
+                                }
+
                                 p.setCanUse(true);
                             }
                         }
