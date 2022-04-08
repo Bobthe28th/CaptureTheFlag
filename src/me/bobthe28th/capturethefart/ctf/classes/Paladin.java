@@ -46,6 +46,7 @@ public class Paladin extends CTFClass implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         if (event.getPlayer() != player.getPlayer()) return;
+        if (player.getpClass() != this) return;
         if (((Entity) player.getPlayer()).isOnGround()) {
             player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,Integer.MAX_VALUE,0,true,false,true));
         } else if (player.getPlayer().hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {

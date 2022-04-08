@@ -6,6 +6,9 @@ description: Capture the flag but funnie
 api-version: 1.18
 depend: [ProtocolLib]
 commands:
+  ctfstart:
+    description: Starts the CTF match
+    usage: /<command>
   ctfjoin:
     description: Joins a player to CTF
     usage: /<command> target

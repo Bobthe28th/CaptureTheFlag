@@ -1,6 +1,7 @@
 package me.bobthe28th.capturethefart;
 
 import java.io.*;
+import java.lang.reflect.Constructor;
 import java.util.*;
 
 import com.comphenix.protocol.PacketType;
@@ -49,8 +50,8 @@ public class Main extends JavaPlugin implements Listener {
 
     public static CTFTeam[] CTFTeams;
     public static CTFFlag[] CTFFlags;
-    public static Class<?>[] CTFClasses = new Class<?>[]{WizardFire.class, WizardIce.class, WizardWind.class, Paladin.class, Demo.class, Builder.class, Archer.class, Assassin.class, Alchemist.class};
-    public static String[] CTFClassNames = new String[]{"WizardFire","WizardIce","WizardWind","Paladin","Demo","Builder","Archer","Assassin","Alchemist"};
+    public static Class<?>[] CTFClasses = new Class<?>[]{Paladin.class, Demo.class, Builder.class, Archer.class, Assassin.class, Alchemist.class, WizardFire.class, WizardIce.class, WizardWind.class, WizardEnd.class};
+    public static String[] CTFClassNames = new String[]{"Paladin","Demo","Builder","Archer","Assassin","Alchemist","WizardFire","WizardIce","WizardWind","WizardEnd"};
     public static HashMap<Player,CTFPlayer> CTFPlayers;
 
     public static String[] musicTitle = new String[]{"Halland / Dalarna - Smash Ultimate OST","Glide - Smash Ultimate OST","Mick Gordon - 11. BFG Division","Chris Christodoulou - You're Gonna Need a Bigger Ukulele | Risk of Rain 2 (2020)","Plants vs. Zombies: Garden Warfare [OST] #13: Loon Skirmish","Klaus Veen - Ordinary Days V2"};
@@ -60,6 +61,7 @@ public class Main extends JavaPlugin implements Listener {
     static String currentMusic;
     static boolean musicPlaying = false;
     static BukkitTask musicRunnable;
+    public static CTFGameController gameController;
 
     CTFDeathMessages deathMessages;
 
@@ -77,7 +79,7 @@ public class Main extends JavaPlugin implements Listener {
         CTFTabCompletion tabCompleter = new CTFTabCompletion();
         getServer().getPluginManager().registerEvents(this, this);
 
-        String[] commandNames = new String[]{"ctfjoin","ctfleave","ctffulljoin","ctfteamjoin","ctfteamleave","ctfteams","ctfsetclass","ctfleaveclass","fly","heal","test","music"};
+        String[] commandNames = new String[]{"ctfstart","ctfjoin","ctfleave","ctffulljoin","ctfteamjoin","ctfteamleave","ctfteams","ctfsetclass","ctfleaveclass","fly","heal","test","music"};
 
         for (String commandName : commandNames) {
             Objects.requireNonNull(getCommand(commandName)).setExecutor(commands);
@@ -96,6 +98,8 @@ public class Main extends JavaPlugin implements Listener {
         World w = Bukkit.getServer().getWorld("world");
         CTFFlags = new CTFFlag[]{new CTFFlag(CTFTeams[0],this, new Location(w,109.0, 66.0, -199.0)), new CTFFlag(CTFTeams[1],this, new Location(w, 118.0, 66.0, -199.0))};
         CTFPlayers = new HashMap<>();
+
+        gameController = new CTFGameController(this,w);
 
         Gson gson = new Gson();
         InputStream stream = this.getResource("me/bobthe28th/capturethefart/ctf/deathMessages.json");
@@ -361,8 +365,25 @@ public class Main extends JavaPlugin implements Listener {
         }.runTaskTimer(plugin,freq,freq);
     }
 
-    public static void fakeClass(Player player, UUID uuid, Integer id, CTFClass ctfClass, Main plugin) {
+    public static void fakeClass(Player player, UUID uuid, Integer id, Location loc, float pitch, float yaw, Class<?> c, CTFTeam team, Main plugin) {
         //add
+        CTFClass ctfClass = null;
+        if (c != null) {
+            if (c.equals(TeamPreview.class)) {
+                ctfClass = new TeamPreview(team, plugin);
+            } else if (c.equals(WizardPreview.class)) {
+                ctfClass = new WizardPreview(team, plugin);
+            } else {
+                try {
+                    Constructor<?> constructor = c.getConstructor(CTFPlayer.class, Main.class);
+                    ctfClass = (CTFClass) constructor.newInstance(null, plugin);
+                } catch (Exception ignored) {}
+            }
+        }
+        if (ctfClass == null) {
+            ctfClass = new TeamPreview(team, plugin);
+        }
+
         PacketContainer add = new PacketContainer(PacketType.Play.Server.PLAYER_INFO);
         add.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.ADD_PLAYER);
         WrappedGameProfile profile = new WrappedGameProfile(uuid, ctfClass.getName());
@@ -370,26 +391,30 @@ public class Main extends JavaPlugin implements Listener {
         WrappedChatComponent name = WrappedChatComponent.fromText(profile.getName());
         List<PlayerInfoData> pd = new ArrayList<>();
         pd.add(new PlayerInfoData(profile, 0, EnumWrappers.NativeGameMode.CREATIVE, name));
-        add.getPlayerInfoDataLists().write(0,pd);
+        add.getPlayerInfoDataLists().write(0, pd);
 
         //spawn
         PacketContainer spawn = new PacketContainer(PacketType.Play.Server.NAMED_ENTITY_SPAWN);
-        spawn.getIntegers().write(0,id);
+        spawn.getIntegers().write(0, id);
         spawn.getUUIDs().write(0, uuid);
-        spawn.getBytes().write(0,(byte)0).write(1,(byte)0);
-        Location pLoc = player.getLocation();
-        spawn.getDoubles().write(0,pLoc.getX()).write(1,pLoc.getY()).write(2,pLoc.getZ());
+        spawn.getBytes().write(0, (byte) yaw).write(1, (byte) pitch);
+        spawn.getDoubles().write(0, loc.getX()).write(1, loc.getY()).write(2, loc.getZ());
+
+        //head look
+        PacketContainer look = new PacketContainer(PacketType.Play.Server.ENTITY_HEAD_ROTATION);
+        look.getIntegers().write(0, id);
+        look.getBytes().write(0, (byte) (yaw * 256.0F / 360.0F));
 
         //show skin outer layer
         PacketContainer outerSkin = new PacketContainer(PacketType.Play.Server.ENTITY_METADATA);
-        outerSkin.getIntegers().write(0,id);
+        outerSkin.getIntegers().write(0, id);
         WrappedDataWatcher watcher = new WrappedDataWatcher(player);
-        watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(17, WrappedDataWatcher.Registry.get(Byte.class)), (byte)127);
-        outerSkin.getWatchableCollectionModifier().write(0,watcher.getWatchableObjects());
+        watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(17, WrappedDataWatcher.Registry.get(Byte.class)), (byte) 127);
+        outerSkin.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects());
 
         //give armor
         PacketContainer equipment = new PacketContainer(PacketType.Play.Server.ENTITY_EQUIPMENT);
-        equipment.getIntegers().write(0,70);
+        equipment.getIntegers().write(0, id);
         List<Pair<EnumWrappers.ItemSlot, ItemStack>> pairList = new ArrayList<>();
 
         Material[] armor = ctfClass.getArmor();
@@ -397,45 +422,44 @@ public class Main extends JavaPlugin implements Listener {
         Enchantment[][] armorE = ctfClass.getEnchantments();
         Integer[][] armorEL = ctfClass.getEnchantmentLevels();
         ctfClass.deselect();
+//        ctfClass = null;
 
         ItemStack[] armorItem = new ItemStack[3];
-        for (int i = 0; i < armor.length; i++) {
-            if (armor[i] != null) {
-                armorItem[i] = new ItemStack(armor[i]);
-                ItemMeta meta = armorItem[i].getItemMeta();
-                if (meta != null) {
-                    if (i == 0) {
-                        meta.setCustomModelData(helmetM);
-                    }
-                    if (armorE != null && armorEL != null) {
-                        if (armorE[i] != null && armorEL[i] != null) {
-                            for (int j = 0; j < armorE[i].length; j++) {
-                                if (armorE[i][j] != null && armorEL[i][j] != null) {
-                                    meta.addEnchant(armorE[i][j],armorEL[i][j], true);
+        if (armor != null) {
+            for (int i = 0; i < armor.length; i++) {
+                if (armor[i] != null) {
+                    armorItem[i] = new ItemStack(armor[i]);
+                    ItemMeta meta = armorItem[i].getItemMeta();
+                    if (meta != null) {
+                        if (i == 0) {
+                            meta.setCustomModelData(helmetM);
+                        }
+                        if (armorE != null && armorEL != null) {
+                            if (armorE[i] != null && armorEL[i] != null) {
+                                for (int j = 0; j < armorE[i].length; j++) {
+                                    if (armorE[i][j] != null && armorEL[i][j] != null) {
+                                        meta.addEnchant(armorE[i][j], armorEL[i][j], true);
+                                    }
                                 }
                             }
                         }
+                        meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE, (byte) 1);
+                        armorItem[i].setItemMeta(meta);
                     }
-                    meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE, (byte) 1);
-                    armorItem[i].setItemMeta(meta);
-                }
-                switch (i) {
-                    case 0 -> pairList.add(new Pair<>(EnumWrappers.ItemSlot.HEAD, armorItem[i]));
-                    case 1 -> pairList.add(new Pair<>(EnumWrappers.ItemSlot.LEGS, armorItem[i]));
-                    case 2 -> pairList.add(new Pair<>(EnumWrappers.ItemSlot.FEET, armorItem[i]));
+                    switch (i) {
+                        case 0 -> pairList.add(new Pair<>(EnumWrappers.ItemSlot.HEAD, armorItem[i]));
+                        case 1 -> pairList.add(new Pair<>(EnumWrappers.ItemSlot.LEGS, armorItem[i]));
+                        case 2 -> pairList.add(new Pair<>(EnumWrappers.ItemSlot.FEET, armorItem[i]));
+                    }
                 }
             }
         }
-
         ItemStack chestPlate = new ItemStack(Material.LEATHER_CHESTPLATE);
         LeatherArmorMeta lam = (LeatherArmorMeta) chestPlate.getItemMeta();
-        if (Main.CTFPlayers.containsKey(player)) {
-            CTFPlayer cPlayer = Main.CTFPlayers.get(player);
-            if (lam != null) {
-                lam.setColor(cPlayer.getTeam().getColor());
-                lam.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE, (byte) 1);
-                chestPlate.setItemMeta(lam);
-            }
+        if (lam != null) {
+            lam.setColor(team.getColor());
+            lam.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE, (byte) 1);
+            chestPlate.setItemMeta(lam);
         }
         pairList.add(new Pair<>(EnumWrappers.ItemSlot.CHEST, chestPlate));
         equipment.getSlotStackPairLists().write(0, pairList);
@@ -443,8 +467,34 @@ public class Main extends JavaPlugin implements Listener {
         try {
             ProtocolLibrary.getProtocolManager().sendServerPacket(player, add);
             ProtocolLibrary.getProtocolManager().sendServerPacket(player, spawn);
+            ProtocolLibrary.getProtocolManager().sendServerPacket(player, look);
             ProtocolLibrary.getProtocolManager().sendServerPacket(player, outerSkin);
             ProtocolLibrary.getProtocolManager().sendServerPacket(player, equipment);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void despawnFake(Player player, UUID uuid, Integer id) {
+        //remove from list
+        PacketContainer remove = new PacketContainer(PacketType.Play.Server.PLAYER_INFO);
+        remove.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.REMOVE_PLAYER);
+
+        WrappedGameProfile profile = new WrappedGameProfile(uuid,"");
+        WrappedChatComponent name = WrappedChatComponent.fromText(profile.getName());
+        List<PlayerInfoData> pd = new ArrayList<>();
+        pd.add(new PlayerInfoData(profile, 0, EnumWrappers.NativeGameMode.CREATIVE, name));
+        remove.getPlayerInfoDataLists().write(0, pd);
+
+        //despawn
+        PacketContainer despawn = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
+        List<Integer> entityIDList = new ArrayList<>();
+        entityIDList.add(id);
+        despawn.getIntLists().write(0,entityIDList);
+
+        try {
+            ProtocolLibrary.getProtocolManager().sendServerPacket(player, remove);
+            ProtocolLibrary.getProtocolManager().sendServerPacket(player, despawn);
         } catch (Exception e) {
             e.printStackTrace();
         }

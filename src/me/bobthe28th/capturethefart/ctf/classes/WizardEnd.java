@@ -3,32 +3,28 @@ package me.bobthe28th.capturethefart.ctf.classes;
 import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFClass;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
-import me.bobthe28th.capturethefart.ctf.items.wizard.WizBookFire;
-import me.bobthe28th.capturethefart.ctf.items.wizard.WizStickFire;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
-public class WizardFire extends CTFClass implements Listener {
+public class WizardEnd extends CTFClass implements Listener {
 
-    String name = "Fire Wizard";
+    String name = "End Wizard";
 
-    public WizardFire(CTFPlayer player_, Main plugin_) {
-        super("Fire Wizard",plugin_,player_);
+    public WizardEnd(CTFPlayer player_, Main plugin_) {
+        super("End Wizard",plugin_,player_);
         if (player_ != null) {
             Bukkit.getPluginManager().registerEvents(this, plugin);
         }
         setArmor(new Material[]{Material.LEATHER,null,null});
-        setHelmetCustomModel(1);
+        setHelmetCustomModel(4);
     }
 
     @Override
     public void giveItems() {
         player.removeItems();
-        player.giveItem(new WizStickFire(player,plugin,0));
-        player.giveItem(new WizBookFire(player,plugin,1));
     }
 
     @Override
@@ -38,7 +34,6 @@ public class WizardFire extends CTFClass implements Listener {
 
     @Override
     public String getFormattedName() {
-        return ChatColor.RED + name + ChatColor.RESET;
+        return ChatColor.DARK_PURPLE + name + ChatColor.RESET;
     }
-
 }

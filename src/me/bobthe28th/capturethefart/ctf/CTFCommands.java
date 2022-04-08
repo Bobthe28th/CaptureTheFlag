@@ -1,28 +1,13 @@
 package me.bobthe28th.capturethefart.ctf;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.*;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import me.bobthe28th.capturethefart.ctf.classes.Demo;
-import me.bobthe28th.capturethefart.ctf.classes.Paladin;
-import me.bobthe28th.capturethefart.ctf.classes.WizardFire;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 
 import me.bobthe28th.capturethefart.Main;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
@@ -45,6 +30,9 @@ public class CTFCommands implements CommandExecutor {
         Player target = null;
 
         switch (cmd.getName().toLowerCase()) {
+            case "ctfstart":
+                Main.gameController.start();
+                return true;
             case "ctfjoin":
                 if (args.length > 0) {
                     target = Bukkit.getPlayer(args[0]);
@@ -319,7 +307,7 @@ public class CTFCommands implements CommandExecutor {
                 return true;
             case "test":
 
-                Main.fakeClass(player,UUID.fromString("00000000-0000-0000-0000-000000000000"),70,new Demo(null,plugin),plugin);
+//                Main.fakeClass(player,UUID.fromString("00000000-0000-0000-0000-000000000000"),70,new Demo(null,plugin),plugin);
 
 //                UUID uuid = UUID.fromString("00000000-0000-0000-0000-000000000000");
 //
@@ -465,7 +453,7 @@ public class CTFCommands implements CommandExecutor {
 //////                watcher.setObject(0, serializer , (byte) (0x01));
 //////                watcher.setObject(9, serializer , 10.0F);
 //                watcher.setObject(6, serializer, );
-//
+
 //                packet.getWatchableCollectionModifier().write(0,watcher.getWatchableObjects());
 //                try {
 //                    ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
