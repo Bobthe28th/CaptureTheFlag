@@ -79,7 +79,7 @@ public class Main extends JavaPlugin implements Listener {
         CTFTabCompletion tabCompleter = new CTFTabCompletion();
         getServer().getPluginManager().registerEvents(this, this);
 
-        String[] commandNames = new String[]{"ctfjoin","ctfleave","ctffulljoin","ctfteamjoin","ctfteamleave","ctfteams","ctfsetclass","ctfleaveclass","fly","heal","test","music"};
+        String[] commandNames = new String[]{"ctfstart","ctfjoin","ctfleave","ctffulljoin","ctfteamjoin","ctfteamleave","ctfteams","ctfsetclass","ctfleaveclass","fly","heal","test","music"};
 
         for (String commandName : commandNames) {
             Objects.requireNonNull(getCommand(commandName)).setExecutor(commands);

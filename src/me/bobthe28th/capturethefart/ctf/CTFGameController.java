@@ -82,7 +82,11 @@ public class CTFGameController implements Listener {
         gameStart[1] = new Location(w,112.5, 66, -205.5);
     }
 
-    public void selectTeam() {
+    public void start() {
+        selectTeam();
+    }
+
+    void selectTeam() {
         selectingTeam = true;
         for (CTFTeam team : Main.CTFTeams) {
             team.setNameTagVisiblity(true);

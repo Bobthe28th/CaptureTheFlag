@@ -30,6 +30,9 @@ public class CTFCommands implements CommandExecutor {
         Player target = null;
 
         switch (cmd.getName().toLowerCase()) {
+            case "ctfstart":
+                Main.gameController.start();
+                return true;
             case "ctfjoin":
                 if (args.length > 0) {
                     target = Bukkit.getPlayer(args[0]);
@@ -304,7 +307,6 @@ public class CTFCommands implements CommandExecutor {
                 return true;
             case "test":
 
-                Main.gameController.selectTeam();
 //                Main.fakeClass(player,UUID.fromString("00000000-0000-0000-0000-000000000000"),70,new Demo(null,plugin),plugin);
 
 //                UUID uuid = UUID.fromString("00000000-0000-0000-0000-000000000000");
