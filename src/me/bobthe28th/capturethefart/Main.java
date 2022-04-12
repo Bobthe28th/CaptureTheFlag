@@ -249,6 +249,15 @@ public class Main extends JavaPlugin implements Listener {
         if (p instanceof Arrow && !p.hasMetadata("dontKillOnLand")) {
             p.remove();
         }
+
+        if (p instanceof Fireball) {
+            Location loc = p.getLocation();
+            if (event.getHitEntity() != null) {
+                loc = event.getHitEntity().getLocation();
+            }
+            p.getWorld().createExplosion(loc,4F, false, false, Bukkit.getPlayer(p.getMetadata("playerSent").get(0).asString()));
+        }
+
     }
 
     @EventHandler
