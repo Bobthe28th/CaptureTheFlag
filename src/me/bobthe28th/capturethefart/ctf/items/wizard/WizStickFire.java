@@ -12,6 +12,7 @@ import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import me.bobthe28th.capturethefart.Main;
@@ -20,7 +21,7 @@ import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 public class WizStickFire extends CTFDoubleCooldownItem {
 
     public WizStickFire(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("Fire Staff", Material.STICK, 3, "Solar Blast", 1.5, "Ballz", 69, player_, plugin_, defaultSlot_);
+        super("Fire Staff", Material.STICK, 3, "Solar Blast", 1.5, "Fire Ball", 3, player_, plugin_, defaultSlot_);
         plugin = plugin_;
         player = player_;
     }
@@ -76,12 +77,16 @@ public class WizStickFire extends CTFDoubleCooldownItem {
                 break;
             case RIGHT_CLICK_BLOCK:
             case RIGHT_CLICK_AIR:
-                Fireball f = p.getWorld().spawn(p.getLocation().add(p.getLocation().getDirection().normalize().multiply(1.5)).add(new Vector(0.0,1.0,0.0)), Fireball.class);
-                f.setDirection(p.getLocation().getDirection().normalize());
-                f.setVelocity(p.getEyeLocation().getDirection().multiply(1.7));
-                f.setShooter(p);
-                f.setYield(0);
-                f.setIsIncendiary(false);
+                if (getCooldown(1) == 0) {
+                    startCooldown(1);
+                    Fireball f = p.getWorld().spawn(p.getLocation().add(p.getLocation().getDirection().normalize().multiply(1.5)).add(new Vector(0.0, 1.0, 0.0)), Fireball.class);
+                    f.setDirection(p.getLocation().getDirection().normalize());
+                    f.setVelocity(p.getEyeLocation().getDirection().multiply(1.7));
+                    f.setShooter(p);
+                    f.setYield(0);
+                    f.setIsIncendiary(false);
+                    f.setMetadata("playerSent", new FixedMetadataValue(plugin, Objects.requireNonNull(p.getPlayer()).getName()));
+                }
                 break;
             default:
                 break;
