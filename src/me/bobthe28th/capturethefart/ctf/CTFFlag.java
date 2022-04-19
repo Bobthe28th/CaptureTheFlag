@@ -153,6 +153,7 @@ public class CTFFlag implements Listener {
     public void capture(CTFPlayer cp) {
         carriedPlayer = null;
         setPos(home);
+        team.scorePoint();
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.sendTitle(" ", cp.getFormattedName() + " captured the " + team.getFormattedName() + team.getChatColor() + "'s " + "Flag" + ChatColor.RESET, 10, 20, 5);
         }

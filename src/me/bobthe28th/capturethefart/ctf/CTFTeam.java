@@ -1,9 +1,12 @@
 package me.bobthe28th.capturethefart.ctf;
 
+import me.bobthe28th.capturethefart.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
@@ -12,6 +15,7 @@ import java.util.Objects;
 public class CTFTeam {
 
     int id;
+    int points = 0;
     String name;
     ChatColor chatColor;
     Color color;
@@ -43,6 +47,19 @@ public class CTFTeam {
         }
     }
 
+    public String flagStatus() {
+        return ""; //TODO
+    }
+
+    public void scorePoint() {
+        points ++;
+        Main.gameController.updateScoreBoard(this,"points");
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
     public Material getBanner() {
         return banner;
     }
@@ -63,7 +80,11 @@ public class CTFTeam {
         return team;
     }
 
-    public ChatColor getChatColor() { return chatColor; }
+    public ChatColor getChatColor() {
+        return chatColor;
+    }
 
-    public Color getColor() { return color; }
+    public Color getColor() {
+        return color;
+    }
 }

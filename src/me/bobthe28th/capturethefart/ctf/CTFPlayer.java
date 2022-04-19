@@ -51,12 +51,19 @@ public class CTFPlayer implements Listener {
     boolean canUse = true;
     boolean selectingWizard = false;
 
+    int kills = 0;
+    int deaths = 0;
+
 
     public CTFPlayer(Main plugin_, Player p) {
         player = p;
         plugin = plugin_;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
 
+        Main.gameController.addScoreboard(this);
+        if (Bukkit.getScoreboardManager() != null) {
+            player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+        }
         player.setLevel(0);
         player.setExp(0.0F);
         player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getDefaultValue());
@@ -81,6 +88,14 @@ public class CTFPlayer implements Listener {
             }
         }, 0, 2);
 
+    }
+
+    public int getKills() {
+        return kills;
+    }
+
+    public int getDeaths() {
+        return deaths;
     }
 
     public void setTeam(CTFTeam t) {
@@ -208,7 +223,7 @@ public class CTFPlayer implements Listener {
         HandlerList.unregisterAll(this);
 
         removeItems();
-
+        Main.gameController.removeScoreboard(this);
         Main.CTFPlayers.remove(player);
     }
 
