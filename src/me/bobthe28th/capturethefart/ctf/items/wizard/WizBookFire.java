@@ -99,7 +99,7 @@ public class WizBookFire extends CTFDoubleCooldownItem {
 
     void attackBoost(CTFPlayer p) {
 
-        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,Integer.MAX_VALUE,0,false,false,true));
+        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,200,0,false,false,true));
 
         new BukkitRunnable() {
             int t = 0;
