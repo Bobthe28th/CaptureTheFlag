@@ -5,8 +5,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
@@ -48,12 +46,28 @@ public class CTFTeam {
     }
 
     public String flagStatus() {
-        return ""; //TODO
+        CTFFlag f = null;
+        for (CTFFlag flag : Main.CTFFlags) {
+            if (flag.getTeam() == this) {
+                f = flag;
+                break;
+            }
+        }
+        if (f == null) {
+            return "???";
+        } else {
+            return f.getStatus();
+        }
+    }
+
+    public int getAlive() {
+        return 0;
+        //TODO
     }
 
     public void scorePoint() {
         points ++;
-        Main.gameController.updateScoreBoard(this,"points");
+        Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.POINTS,this);
     }
 
     public int getPoints() {

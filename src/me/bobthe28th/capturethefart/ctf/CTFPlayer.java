@@ -92,7 +92,7 @@ public class CTFPlayer implements Listener {
 
     public int getKills() {
         return kills;
-    }
+    } //TODO
 
     public int getDeaths() {
         return deaths;
@@ -211,6 +211,8 @@ public class CTFPlayer implements Listener {
     }
 
     public void death(boolean byEntity) {
+        deaths ++;
+        Main.gameController.updateScoreboard(this,ScoreboardRow.DEATHS);
         if (carriedFlag != null) {
             dropFlag();
         }

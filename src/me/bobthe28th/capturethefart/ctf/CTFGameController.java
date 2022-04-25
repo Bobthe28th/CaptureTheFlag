@@ -87,58 +87,77 @@ public class CTFGameController implements Listener {
         gameStart = new Location[Main.CTFTeams.length];
         gameStart[0] = new Location(w,109.5, 66, -205.5);
         gameStart[1] = new Location(w,112.5, 66, -205.5);
-
-//        if (Bukkit.getScoreboardManager() != null) {
-//            Scoreboard s = Bukkit.getScoreboardManager().getMainScoreboard();
-//            if (s.getObjective("ctfscores") != null) {
-//                Objects.requireNonNull(s.getObjective("ctfscores")).unregister();
-//            }
-//            Objective o = s.registerNewObjective("ctfscores", "dummy", "Capture The Fart");
-//
-//            o.setDisplaySlot(DisplaySlot.SIDEBAR);
-//            for (int i = 0; i < Main.CTFTeams.length; i++) {
-//                CTFTeam t = Main.CTFTeams[i];
-//                o.getScore(t.getChatColor() + "" + ChatColor.BOLD + t.getName() + ChatColor.RESET).setScore(3 + 4*i);
-//                o.getScore( t.getChatColor() + "" + ChatColor.RESET + "Points: " + t.getPoints()).setScore(2 + 4*i);
-//                o.getScore(t.getChatColor() + "" + ChatColor.RESET + "Flag: " + t.flagStatus()).setScore(1 + 4*i);
-//            }
-//            for (int i = 1; i < Main.CTFTeams.length; i++) {
-//                o.getScore(Main.CTFTeams[i].getChatColor() + "").setScore(4*i);
-//            }
-//        }
     }
 
-    public void updateScoreBoard(CTFTeam team, String info) {
-//        if (Bukkit.getScoreboardManager() != null) {
-//            Scoreboard s = Bukkit.getScoreboardManager().getMainScoreboard();
-//            Objective o = s.getObjective("ctfscores");
-//            if (o != null) {
-//                for (String e : s.getEntries()) {
-//                    if (o.getScore(e).getScore() != 0) {
-//                        if (e.contains(team.getChatColor() + "") && e.toLowerCase().contains(info)) {
-//                            int score = o.getScore(e).getScore();
-//                            s.resetScores(e);
-//                            //TODO
-//                        }
-//                    }
-//                }
-//            }
-//        }
+    public void updateScoreboard(CTFPlayer p, ScoreboardRow r) {
+        Scoreboard s = pScoreboard.get(p);
+        if (s != null) {
+            Objective o = s.getObjective("ctfscores");
+            if (o != null) {
+                for (String e : s.getEntries()) {
+                    if (o.getScore(e).getScore() != 0) {
+                        if (o.getScore(e).getScore() == r.getRow()) {
+                            s.resetScores(e);
+                            break;
+                        }
+                    }
+                }
+                switch (r) {
+                    case KILLS -> o.getScore("Kills: " + p.getKills()).setScore(r.getRow());
+                    case DEATHS -> o.getScore("Deaths: " + p.getDeaths()).setScore(r.getRow());
+                }
+            }
+        }
+    }
+
+    public void updateScoreboardGlobal(ScoreboardRowGlobal r, CTFTeam t) {
+        int row = (t.getId()+1)*5 + r.getRow();
+
+        for (CTFPlayer p : Main.CTFPlayers.values()) {
+            Scoreboard s = pScoreboard.get(p);
+            if (s != null) {
+            Objective o = s.getObjective("ctfscores");
+                if (o != null) {
+                    for (String e : s.getEntries()) {
+                        if (o.getScore(e).getScore() != 0) {
+                            if (o.getScore(e).getScore() == row) {
+                                s.resetScores(e);
+                                break;
+                            }
+                        }
+                    }
+                    switch (r) {
+                        case FLAG -> o.getScore(t.getChatColor() + "" + ChatColor.RESET + "Flag: " + t.flagStatus()).setScore(row);
+                        case ALIVE -> o.getScore(t.getChatColor() + "" + ChatColor.RESET + "Alive: " + t.getAlive()).setScore(row);
+                        case POINTS -> o.getScore(t.getChatColor() + "" + ChatColor.RESET + "Points: " + t.getPoints()).setScore(row);
+                    }
+
+                }
+            }
+        }
+    }
+
+    public void updateTeams() {
+        for (CTFPlayer p : Main.CTFPlayers.values()) {
+            updateTeams(p);
+        }
     }
 
     public void updateTeams(CTFPlayer p) {
         Scoreboard s = pScoreboard.get(p);
-        for (CTFTeam team : Main.CTFTeams) {
-            if (s.getTeam(team.getTeam().getName()) != null) {
-                Objects.requireNonNull(s.getTeam(team.getTeam().getName())).unregister();
-            }
-            Team t = s.registerNewTeam(team.getTeam().getName());
-            t.setColor(team.getTeam().getColor());
-            t.setAllowFriendlyFire(false);
-            t.setCanSeeFriendlyInvisibles(true);
-            t.setOption(Team.Option.NAME_TAG_VISIBILITY, team.getTeam().getOption(Team.Option.NAME_TAG_VISIBILITY));
-            for (String e : team.getTeam().getEntries()) {
-                t.addEntry(e);
+        if (s != null) {
+            for (CTFTeam team : Main.CTFTeams) {
+                if (s.getTeam(team.getTeam().getName()) != null) {
+                    Objects.requireNonNull(s.getTeam(team.getTeam().getName())).unregister();
+                }
+                Team t = s.registerNewTeam(team.getTeam().getName());
+                t.setColor(team.getTeam().getColor());
+                t.setAllowFriendlyFire(false);
+                t.setCanSeeFriendlyInvisibles(true);
+                t.setOption(Team.Option.NAME_TAG_VISIBILITY, team.getTeam().getOption(Team.Option.NAME_TAG_VISIBILITY));
+                for (String e : team.getTeam().getEntries()) {
+                    t.addEntry(e);
+                }
             }
         }
     }
@@ -149,7 +168,19 @@ public class CTFGameController implements Listener {
             updateTeams(p);
             Objective o = pScoreboard.get(p).registerNewObjective("ctfscores", "dummy", "Capture The Fart");
             o.setDisplaySlot(DisplaySlot.SIDEBAR);
-            o.getScore(p.getPlayer().getName()).setScore(1);
+            o.getScore(ChatColor.GOLD + "" + ChatColor.BOLD + "Your Stats:").setScore(3);
+            o.getScore("Kills: " + p.getKills()).setScore(2);
+            o.getScore("Deaths: " + p.getDeaths()).setScore(1);
+            for (int i = 0; i < Main.CTFTeams.length; i++) {
+                CTFTeam t = Main.CTFTeams[i];
+                o.getScore(t.getChatColor() + "" + ChatColor.BOLD + t.getName() + ChatColor.RESET).setScore(4 + 5*(i+1));
+                o.getScore( t.getChatColor() + "" + ChatColor.RESET + "Points: " + t.getPoints()).setScore(3 + 5*(i+1));
+                o.getScore(t.getChatColor() + "" + ChatColor.RESET + "Flag: " + t.flagStatus()).setScore(2 + 5*(i+1));
+                o.getScore(t.getChatColor() + "" + ChatColor.RESET + "Alive: " + t.getAlive()).setScore(1 + 5*(i+1));
+            }
+            for (int i = 0; i < Main.CTFTeams.length; i++) {
+                o.getScore(Main.CTFTeams[i].getChatColor() + "").setScore(5*(i+1));
+            }
         }
     }
 
