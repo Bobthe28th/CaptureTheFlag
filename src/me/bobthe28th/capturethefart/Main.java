@@ -328,7 +328,6 @@ public class Main extends JavaPlugin implements Listener {
                 } else {
                     Bukkit.broadcastMessage(deathMessages.getMessage(false,damageType).replace("$1",ChatColor.RED + event.getEntity().getName() + ChatColor.RESET));
                 }
-                Bukkit.broadcastMessage(damageType);
 
                 player.sendTitle(ChatColor.RED + "You Died!", "got farted on", 10, 20, 10);
             }
