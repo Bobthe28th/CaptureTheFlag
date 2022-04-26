@@ -47,8 +47,6 @@ public class CTFGameController implements Listener {
     int classSelectTimeMax = 5;
     int classSelectTime = teamSelectTimeMax;
 
-    Location[] gameStart;
-
     public CTFGameController(Main plugin_, World w) {
         plugin = plugin_;
         Bukkit.getPluginManager().registerEvents(this, plugin);
@@ -83,10 +81,6 @@ public class CTFGameController implements Listener {
                 new Location(w,68.5, 81, -239.5),
                 new Location(w,63.5, 81, -239.5)
         };
-
-        gameStart = new Location[Main.CTFTeams.length];
-        gameStart[0] = new Location(w,109.5, 66, -205.5);
-        gameStart[1] = new Location(w,112.5, 66, -205.5);
     }
 
     public void updateScoreboard(CTFPlayer p, ScoreboardRow r) {
@@ -192,13 +186,16 @@ public class CTFGameController implements Listener {
         for (CTFPlayer p : Main.CTFPlayers.values()) {
             p.getPlayer().sendTitle(" ", "", 0, 0, 0);
             if (p.getTeam() != null) {
-                p.getPlayer().teleport(gameStart[p.getTeam().getId()]);
+                p.getPlayer().teleport(p.getTeam().getSpawnLocation());
                 for (int i = 0; i < Main.CTFClasses.length - 3; i++) {
                     Main.despawnFake(p.getPlayer(), new UUID(0, i), 70 + i);
                 }
                 p.setCanUse(true);
             }
             updateTeams(p);
+            for (CTFTeam t : Main.CTFTeams) {
+                updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,t);
+            }
             p.getPlayer().setScoreboard(pScoreboard.get(p));
         }
     }

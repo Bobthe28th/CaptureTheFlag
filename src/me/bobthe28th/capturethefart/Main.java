@@ -95,8 +95,8 @@ public class Main extends JavaPlugin implements Listener {
             }
         }
 
-        CTFTeams = new CTFTeam[]{new CTFTeam(0,"Blue Team",ChatColor.BLUE,Color.BLUE,Material.BLUE_BANNER), new CTFTeam(1,"Red Team",ChatColor.RED,Color.RED,Material.RED_BANNER)};
         World w = Bukkit.getServer().getWorld("world");
+        CTFTeams = new CTFTeam[]{new CTFTeam(0,"Blue Team",ChatColor.BLUE,Color.BLUE,Material.BLUE_BANNER, new Location(w,109.5, 66, -205.5)), new CTFTeam(1,"Red Team",ChatColor.RED,Color.RED,Material.RED_BANNER,new Location(w,112.5, 66, -205.5))};
         CTFFlags = new CTFFlag[]{new CTFFlag(CTFTeams[0],this, new Location(w,109.0, 66.0, -199.0)), new CTFFlag(CTFTeams[1],this, new Location(w, 118.0, 66.0, -199.0))};
         CTFPlayers = new HashMap<>();
 
@@ -329,7 +329,7 @@ public class Main extends JavaPlugin implements Listener {
                     Bukkit.broadcastMessage(deathMessages.getMessage(false,damageType).replace("$1",ChatColor.RED + event.getEntity().getName() + ChatColor.RESET));
                 }
 
-                player.sendTitle(ChatColor.RED + "You Died!", "got farted on", 10, 20, 10);
+                //player.sendTitle(ChatColor.RED + "You Died!", "got farted on", 10, 20, 10);
             }
             customDamageCause.remove(player);
         }
