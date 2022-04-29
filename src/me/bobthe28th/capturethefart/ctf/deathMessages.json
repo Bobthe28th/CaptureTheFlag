@@ -12,6 +12,12 @@
     "builderAxe": ["$1 got hella 90s built on them by $2","$1 lost the build battle to $2","$1 could not escape maze built by $2"],
     "builderSheers": ["$1 fucking died to sheers from $2"],
     "demoTNT": ["$1 got blown into a million pieces by $2", "$1 got fucking blown up by $2","$1 bit za dusto due to $2"],
+    "archerGhost": ["$1 got ghosted by $2"],
+    "archerArrow": ["$1 got shot by $2","$1 got gatted by $2","$1 got an arrow put in their knee by $2"],
+    "assKnife": ["$1 was stabbed by $2","$1 got killed by $2 playing a class with ass in its name twice"],
+    "assKnifeStrong": ["$1 didn't see $2 coming","$1 didn't have one-shot protection from $2's attack"],
+    "palHammer": ["$1 got smashed by $2","$1's head caved in by $2"],
+    "palThrow": ["$1 got bonked by $2"],
     "ENTITY_ATTACK": ["$1 was slain by $2","$1 got destroyed by $2"]
   }
 }
