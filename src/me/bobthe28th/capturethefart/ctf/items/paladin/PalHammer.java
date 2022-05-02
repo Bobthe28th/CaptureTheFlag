@@ -40,8 +40,8 @@ public class PalHammer extends CTFToolCooldownItem {
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
                 meta.setCustomModelData(2);
-                item.setItemMeta(meta);
             }
+            item.setItemMeta(meta);
             hammer.setItem(item);
 
             ArmorStand hammerStand = player.getPlayer().getWorld().spawn(player.getPlayer().getLocation(), ArmorStand.class);
@@ -51,7 +51,13 @@ public class PalHammer extends CTFToolCooldownItem {
             hammerStand.setSmall(true);
             hammer.addPassenger(hammerStand);
             if (hammerStand.getEquipment() != null) {
-                hammerStand.getEquipment().setHelmet(getItem());
+                ItemStack h = new ItemStack(Material.IRON_AXE);
+                ItemMeta hm = item.getItemMeta();
+                if (hm != null) {
+                    hm.setCustomModelData(3);
+                }
+                h.setItemMeta(hm);
+                hammerStand.getEquipment().setHelmet(h);
             }
         }
     }
