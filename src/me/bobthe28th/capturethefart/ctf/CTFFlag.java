@@ -88,6 +88,7 @@ public class CTFFlag implements Listener {
                                                 p.setExp(0.0F);
                                                 pickUpTimer.remove(cp);
                                                 setPos(home);
+                                                Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.FLAG,team);
                                                 pickUpTimer.clear();
                                             } else {
                                                 p.setLevel((int) Math.ceil(pickUpTimer.get(cp)));
@@ -196,13 +197,13 @@ public class CTFFlag implements Listener {
     public void fall(Location loc) {
         loc.setDirection(new Vector(0.0,-1.0,0.0));
         carriedPlayer = null;
-        Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.FLAG,team);
         BlockIterator blocksToAdd = new BlockIterator(loc,0,200);
         Location blockToAdd = null;
         while(blocksToAdd.hasNext()) {
             blockToAdd = blocksToAdd.next().getLocation();
             if (blockToAdd.getBlock().getType().isSolid()) {
                 setPos(blockToAdd.add(new Vector(0.0,1.0,0.0)));
+                Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.FLAG,team);
                 return;
             }
         }

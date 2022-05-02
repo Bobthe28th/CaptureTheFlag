@@ -324,12 +324,13 @@ public class Main extends JavaPlugin implements Listener {
                     if (damager == null) {
                         damager = eventE.getDamager();
                     }
+                    if (damager instanceof Player && CTFPlayers.containsKey(damager) && CTFPlayers.containsKey(player)) {
+                        CTFPlayers.get(damager).kill(CTFPlayers.get(player));
+                    }
                     Bukkit.broadcastMessage(deathMessages.getMessage(true,damageType).replace("$1",ChatColor.RED + event.getEntity().getName() + ChatColor.RESET).replace("$2",ChatColor.BLUE + damager.getName() + ChatColor.RESET));
                 } else {
                     Bukkit.broadcastMessage(deathMessages.getMessage(false,damageType).replace("$1",ChatColor.RED + event.getEntity().getName() + ChatColor.RESET));
                 }
-
-                //player.sendTitle(ChatColor.RED + "You Died!", "got farted on", 10, 20, 10);
             }
             customDamageCause.remove(player);
         }

@@ -371,6 +371,10 @@ public class CTFGameController implements Listener {
 
     void selectClass() {
         selectingClass = true;
+        for (CTFTeam team : Main.CTFTeams) {
+            team.setNameTagVisiblity(false);
+        }
+
         for (Player p : Bukkit.getOnlinePlayers()) {
             Main.despawnFake(p, new UUID(0,0),70);
             Main.despawnFake(p, new UUID(0,1),71);

@@ -35,6 +35,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 
 public class CTFPlayer implements Listener {
 
@@ -218,6 +219,13 @@ public class CTFPlayer implements Listener {
         carriedFlag.fall(player.getLocation());
         carriedFlag = null;
         flagOnHead.remove();
+    }
+
+    public void kill(CTFPlayer p) {
+        player.playSound(player,Sound.ITEM_AXE_SCRAPE,1F,1F);
+        player.spawnParticle(Particle.TOTEM,p.getPlayer().getLocation().clone().add(new Vector(0.0,1.0,0.0)),20,0.2,0.5,0.2,0.2);
+        kills ++;
+        Main.gameController.updateScoreboard(this,ScoreboardRow.KILLS);
     }
 
     public void death(boolean byEntity) {

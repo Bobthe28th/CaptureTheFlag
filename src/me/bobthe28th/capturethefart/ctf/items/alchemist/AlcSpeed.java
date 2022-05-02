@@ -3,6 +3,7 @@ package me.bobthe28th.capturethefart.ctf.items.alchemist;
 import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFStackCooldownItem;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -26,7 +27,7 @@ public class AlcSpeed extends CTFStackCooldownItem {
     }
 
     @Override
-    public void onPotionLaunch(ProjectileLaunchEvent event, ThrownPotion thrownPotion) {
+    public void onPotionLaunch() {
         startCooldown();
         ItemStack item = new ItemStack(Material.SPLASH_POTION);
         ItemMeta meta = item.getItemMeta();
@@ -37,6 +38,7 @@ public class AlcSpeed extends CTFStackCooldownItem {
             }
         }
         item.setItemMeta(meta);
-        thrownPotion.setItem(item);
+        ThrownPotion potion = player.getPlayer().launchProjectile(ThrownPotion.class);
+        potion.setItem(item);
     }
 }
