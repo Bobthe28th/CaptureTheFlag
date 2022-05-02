@@ -26,7 +26,7 @@ public class AlcRegen extends CTFStackCooldownItem {
     }
 
     @Override
-    public void onPotionLaunch(ProjectileLaunchEvent event, ThrownPotion thrownPotion) {
+    public void onPotionLaunch() {
         startCooldown();
         ItemStack item = new ItemStack(Material.LINGERING_POTION);
         ItemMeta meta = item.getItemMeta();
@@ -37,6 +37,7 @@ public class AlcRegen extends CTFStackCooldownItem {
             }
         }
         item.setItemMeta(meta);
-        thrownPotion.setItem(item);
+        ThrownPotion potion = player.getPlayer().launchProjectile(ThrownPotion.class);
+        potion.setItem(item);
     }
 }

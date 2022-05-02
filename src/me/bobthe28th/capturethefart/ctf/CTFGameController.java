@@ -13,14 +13,21 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scoreboard.*;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Objects;
 import java.util.UUID;
+
+//TODO depspawn fakes that other people stand on
 
 public class CTFGameController implements Listener {
 
     static Main plugin;
+
+    HashMap<CTFPlayer,Scoreboard> pScoreboard = new HashMap<>();
 
     Location teamStart;
     Location[] teamSelect;
@@ -39,8 +46,6 @@ public class CTFGameController implements Listener {
     BukkitTask classSelectTimer = null;
     int classSelectTimeMax = 5;
     int classSelectTime = teamSelectTimeMax;
-
-    Location[] gameStart;
 
     public CTFGameController(Main plugin_, World w) {
         plugin = plugin_;
@@ -76,10 +81,123 @@ public class CTFGameController implements Listener {
                 new Location(w,68.5, 81, -239.5),
                 new Location(w,63.5, 81, -239.5)
         };
+    }
 
-        gameStart = new Location[Main.CTFTeams.length];
-        gameStart[0] = new Location(w,109.5, 66, -205.5);
-        gameStart[1] = new Location(w,112.5, 66, -205.5);
+    public void updateScoreboard(CTFPlayer p, ScoreboardRow r) {
+        Scoreboard s = pScoreboard.get(p);
+        if (s != null) {
+            Objective o = s.getObjective("ctfscores");
+            if (o != null) {
+                for (String e : s.getEntries()) {
+                    if (o.getScore(e).getScore() != 0) {
+                        if (o.getScore(e).getScore() == r.getRow()) {
+                            s.resetScores(e);
+                            break;
+                        }
+                    }
+                }
+                switch (r) {
+                    case KILLS -> o.getScore("Kills: " + p.getKills()).setScore(r.getRow());
+                    case DEATHS -> o.getScore("Deaths: " + p.getDeaths()).setScore(r.getRow());
+                }
+            }
+        }
+    }
+
+    public void updateScoreboardGlobal(ScoreboardRowGlobal r, CTFTeam t) {
+        int row = (t.getId()+1)*5 + r.getRow();
+
+        for (CTFPlayer p : Main.CTFPlayers.values()) {
+            Scoreboard s = pScoreboard.get(p);
+            if (s != null) {
+            Objective o = s.getObjective("ctfscores");
+                if (o != null) {
+                    for (String e : s.getEntries()) {
+                        if (o.getScore(e).getScore() != 0) {
+                            if (o.getScore(e).getScore() == row) {
+                                s.resetScores(e);
+                                break;
+                            }
+                        }
+                    }
+                    switch (r) {
+                        case FLAG -> o.getScore(t.getChatColor() + "" + ChatColor.RESET + "Flag: " + t.flagStatus()).setScore(row);
+                        case ALIVE -> o.getScore(t.getChatColor() + "" + ChatColor.RESET + "Alive: " + t.getAlive()).setScore(row);
+                        case POINTS -> o.getScore(t.getChatColor() + "" + ChatColor.RESET + "Points: " + t.getPoints()).setScore(row);
+                    }
+
+                }
+            }
+        }
+    }
+
+    public void updateTeams() {
+        for (CTFPlayer p : Main.CTFPlayers.values()) {
+            updateTeams(p);
+        }
+    }
+
+    public void updateTeams(CTFPlayer p) {
+        Scoreboard s = pScoreboard.get(p);
+        if (s != null) {
+            for (CTFTeam team : Main.CTFTeams) {
+                if (s.getTeam(team.getTeam().getName()) != null) {
+                    Objects.requireNonNull(s.getTeam(team.getTeam().getName())).unregister();
+                }
+                Team t = s.registerNewTeam(team.getTeam().getName());
+                t.setColor(team.getTeam().getColor());
+                t.setAllowFriendlyFire(false);
+                t.setCanSeeFriendlyInvisibles(true);
+                t.setOption(Team.Option.NAME_TAG_VISIBILITY, team.getTeam().getOption(Team.Option.NAME_TAG_VISIBILITY));
+                for (String e : team.getTeam().getEntries()) {
+                    t.addEntry(e);
+                }
+            }
+        }
+    }
+
+    public void addScoreboard(CTFPlayer p) {
+        if (Bukkit.getScoreboardManager() != null) {
+            pScoreboard.put(p,Bukkit.getScoreboardManager().getNewScoreboard());
+            updateTeams(p);
+            Objective o = pScoreboard.get(p).registerNewObjective("ctfscores", "dummy", "Capture The Fart");
+            o.setDisplaySlot(DisplaySlot.SIDEBAR);
+            o.getScore(ChatColor.GOLD + "" + ChatColor.BOLD + "Your Stats:").setScore(3);
+            o.getScore("Kills: " + p.getKills()).setScore(2);
+            o.getScore("Deaths: " + p.getDeaths()).setScore(1);
+            for (int i = 0; i < Main.CTFTeams.length; i++) {
+                CTFTeam t = Main.CTFTeams[i];
+                o.getScore(t.getChatColor() + "" + ChatColor.BOLD + t.getName() + ChatColor.RESET).setScore(4 + 5*(i+1));
+                o.getScore( t.getChatColor() + "" + ChatColor.RESET + "Points: " + t.getPoints()).setScore(3 + 5*(i+1));
+                o.getScore(t.getChatColor() + "" + ChatColor.RESET + "Flag: " + t.flagStatus()).setScore(2 + 5*(i+1));
+                o.getScore(t.getChatColor() + "" + ChatColor.RESET + "Alive: " + t.getAlive()).setScore(1 + 5*(i+1));
+            }
+            for (int i = 0; i < Main.CTFTeams.length; i++) {
+                o.getScore(Main.CTFTeams[i].getChatColor() + "").setScore(5*(i+1));
+            }
+        }
+    }
+
+    public void removeScoreboard(CTFPlayer p) {
+        pScoreboard.remove(p);
+    }
+
+    public void startMatch() {
+        for (CTFPlayer p : Main.CTFPlayers.values()) {
+            p.getPlayer().sendTitle(" ", "", 0, 0, 0);
+            if (p.getTeam() != null) {
+                p.getPlayer().teleport(p.getTeam().getSpawnLocation());
+                for (int i = 0; i < Main.CTFClasses.length - 3; i++) {
+                    Main.despawnFake(p.getPlayer(), new UUID(0, i), 70 + i);
+                }
+                p.setCanUse(true);
+            }
+            updateTeams(p);
+            for (CTFTeam t : Main.CTFTeams) {
+                updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,t);
+            }
+            p.getPlayer().setScoreboard(pScoreboard.get(p));
+        }
     }
 
     public void start() {
@@ -217,16 +335,7 @@ public class CTFGameController implements Listener {
 
                     if (classSelectTime <= 0) {
                         selectingClass = false;
-                        for (CTFPlayer p : Main.CTFPlayers.values()) {
-                            p.getPlayer().sendTitle(" ", "", 0, 0, 0);
-                            if (p.getTeam() != null) {
-                                p.getPlayer().teleport(gameStart[p.getTeam().getId()]);
-                                for (int i = 0; i < Main.CTFClasses.length - 3; i++) {
-                                    Main.despawnFake(p.getPlayer(), new UUID(0, i), 70 + i);
-                                }
-                                p.setCanUse(true);
-                            }
-                        }
+                        startMatch();
                         this.cancel();
                     }
 
@@ -262,6 +371,10 @@ public class CTFGameController implements Listener {
 
     void selectClass() {
         selectingClass = true;
+        for (CTFTeam team : Main.CTFTeams) {
+            team.setNameTagVisiblity(false);
+        }
+
         for (Player p : Bukkit.getOnlinePlayers()) {
             Main.despawnFake(p, new UUID(0,0),70);
             Main.despawnFake(p, new UUID(0,1),71);
