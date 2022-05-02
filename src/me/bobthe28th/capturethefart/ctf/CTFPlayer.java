@@ -99,7 +99,7 @@ public class CTFPlayer implements Listener {
 
     public int getKills() {
         return kills;
-    } //TODO
+    }
 
     public int getDeaths() {
         return deaths;
