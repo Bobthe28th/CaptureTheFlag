@@ -34,6 +34,8 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 
 public class CTFPlayer implements Listener {
 
@@ -50,6 +52,12 @@ public class CTFPlayer implements Listener {
     boolean onHealCooldown = false;
     boolean canUse = true;
     boolean selectingWizard = false;
+    BukkitTask respawnTimer = null;
+
+    int kills = 0;
+    int deaths = 0;
+
+    boolean isAlive;
 
 
     public CTFPlayer(Main plugin_, Player p) {
@@ -57,11 +65,17 @@ public class CTFPlayer implements Listener {
         plugin = plugin_;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
 
+        isAlive = true;
+        Main.gameController.addScoreboard(this);
+        if (Bukkit.getScoreboardManager() != null) {
+            player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+        }
         player.setLevel(0);
         player.setExp(0.0F);
         player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getDefaultValue());
         player.setFoodLevel(20);
         player.setSaturation(0F);
+        player.setGameMode(GameMode.SURVIVAL);
         for (PotionEffect pEffect : player.getActivePotionEffects()) {
             player.removePotionEffect(pEffect.getType());
         }
@@ -81,6 +95,18 @@ public class CTFPlayer implements Listener {
             }
         }, 0, 2);
 
+    }
+
+    public int getKills() {
+        return kills;
+    }
+
+    public int getDeaths() {
+        return deaths;
+    }
+
+    public boolean getIsAlive() {
+        return isAlive;
     }
 
     public void setTeam(CTFTeam t) {
@@ -195,20 +221,85 @@ public class CTFPlayer implements Listener {
         flagOnHead.remove();
     }
 
+    public void kill(CTFPlayer p) {
+        player.playSound(player,Sound.ITEM_AXE_SCRAPE,1F,1F);
+        player.spawnParticle(Particle.TOTEM,p.getPlayer().getLocation().clone().add(new Vector(0.0,1.0,0.0)),20,0.2,0.5,0.2,0.2);
+        kills ++;
+        Main.gameController.updateScoreboard(this,ScoreboardRow.KILLS);
+    }
+
     public void death(boolean byEntity) {
+        isAlive = false;
+        Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,team);
+        deaths ++;
+        Main.gameController.updateScoreboard(this,ScoreboardRow.DEATHS);
         if (carriedFlag != null) {
             dropFlag();
         }
+        startRespawnCooldown();
+    }
+
+    public void respawn() {
+        player.teleport(team.getSpawnLocation());
+        player.setGameMode(GameMode.SURVIVAL);
+        isAlive = true;
+        Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,team);
+        player.sendTitle(" "," ",0,0,0);
+    }
+
+    public void startRespawnCooldown() {
+        if (respawnTimer != null) {
+            respawnTimer.cancel();
+        }
+        respawnTimer = new BukkitRunnable() {
+            int t = 5;
+            @Override
+            public void run() {
+                if (this.isCancelled()) {
+                    this.cancel();
+                } else {
+                    if (t <= 0) {
+                        respawn();
+                        this.cancel();
+                    } else {
+                        net.md_5.bungee.api.ChatColor numColor;
+                        switch (t) {
+                            case 2:
+                                numColor = net.md_5.bungee.api.ChatColor.of("#FF4E11");
+                                break;
+                            case 3:
+                                numColor = net.md_5.bungee.api.ChatColor.of("#FF8E15");
+                                break;
+                            case 4:
+                                numColor = net.md_5.bungee.api.ChatColor.YELLOW;
+                                break;
+                            default:
+                                if (t >= 5) {
+                                    numColor = net.md_5.bungee.api.ChatColor.GREEN;
+                                } else {
+                                    numColor = net.md_5.bungee.api.ChatColor.DARK_RED;
+                                }
+                        }
+
+                        player.sendTitle(ChatColor.RED + "You Died!" + ChatColor.RESET, "Respawning in: " + numColor + t + net.md_5.bungee.api.ChatColor.RESET, 0, 30, 0);
+                        t--;
+                    }
+                }
+            }
+        }.runTaskTimer(plugin,0L,20L);
     }
 
     public void remove() {
         leaveClass();
         leaveTeam();
         Bukkit.getServer().getScheduler().cancelTask(cooldownTask);
+        if (respawnTimer != null) {
+            respawnTimer.cancel();
+        }
         HandlerList.unregisterAll(this);
 
         removeItems();
-
+        Main.gameController.removeScoreboard(this);
         Main.CTFPlayers.remove(player);
     }
 

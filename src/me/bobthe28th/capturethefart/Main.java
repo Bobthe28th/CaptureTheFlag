@@ -35,6 +35,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
@@ -94,8 +95,8 @@ public class Main extends JavaPlugin implements Listener {
             }
         }
 
-        CTFTeams = new CTFTeam[]{new CTFTeam(0,"Blue Team",ChatColor.BLUE,Color.BLUE,Material.BLUE_BANNER), new CTFTeam(1,"Red Team",ChatColor.RED,Color.RED,Material.RED_BANNER)};
         World w = Bukkit.getServer().getWorld("world");
+        CTFTeams = new CTFTeam[]{new CTFTeam(0,"Blue Team",ChatColor.BLUE,Color.BLUE,Material.BLUE_BANNER, new Location(w,109.5, 66, -205.5)), new CTFTeam(1,"Red Team",ChatColor.RED,Color.RED,Material.RED_BANNER,new Location(w,112.5, 66, -205.5))};
         CTFFlags = new CTFFlag[]{new CTFFlag(CTFTeams[0],this, new Location(w,109.0, 66.0, -199.0)), new CTFFlag(CTFTeams[1],this, new Location(w, 118.0, 66.0, -199.0))};
         CTFPlayers = new HashMap<>();
 
@@ -323,12 +324,13 @@ public class Main extends JavaPlugin implements Listener {
                     if (damager == null) {
                         damager = eventE.getDamager();
                     }
+                    if (damager instanceof Player && CTFPlayers.containsKey(damager) && CTFPlayers.containsKey(player)) {
+                        CTFPlayers.get(damager).kill(CTFPlayers.get(player));
+                    }
                     Bukkit.broadcastMessage(deathMessages.getMessage(true,damageType).replace("$1",ChatColor.RED + event.getEntity().getName() + ChatColor.RESET).replace("$2",ChatColor.BLUE + damager.getName() + ChatColor.RESET));
                 } else {
                     Bukkit.broadcastMessage(deathMessages.getMessage(false,damageType).replace("$1",ChatColor.RED + event.getEntity().getName() + ChatColor.RESET));
                 }
-
-                player.sendTitle(ChatColor.RED + "You Died!", "got farted on", 10, 20, 10);
             }
             customDamageCause.remove(player);
         }

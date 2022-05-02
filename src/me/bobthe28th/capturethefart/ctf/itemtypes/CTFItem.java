@@ -52,7 +52,7 @@ public abstract class CTFItem {
 
     public void onConsume(PlayerItemConsumeEvent event) {}
 
-    public void onPotionLaunch(ProjectileLaunchEvent event, ThrownPotion thrownPotion) {}
+    public void onPotionLaunch() {}
 
     public void displayCooldowns() {
         player.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));

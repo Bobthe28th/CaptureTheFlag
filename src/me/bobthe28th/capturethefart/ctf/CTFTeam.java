@@ -1,9 +1,7 @@
 package me.bobthe28th.capturethefart.ctf;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.Material;
+import me.bobthe28th.capturethefart.Main;
+import org.bukkit.*;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
@@ -12,18 +10,21 @@ import java.util.Objects;
 public class CTFTeam {
 
     int id;
+    int points = 0;
     String name;
     ChatColor chatColor;
     Color color;
     Team team;
     Material banner;
+    Location spawnLocation;
 
-    public CTFTeam(Integer id_, String name_, ChatColor chatColor_, Color color_, Material banner_) {
+    public CTFTeam(Integer id_, String name_, ChatColor chatColor_, Color color_, Material banner_, Location spawnLocation_) {
         id = id_;
         name = name_;
         chatColor = chatColor_;
         color = color_;
         banner = banner_;
+        spawnLocation = spawnLocation_;
 
         Scoreboard s = Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard();
         Team t = s.registerNewTeam("ctf" + id);
@@ -41,6 +42,48 @@ public class CTFTeam {
         } else {
             team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.FOR_OTHER_TEAMS);
         }
+    }
+
+    public String flagStatus() {
+        CTFFlag f = null;
+        for (CTFFlag flag : Main.CTFFlags) {
+            if (flag.getTeam() == this) {
+                f = flag;
+                break;
+            }
+        }
+        if (f == null) {
+            return "???";
+        } else {
+            return f.getStatus();
+        }
+    }
+
+    public String getAlive() {
+        int alive = 0;
+        int total = 0;
+        for (CTFPlayer p : Main.CTFPlayers.values()) {
+            if (p.getTeam() == this) {
+                if (p.getIsAlive()) {
+                    alive ++;
+                }
+                total ++;
+            }
+        }
+        return alive + "/" + total;
+    }
+
+    public Location getSpawnLocation() {
+        return spawnLocation;
+    }
+
+    public void scorePoint() {
+        points ++;
+        Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.POINTS,this);
+    }
+
+    public int getPoints() {
+        return points;
     }
 
     public Material getBanner() {
@@ -63,7 +106,11 @@ public class CTFTeam {
         return team;
     }
 
-    public ChatColor getChatColor() { return chatColor; }
+    public ChatColor getChatColor() {
+        return chatColor;
+    }
 
-    public Color getColor() { return color; }
+    public Color getColor() {
+        return color;
+    }
 }

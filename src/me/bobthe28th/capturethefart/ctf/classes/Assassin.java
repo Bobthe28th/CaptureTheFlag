@@ -64,15 +64,13 @@ public class Assassin extends CTFClass implements Listener {
         if (event.getEntity() instanceof Player pf) {
             if (event instanceof EntityDamageByEntityEvent eEvent) {
                 if (eEvent.getDamager() instanceof Player pA) {
-                    if (pA != player.getPlayer()) return;
-                    if (player.getPlayer().hasPotionEffect(PotionEffectType.INVISIBILITY)) {
+                    if (pA == player.getPlayer() && player.getPlayer().hasPotionEffect(PotionEffectType.INVISIBILITY)) {
                         event.setDamage(event.getFinalDamage() * 2);
                         player.getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
                     }
                 }
             }
-            if (pf != player.getPlayer()) return;
-            if (player.getPlayer().hasPotionEffect(PotionEffectType.INVISIBILITY)) {
+            if (pf == player.getPlayer() && player.getPlayer().hasPotionEffect(PotionEffectType.INVISIBILITY)) {
                 player.getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
             }
         }

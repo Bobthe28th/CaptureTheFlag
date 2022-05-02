@@ -63,7 +63,9 @@ public class Alchemist extends CTFClass implements Listener {
         if (event.getEntity() instanceof ThrownPotion thrownPotion) {
             for (PotionEffect pEffect : thrownPotion.getEffects()) {
                 if (potions.containsKey(pEffect.getType())) {
-                    potions.get(pEffect.getType()).onPotionLaunch(event,thrownPotion);
+                    event.setCancelled(true);
+                    potions.get(pEffect.getType()).onPotionLaunch();
+                    return;
                 }
             }
         }

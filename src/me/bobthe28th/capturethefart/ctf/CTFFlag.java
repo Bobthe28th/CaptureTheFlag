@@ -60,6 +60,8 @@ public class CTFFlag implements Listener {
                                             pickUpTimer.remove(cp);
                                             carriedPlayer = cp;
                                             cp.pickupFlag(this);
+                                            Main.gameController.updateTeams();
+                                            Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.FLAG,team);
                                             pickUpTimer.clear();
                                             pos.getBlock().setType(Material.AIR);
                                         } else {
@@ -86,6 +88,7 @@ public class CTFFlag implements Listener {
                                                 p.setExp(0.0F);
                                                 pickUpTimer.remove(cp);
                                                 setPos(home);
+                                                Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.FLAG,team);
                                                 pickUpTimer.clear();
                                             } else {
                                                 p.setLevel((int) Math.ceil(pickUpTimer.get(cp)));
@@ -138,6 +141,16 @@ public class CTFFlag implements Listener {
         return team;
     }
 
+    public String getStatus() {
+        if (isHome()) {
+            return ChatColor.GREEN + "At home";
+        } else if (carriedPlayer == null) {
+            return ChatColor.YELLOW + "On ground";
+        } else {
+            return ChatColor.RED + "Taken";
+        }
+    }
+
     public void setPos(Location loc) {
         carriedPlayer = null;
         if (pos != null) {
@@ -151,8 +164,10 @@ public class CTFFlag implements Listener {
     }
 
     public void capture(CTFPlayer cp) {
+        carriedPlayer.getTeam().scorePoint();
         carriedPlayer = null;
         setPos(home);
+        Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.FLAG,team);
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.sendTitle(" ", cp.getFormattedName() + " captured the " + team.getFormattedName() + team.getChatColor() + "'s " + "Flag" + ChatColor.RESET, 10, 20, 5);
         }
@@ -188,6 +203,7 @@ public class CTFFlag implements Listener {
             blockToAdd = blocksToAdd.next().getLocation();
             if (blockToAdd.getBlock().getType().isSolid()) {
                 setPos(blockToAdd.add(new Vector(0.0,1.0,0.0)));
+                Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.FLAG,team);
                 return;
             }
         }
