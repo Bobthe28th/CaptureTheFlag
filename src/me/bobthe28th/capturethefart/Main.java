@@ -256,7 +256,11 @@ public class Main extends JavaPlugin implements Listener {
             if (event.getHitEntity() != null) {
                 loc = event.getHitEntity().getLocation();
             }
-            p.getWorld().createExplosion(loc,4F, false, false, Bukkit.getPlayer(p.getMetadata("playerSent").get(0).asString()));
+            if (p.hasMetadata("playerSent")) {
+                p.getWorld().createExplosion(loc,4F, false, false, Bukkit.getPlayer(p.getMetadata("playerSent").get(0).asString()));
+            } else {
+                p.getWorld().createExplosion(loc,4F, false, false);
+            }
         }
 
     }
@@ -277,24 +281,26 @@ public class Main extends JavaPlugin implements Listener {
 
         if (event.getEntity() instanceof Player player && eventE != null && eventE.getDamager().getType() == EntityType.PRIMED_TNT && event.getCause() == DamageCause.ENTITY_EXPLOSION) {
             TNTPrimed tnt = (TNTPrimed) eventE.getDamager();
-            String pSent = tnt.getMetadata("playerSent").get(0).asString();
-            Player pS = Bukkit.getPlayer(pSent);
-            if (pS != null) {
-                if (CTFPlayers.containsKey(pS) && CTFPlayers.containsKey(player)) {
-                    if (CTFPlayers.get(pS).getTeam() == CTFPlayers.get(player).getTeam()) {
-                        if (player == pS) {
-                            double xPos = player.getLocation().getBlockX() - tnt.getLocation().getBlockX();
-                            double yPos = player.getLocation().getBlockY() + 1.0 - tnt.getLocation().getBlockY();
-                            double zPos = player.getLocation().getBlockZ() - tnt.getLocation().getBlockZ();
-                            double div = 1.5;
-                            player.setVelocity(player.getVelocity().add(new Vector(xPos/div, yPos/div, zPos/div)));
-                            customDamageCause.put(player,new Object[]{"demoTNT",pS});
-                            event.setDamage(event.getFinalDamage()/5.0);
+            if (tnt.hasMetadata("playerSent")) {
+                String pSent = tnt.getMetadata("playerSent").get(0).asString();
+                Player pS = Bukkit.getPlayer(pSent);
+                if (pS != null) {
+                    if (CTFPlayers.containsKey(pS) && CTFPlayers.containsKey(player)) {
+                        if (CTFPlayers.get(pS).getTeam() == CTFPlayers.get(player).getTeam()) {
+                            if (player == pS) {
+                                double xPos = player.getLocation().getBlockX() - tnt.getLocation().getBlockX();
+                                double yPos = player.getLocation().getBlockY() + 1.0 - tnt.getLocation().getBlockY();
+                                double zPos = player.getLocation().getBlockZ() - tnt.getLocation().getBlockZ();
+                                double div = 1.5;
+                                player.setVelocity(player.getVelocity().add(new Vector(xPos/div, yPos/div, zPos/div)));
+                                customDamageCause.put(player,new Object[]{"demoTNT",pS});
+                                event.setDamage(event.getFinalDamage()/5.0);
+                            } else {
+                                event.setCancelled(true);
+                            }
                         } else {
-                            event.setCancelled(true);
+                            customDamageCause.put(player,new Object[]{"demoTNT",pS});
                         }
-                    } else {
-                        customDamageCause.put(player,new Object[]{"demoTNT",pS});
                     }
                 }
             }
