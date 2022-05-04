@@ -197,9 +197,16 @@ public class Main extends JavaPlugin implements Listener {
         Projectile p = event.getEntity();
         if (p instanceof Snowball) {
             if (p.getMetadata("hammer").get(0).asBoolean()) {
+
+                Material particleM = (event.getHitBlock() != null) ? event.getHitBlock().getType() : Material.REDSTONE_BLOCK;
+
+                for (Player particleP : Bukkit.getOnlinePlayers()) {
+                    particleP.spawnParticle(Particle.BLOCK_DUST,p.getLocation(),40,0.2,0.2,0.2,1.0,particleM.createBlockData());
+                }
+
                 if (p.getShooter() instanceof Player shooter && Main.CTFPlayers.containsKey(shooter)) {
-                    for (Entity e : p.getWorld().getNearbyEntities(p.getLocation(), 3, 3, 3)) {
-                        if (e instanceof Player pl && p.getLocation().distance(pl.getLocation()) <= 3 && Main.CTFPlayers.containsKey(pl)) {
+                    for (Entity e : p.getWorld().getNearbyEntities(p.getLocation(), 4, 4, 4)) {
+                        if (e instanceof Player pl && p.getLocation().distance(pl.getLocation()) <= 4 && Main.CTFPlayers.containsKey(pl)) {
                             if (Main.CTFPlayers.get(pl).getTeam() != Main.CTFPlayers.get(shooter).getTeam()) {
                                 Main.customDamageCause.put(pl, new Object[]{"hammerThrow", shooter});
                                 pl.damage(2, shooter);
@@ -354,6 +361,22 @@ public class Main extends JavaPlugin implements Listener {
             }
         }
         return target;
+    }
+
+    public static void createFakeFire(Location pos, Integer ageMax, Integer freq, Main plugin) {
+        pos.getBlock().setType(Material.FIRE);
+        new BukkitRunnable() {
+            int age = 0;
+            public void run() {
+                age ++;
+                if (pos.getBlock().getType() != Material.FIRE) {
+                    this.cancel();
+                } else if (age > ageMax) {
+                    pos.getBlock().setType(Material.AIR);
+                    this.cancel();
+                }
+            }
+        }.runTaskTimer(plugin,freq,freq);
     }
 
     public static void createFadingBlock(Location pos, Material m1, Material m2, Integer ageMax, Integer freq, Main plugin) {

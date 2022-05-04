@@ -10,6 +10,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class WizardFire extends CTFClass implements Listener {
 
@@ -26,6 +28,7 @@ public class WizardFire extends CTFClass implements Listener {
 
     @Override
     public void giveItems() {
+        player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,Integer.MAX_VALUE,0,true,false,true));
         player.removeItems();
         player.giveItem(new WizStickFire(player,plugin,0));
         player.giveItem(new WizBookFire(player,plugin,1));
