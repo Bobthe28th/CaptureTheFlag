@@ -448,7 +448,6 @@ public class CTFGameController implements Listener {
                     } else {
                         int index = Arrays.asList(Main.CTFClasses).indexOf(player.getpClass().getClass());
                         if (index != -1) {
-                            Bukkit.broadcastMessage("spawn");
                             for (CTFPlayer p : Main.CTFPlayers.values()) {
                                 if (p.getTeam() == player.getTeam()) {
                                     Main.fakeClass(p.getPlayer(), new UUID(0, index), 70 + index, classSelect[player.getTeam().getId()][index], 0F, 90F,Main.CTFClasses[index], player.getTeam(), plugin);
