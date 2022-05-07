@@ -39,6 +39,7 @@ public abstract class CTFStackCooldownItem extends CTFItem {
                     cItem.setAmount((int)(cooldown));
                     ItemMeta cMeta = cItem.getItemMeta();
                     if (cMeta != null) {
+                        cMeta.setDisplayName(ChatColor.RESET + itemName);
                         cMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE, (byte) 1);
                         cItem.setItemMeta(cMeta);
                     }
@@ -67,6 +68,7 @@ public abstract class CTFStackCooldownItem extends CTFItem {
         cItem.setAmount(1);
         ItemMeta cMeta = cItem.getItemMeta();
         if (cMeta != null) {
+            cMeta.setDisplayName(ChatColor.RESET + itemName);
             cMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE, (byte) 1);
             cItem.setItemMeta(cMeta);
         }
