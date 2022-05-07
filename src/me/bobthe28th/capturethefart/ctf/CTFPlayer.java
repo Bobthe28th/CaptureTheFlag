@@ -11,6 +11,8 @@ import com.comphenix.protocol.events.PacketContainer;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFItem;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.block.data.type.Door;
+import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
@@ -657,5 +659,29 @@ public class CTFPlayer implements Listener {
     public void onPlayerItemDamage(PlayerItemDamageEvent event) {
         if (event.getPlayer() != player) return;
         event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.getPlayer() != player) return;
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock() != null && (event.getClickedBlock().getBlockData() instanceof Door || event.getClickedBlock().getBlockData() instanceof TrapDoor)) {
+            event.setCancelled(true); //Door and trapdoor opening
+        } else if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock() != null && event.getItem() != null && event.getItem().getType().toString().endsWith("_AXE") && event.getClickedBlock().getType().toString().startsWith("WAXED")) {
+            event.setCancelled(true); //Scraping off wax
+        }
+    }
+
+    @EventHandler
+    public void onPlayerArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
+        if (event.getPlayer() != player) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+        if (event.getPlayer() != player) return;
+        if (event.getRightClicked() instanceof ItemFrame || event.getRightClicked() instanceof GlowItemFrame) {
+            event.setCancelled(true);
+        }
     }
 }
