@@ -668,6 +668,8 @@ public class CTFPlayer implements Listener {
             event.setCancelled(true); //Door and trapdoor opening
         } else if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock() != null && event.getItem() != null && event.getItem().getType().toString().endsWith("_AXE") && event.getClickedBlock().getType().toString().startsWith("WAXED")) {
             event.setCancelled(true); //Scraping off wax
+        } else if ((event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) && event.getItem() != null && event.getItem().getType() == Material.GLASS_BOTTLE) {
+            event.setCancelled(true); //Fill bottle with water
         }
     }
 
