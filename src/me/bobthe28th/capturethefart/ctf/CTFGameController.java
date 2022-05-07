@@ -21,8 +21,6 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
 
-//TODO depspawn fakes that other people stand on
-
 public class CTFGameController implements Listener {
 
     static Main plugin;
@@ -232,7 +230,11 @@ public class CTFGameController implements Listener {
     }
 
     void selectClassJoin(CTFPlayer player, Class<?> ctfclass, int index) {
-        Main.despawnFake(player.getPlayer(), new UUID(0,index), 70+index);
+        for (CTFPlayer p : Main.CTFPlayers.values()) {
+            if (p.getTeam() == player.getTeam()) {
+                Main.despawnFake(p.getPlayer(), new UUID(0,index), 70+index);
+            }
+        }
         if (ctfclass == null) {
             player.setSelectingWizard(true);
         } else {
@@ -438,11 +440,20 @@ public class CTFGameController implements Listener {
                 if (player.getpClass() != null || player.getSelectingWizard()) {
                     if (player.getSelectingWizard()) {
                         int index = Main.CTFClasses.length - 4;
-                        Main.fakeClass(player.getPlayer(), new UUID(0, index), 70 + index, classSelect[player.getTeam().getId()][index], 0F, 90F, WizardPreview.class, player.getTeam(), plugin);
+                        for (CTFPlayer p : Main.CTFPlayers.values()) {
+                            if (p.getTeam() == player.getTeam()) {
+                                Main.fakeClass(p.getPlayer(), new UUID(0, index), 70 + index, classSelect[player.getTeam().getId()][index], 0F, 90F, WizardPreview.class, player.getTeam(), plugin);
+                            }
+                        }
                     } else {
                         int index = Arrays.asList(Main.CTFClasses).indexOf(player.getpClass().getClass());
                         if (index != -1) {
-                            Main.fakeClass(player.getPlayer(), new UUID(0, index), 70 + index, classSelect[player.getTeam().getId()][index], 0F, 90F,Main.CTFClasses[index], player.getTeam(), plugin);
+                            Bukkit.broadcastMessage("spawn");
+                            for (CTFPlayer p : Main.CTFPlayers.values()) {
+                                if (p.getTeam() == player.getTeam()) {
+                                    Main.fakeClass(p.getPlayer(), new UUID(0, index), 70 + index, classSelect[player.getTeam().getId()][index], 0F, 90F,Main.CTFClasses[index], player.getTeam(), plugin);
+                                }
+                            }
                         }
                     }
 
