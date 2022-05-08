@@ -11,8 +11,14 @@ import com.comphenix.protocol.events.PacketContainer;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFItem;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.block.data.type.Door;
+import org.bukkit.block.data.type.TrapDoor;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.HandlerList;
@@ -54,6 +60,13 @@ public class CTFPlayer implements Listener {
     boolean selectingWizard = false;
     BukkitTask respawnTimer = null;
 
+    //TODO enemy bossbar needs testing like with respawn and other players
+
+    BossBar enemyHealth;
+    LivingEntity enemy;
+    double enemyHealthCooldown = 0.0;
+    boolean onEnemyHealthCooldown = false;
+
     int kills = 0;
     int deaths = 0;
 
@@ -85,6 +98,9 @@ public class CTFPlayer implements Listener {
             e.remove();
         }
         removeItems();
+        enemyHealth = Bukkit.createBossBar(new NamespacedKey(plugin,"ctfbossbar" + p.getName()),"",BarColor.RED,BarStyle.SEGMENTED_10);
+        enemyHealth.setVisible(false);
+        enemyHealth.addPlayer(player);
 
         cooldownTask = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
             int slot = player.getInventory().getHeldItemSlot();
@@ -229,6 +245,9 @@ public class CTFPlayer implements Listener {
     }
 
     public void death(boolean byEntity) {
+        for (PotionEffect pEffect : player.getActivePotionEffects()) {
+            player.removePotionEffect(pEffect.getType());
+        }
         isAlive = false;
         Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,team);
         deaths ++;
@@ -242,6 +261,13 @@ public class CTFPlayer implements Listener {
     public void respawn() {
         player.teleport(team.getSpawnLocation());
         player.setGameMode(GameMode.SURVIVAL);
+        player.setHealth(20.0);
+        for (PotionEffect pEffect : player.getActivePotionEffects()) {
+            player.removePotionEffect(pEffect.getType());
+        }
+        if (pClass != null) {
+            pClass.givePassives();
+        }
         isAlive = true;
         Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,team);
         player.sendTitle(" "," ",0,0,0);
@@ -292,6 +318,7 @@ public class CTFPlayer implements Listener {
     public void remove() {
         leaveClass();
         leaveTeam();
+        enemyHealth.removeAll();
         Bukkit.getServer().getScheduler().cancelTask(cooldownTask);
         if (respawnTimer != null) {
             respawnTimer.cancel();
@@ -399,6 +426,7 @@ public class CTFPlayer implements Listener {
         }
         pClass = cl;
         pClass.giveItems();
+        pClass.givePassives();
         giveArmor();
 	}
 
@@ -488,6 +516,41 @@ public class CTFPlayer implements Listener {
         }.runTaskTimer(plugin, 2L, 2L);
     }
 
+    public void startEnemyHealthCooldown() {
+        onEnemyHealthCooldown = true;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                enemyHealthCooldown -= 0.1;
+                enemyHealthCooldown = Math.round(enemyHealthCooldown*10.0)/10.0;
+                if (enemyHealthCooldown <= 0) {
+                    enemyHealthCooldown = 0;
+                    enemy = null;
+                    onEnemyHealthCooldown = false;
+                    enemyHealth.setVisible(false);
+                    this.cancel();
+                }
+            }
+        }.runTaskTimer(plugin, 2L, 2L);
+    }
+
+    public void setEnemyHealthCooldown() {
+        enemyHealthCooldown = 4.0;
+        if (!onEnemyHealthCooldown) {
+            startEnemyHealthCooldown();
+        }
+    }
+
+    public void setEnemy(LivingEntity newEnemy) {
+        enemy = newEnemy;
+    }
+
+    public void updateEnemyHealth(double healthProgress) {
+        enemyHealth.setProgress(healthProgress);
+        enemyHealth.setTitle(enemy.getName());
+        enemyHealth.setVisible(true);
+    }
+
     @EventHandler
     public void onPlayerClick(PlayerInteractEvent event) {
         if (event.getPlayer() != player) return;
@@ -506,7 +569,16 @@ public class CTFPlayer implements Listener {
                             setClass(c);
                         } catch (Exception ignored) {}
                         setCanUse(false);
-                        Main.gameController.startClassSelectTimer();
+                        boolean allReady = true;
+                        for (CTFPlayer p : Main.CTFPlayers.values()) {
+                            if (p.getpClass() == null) {
+                                Main.gameController.stopClassSelectTimer();
+                                allReady = false;
+                            }
+                        }
+                        if (allReady) {
+                            Main.gameController.startClassSelectTimer();
+                        }
                     }
                 }
             }
@@ -625,10 +697,28 @@ public class CTFPlayer implements Listener {
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player pf) {
-            if (pf != player) return;
-            healCooldown = 7.0;
-            if (!onHealCooldown) {
-                startHealCooldown();
+            if (pf == player) {
+                healCooldown = 7.0;
+                if (!onHealCooldown) {
+                    startHealCooldown();
+                }
+            }
+        }
+        if (event.getEntity() instanceof LivingEntity lEntity) {
+            if (lEntity != enemy) return;
+            updateEnemyHealth(Math.max(0.0,(lEntity.getHealth() - event.getFinalDamage()) / Objects.requireNonNull(lEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        if (event.getDamager() instanceof Player pDamager && event.getEntity() instanceof LivingEntity lEntity) {
+            if (pDamager != player) return;
+
+            if (lEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH) != null) {
+                enemy = lEntity;
+                setEnemyHealthCooldown();
+                updateEnemyHealth(Math.max(0.0,(lEntity.getHealth() - event.getFinalDamage()) / Objects.requireNonNull(lEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
             }
         }
     }
@@ -640,6 +730,9 @@ public class CTFPlayer implements Listener {
             if (event.getRegainReason() == EntityRegainHealthEvent.RegainReason.SATIATED) {
                 event.setCancelled(true);
             }
+        } else if (event.getEntity() instanceof LivingEntity lEntity) {
+            if (lEntity != enemy) return;
+            updateEnemyHealth(Math.min(1.0,(lEntity.getHealth() + event.getAmount()) / Objects.requireNonNull(lEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
         }
     }
 
@@ -657,5 +750,31 @@ public class CTFPlayer implements Listener {
     public void onPlayerItemDamage(PlayerItemDamageEvent event) {
         if (event.getPlayer() != player) return;
         event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.getPlayer() != player) return;
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock() != null && (event.getClickedBlock().getBlockData() instanceof Door || event.getClickedBlock().getBlockData() instanceof TrapDoor)) {
+            event.setCancelled(true); //Door and trapdoor opening
+        } else if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock() != null && event.getItem() != null && event.getItem().getType().toString().endsWith("_AXE") && event.getClickedBlock().getType().toString().startsWith("WAXED")) {
+            event.setCancelled(true); //Scraping off wax
+        } else if ((event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) && event.getItem() != null && event.getItem().getType() == Material.GLASS_BOTTLE) {
+            event.setCancelled(true); //Fill bottle with water
+        }
+    }
+
+    @EventHandler
+    public void onPlayerArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
+        if (event.getPlayer() != player) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+        if (event.getPlayer() != player) return;
+        if (event.getRightClicked() instanceof ItemFrame || event.getRightClicked() instanceof GlowItemFrame) {
+            event.setCancelled(true);
+        }
     }
 }

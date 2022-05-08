@@ -4,6 +4,8 @@ import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFDoubleCooldownItem;
 import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -32,51 +34,48 @@ public class WizBookFire extends CTFDoubleCooldownItem {
             case LEFT_CLICK_BLOCK:
                 if (getCooldown(0) == 0) {
                     startAction(0);
-                    new BukkitRunnable() {
-                        int t = 0;
-                        final int s = 2;
-                        final Location origin = p.getLocation();
-                        final Vector direction = p.getLocation().getDirection().setY(0).normalize();
-                        int lastBlockY = origin.getBlockY();
+                    int blocks = 40;
+                    int timeBetweenBlocks = 1;
 
+                    Location origin = p.getLocation();
+                    Vector direction = origin.getDirection().setY(0.0);
+                    BlockIterator blockDirection = new BlockIterator(origin.clone().setDirection(direction),0,blocks + 1);
+                    blockDirection.next();
+                    blockDirection.next();
+
+                    new BukkitRunnable() {
+                        int lastBlockY = origin.getBlockY();
                         public void run() {
-                            t++;
-                            if (t > 60) {
+                            if (!blockDirection.hasNext())  {
                                 startCooldown(0);
                                 this.cancel();
-                            }
-
-                            if (t % s == 0) {
-
-                                BlockIterator blocksToAdd = new BlockIterator(origin.clone().add(direction.clone().multiply((t+s) / s)).setDirection(new Vector(0.0, -1.0, 0.0)).add(new Vector(0.0, lastBlockY + 3.0, 0.0)),0,100);
-
-                                Location blockToAdd;
-                                while(blocksToAdd.hasNext()) {
-                                    blockToAdd = blocksToAdd.next().getLocation();
-                                    Location fire = blockToAdd.clone().add(new Vector(0.0,1.0,0.0));
-                                    if (blockToAdd.getBlock().getType().isSolid() && fire.getBlock().isEmpty()) {
-                                        if (fire.getBlockY() < lastBlockY + 3 && fire.getBlockY() > lastBlockY - 3) {
-                                            lastBlockY = fire.getBlockY();
-                                            fire.getBlock().setType(Material.FIRE);
-                                        } else {
-                                            startCooldown(0);
-                                            this.cancel();
-                                        }
-                                        return;
+                            } else {
+                                Location nextBlock = blockDirection.next().getLocation();
+                                nextBlock.setY(lastBlockY);
+                                BlockIterator jumpBlock = new BlockIterator(nextBlock.add(new Vector(0.0, 3.0, 0.0)).setDirection(new Vector(0.0, -1.0, 0.0)), 0, 7);
+                                while (jumpBlock.hasNext()) {
+                                    Block fireBlock = jumpBlock.next();
+                                    if (fireBlock.isEmpty() && !fireBlock.getRelative(BlockFace.DOWN).isEmpty()) {
+                                        //Main.createFakeFire(fireBlock.getLocation(), 3, (int)(Math.random() * 10 + 45), plugin);
+                                        Main.createFakeFire(fireBlock.getLocation(), 3, 33, plugin);
+                                        lastBlockY = fireBlock.getY();
+                                        break;
+                                    } else if (!jumpBlock.hasNext()) {
+                                        startCooldown(0);
+                                        this.cancel();
                                     }
                                 }
                             }
-
-
                         }
-                    }.runTaskTimer(plugin,0,1);
+
+                    }.runTaskTimer(plugin,0,timeBetweenBlocks);
                 }
                 break;
             case RIGHT_CLICK_AIR:
             case RIGHT_CLICK_BLOCK:
                 if (getCooldown(1) == 0) {
                     startCooldown(1);
-                    double radius = 5.0;
+                    double radius = 8.0;
                     for (Entity e : p.getWorld().getNearbyEntities(p.getLocation(), radius, radius, radius)) {
                         if (e instanceof Player a) {
                             if (a.getLocation().distance(p.getLocation()) <= radius) {
@@ -99,12 +98,15 @@ public class WizBookFire extends CTFDoubleCooldownItem {
 
     void attackBoost(CTFPlayer p) {
 
-        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,200,0,false,false,true));
+        int buffDuration = 140;
+
+        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,buffDuration,0,false,false,true));
+        p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED,buffDuration,1,false,false,true));
 
         new BukkitRunnable() {
             int t = 0;
-            final int maxTime = 60;
-            final int loops = 2;
+            final int maxTime = buffDuration;
+            final int loops = 15;
             final double ringSize = 0.75;
             public void run() {
                 if (t > maxTime) {

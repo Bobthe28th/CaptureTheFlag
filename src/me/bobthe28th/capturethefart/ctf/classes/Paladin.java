@@ -15,6 +15,8 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+//TODO add GENERIC_KNOCKBACK_RESISTANCE
+
 public class Paladin extends CTFClass implements Listener {
 
     String name = "Paladin";

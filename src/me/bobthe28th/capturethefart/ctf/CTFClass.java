@@ -28,6 +28,8 @@ public abstract class CTFClass {
         player = player_;
     }
 
+    public void givePassives() {}
+
     public String getName() { return className; }
 
     public abstract void deselect();

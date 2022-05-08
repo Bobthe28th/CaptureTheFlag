@@ -4,6 +4,7 @@ import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.ThrownPotion;
@@ -22,17 +23,22 @@ import me.bobthe28th.capturethefart.Main;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 
+import java.util.ArrayList;
+
 public abstract class CTFItem {
 
     String itemName;
     Material item;
-    PotionData pData;
+
     int customModel;
     public Main plugin;
     public CTFPlayer player;
     public int amount = 1;
     public int defaultSlot;
     public int slot;
+
+    Color potionColor;
+    ArrayList<PotionEffect> potionEffects = new ArrayList<>();
 
     public CTFItem(String itemName_, Material item_, Integer customModel_, CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
         itemName = itemName_;
@@ -58,8 +64,16 @@ public abstract class CTFItem {
         player.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
     }
 
-    public void setPotionEffect(PotionData pD) {
-        pData = pD;
+//    public void setPotionEffect(PotionData pD) {
+//        pData = pD;
+//    }
+
+    public void setPotionColor(Color pColor) {
+        potionColor = pColor;
+    }
+
+    public void addPotionEffect(PotionEffect pEffect) {
+        potionEffects.add(pEffect);
     }
 
     public void setItem(Material nItem) {
@@ -79,7 +93,12 @@ public abstract class CTFItem {
         if (meta != null) {
 
             if (meta instanceof PotionMeta pMeta) {
-                pMeta.setBasePotionData(pData);
+                if (potionColor != null) {
+                    pMeta.setColor(potionColor);
+                }
+                for (PotionEffect pEffect : potionEffects) {
+                    pMeta.addCustomEffect(pEffect,true);
+                }
             }
 
             meta.setDisplayName(ChatColor.RESET + itemName);
@@ -115,5 +134,9 @@ public abstract class CTFItem {
 
     public int getSlot() {
         return slot;
+    }
+
+    public String getItemName() {
+        return itemName;
     }
 }

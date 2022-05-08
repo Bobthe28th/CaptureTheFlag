@@ -10,6 +10,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class WizardFire extends CTFClass implements Listener {
 
@@ -22,6 +24,11 @@ public class WizardFire extends CTFClass implements Listener {
         }
         setArmor(new Material[]{Material.LEATHER,null,null});
         setHelmetCustomModel(1);
+    }
+
+    @Override
+    public void givePassives() {
+        player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,Integer.MAX_VALUE,0,true,false,true));
     }
 
     @Override

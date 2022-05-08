@@ -15,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.potion.PotionEffectType;
 
 public class Assassin extends CTFClass implements Listener {
@@ -55,7 +56,9 @@ public class Assassin extends CTFClass implements Listener {
     public void onEntityPotionEffect(EntityPotionEffectEvent event) {
         if (event.getEntity() instanceof Player pf) {
             if (pf != player.getPlayer()) return;
-            potion.onPotion(event);
+            if (potion != null) {
+                potion.onPotion(event);
+            }
         }
     }
 
