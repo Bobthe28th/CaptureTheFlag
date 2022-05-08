@@ -245,6 +245,9 @@ public class CTFPlayer implements Listener {
     }
 
     public void death(boolean byEntity) {
+        for (PotionEffect pEffect : player.getActivePotionEffects()) {
+            player.removePotionEffect(pEffect.getType());
+        }
         isAlive = false;
         Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,team);
         deaths ++;
@@ -259,6 +262,12 @@ public class CTFPlayer implements Listener {
         player.teleport(team.getSpawnLocation());
         player.setGameMode(GameMode.SURVIVAL);
         player.setHealth(20.0);
+        for (PotionEffect pEffect : player.getActivePotionEffects()) {
+            player.removePotionEffect(pEffect.getType());
+        }
+        if (pClass != null) {
+            pClass.givePassives();
+        }
         isAlive = true;
         Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,team);
         player.sendTitle(" "," ",0,0,0);
@@ -417,6 +426,7 @@ public class CTFPlayer implements Listener {
         }
         pClass = cl;
         pClass.giveItems();
+        pClass.givePassives();
         giveArmor();
 	}
 
@@ -559,7 +569,16 @@ public class CTFPlayer implements Listener {
                             setClass(c);
                         } catch (Exception ignored) {}
                         setCanUse(false);
-                        Main.gameController.startClassSelectTimer();
+                        boolean allReady = true;
+                        for (CTFPlayer p : Main.CTFPlayers.values()) {
+                            if (p.getpClass() == null) {
+                                Main.gameController.stopClassSelectTimer();
+                                allReady = false;
+                            }
+                        }
+                        if (allReady) {
+                            Main.gameController.startClassSelectTimer();
+                        }
                     }
                 }
             }

@@ -27,8 +27,12 @@ public class WizardFire extends CTFClass implements Listener {
     }
 
     @Override
-    public void giveItems() {
+    public void givePassives() {
         player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,Integer.MAX_VALUE,0,true,false,true));
+    }
+
+    @Override
+    public void giveItems() {
         player.removeItems();
         player.giveItem(new WizStickFire(player,plugin,0));
         player.giveItem(new WizBookFire(player,plugin,1));

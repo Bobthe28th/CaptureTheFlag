@@ -19,6 +19,8 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.Objects;
+
 public class Archer extends CTFClass implements Listener {
 
     String name = "Archer";
@@ -47,9 +49,12 @@ public class Archer extends CTFClass implements Listener {
     }
 
     @Override
-    public void giveItems() {
+    public void givePassives() {
         player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.JUMP,Integer.MAX_VALUE,1,true,false,true));
+    }
 
+    @Override
+    public void giveItems() {
         player.removeItems();
 
         bow = new ArcBow(player,plugin,4);
@@ -71,7 +76,7 @@ public class Archer extends CTFClass implements Listener {
 
             event.setConsumeItem(false);
             if (event.getConsumable() != null) {
-                if (p.getInventory().getItem(EquipmentSlot.OFF_HAND).getType() == event.getConsumable().getType()) {
+                if (p.getInventory().getItem(EquipmentSlot.OFF_HAND) != null && Objects.requireNonNull(p.getInventory().getItem(EquipmentSlot.OFF_HAND)).getType() == event.getConsumable().getType()) {
                     if (event.getProjectile() instanceof Arrow && event.getConsumable().getItemMeta() != null && event.getConsumable().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(plugin,"ctfname"),  PersistentDataType.STRING)) {
                         String name = event.getConsumable().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,"ctfname"),  PersistentDataType.STRING);
                         if (name != null) {
