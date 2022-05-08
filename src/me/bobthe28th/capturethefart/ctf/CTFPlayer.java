@@ -99,7 +99,6 @@ public class CTFPlayer implements Listener {
         }
         removeItems();
         enemyHealth = Bukkit.createBossBar(new NamespacedKey(plugin,"ctfbossbar" + p.getName()),"",BarColor.RED,BarStyle.SEGMENTED_10);
-//        enemyHealth = Bukkit.createBossBar("",BarColor.RED,BarStyle.SEGMENTED_10);
         enemyHealth.setVisible(false);
         enemyHealth.addPlayer(player);
 
@@ -259,6 +258,7 @@ public class CTFPlayer implements Listener {
     public void respawn() {
         player.teleport(team.getSpawnLocation());
         player.setGameMode(GameMode.SURVIVAL);
+        player.setHealth(20.0);
         isAlive = true;
         Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,team);
         player.sendTitle(" "," ",0,0,0);
@@ -309,6 +309,7 @@ public class CTFPlayer implements Listener {
     public void remove() {
         leaveClass();
         leaveTeam();
+        enemyHealth.removeAll();
         Bukkit.getServer().getScheduler().cancelTask(cooldownTask);
         if (respawnTimer != null) {
             respawnTimer.cancel();
@@ -660,12 +661,14 @@ public class CTFPlayer implements Listener {
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player pf) {
-            if (pf != player) return;
-            healCooldown = 7.0;
-            if (!onHealCooldown) {
-                startHealCooldown();
+            if (pf == player) {
+                healCooldown = 7.0;
+                if (!onHealCooldown) {
+                    startHealCooldown();
+                }
             }
-        } else if (event.getEntity() instanceof LivingEntity lEntity) {
+        }
+        if (event.getEntity() instanceof LivingEntity lEntity) {
             if (lEntity != enemy) return;
             enemyHealth.setProgress(Math.max(0.0,(lEntity.getHealth() - event.getFinalDamage()) / Objects.requireNonNull(lEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
             enemyHealth.setTitle(lEntity.getName());

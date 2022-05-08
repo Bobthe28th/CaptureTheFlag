@@ -324,7 +324,7 @@ public class Main extends JavaPlugin implements Listener {
                     CTFPlayers.get(player).death(byEntity);
                 }
                 event.setCancelled(true);
-                player.setHealth(20.0);
+                player.setHealth(0.1);
                 player.setGameMode(GameMode.SPECTATOR);
                 player.setFreezeTicks(0);
                 String damageType;
