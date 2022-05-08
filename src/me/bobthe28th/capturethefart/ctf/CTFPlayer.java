@@ -524,6 +524,23 @@ public class CTFPlayer implements Listener {
         }.runTaskTimer(plugin, 2L, 2L);
     }
 
+    public void setEnemyHealthCooldown() {
+        enemyHealthCooldown = 4.0;
+        if (!onEnemyHealthCooldown) {
+            startEnemyHealthCooldown();
+        }
+    }
+
+    public void setEnemy(LivingEntity newEnemy) {
+        enemy = newEnemy;
+    }
+
+    public void updateEnemyHealth(double healthProgress) {
+        enemyHealth.setProgress(healthProgress);
+        enemyHealth.setTitle(enemy.getName());
+        enemyHealth.setVisible(true);
+    }
+
     @EventHandler
     public void onPlayerClick(PlayerInteractEvent event) {
         if (event.getPlayer() != player) return;
@@ -670,9 +687,7 @@ public class CTFPlayer implements Listener {
         }
         if (event.getEntity() instanceof LivingEntity lEntity) {
             if (lEntity != enemy) return;
-            enemyHealth.setProgress(Math.max(0.0,(lEntity.getHealth() - event.getFinalDamage()) / Objects.requireNonNull(lEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
-            enemyHealth.setTitle(lEntity.getName());
-            enemyHealth.setVisible(true);
+            updateEnemyHealth(Math.max(0.0,(lEntity.getHealth() - event.getFinalDamage()) / Objects.requireNonNull(lEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
         }
     }
 
@@ -683,13 +698,8 @@ public class CTFPlayer implements Listener {
 
             if (lEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH) != null) {
                 enemy = lEntity;
-                enemyHealthCooldown = 4.0;
-                if (!onEnemyHealthCooldown) {
-                    startEnemyHealthCooldown();
-                }
-                enemyHealth.setProgress(Math.max(0.0,(lEntity.getHealth() - event.getFinalDamage()) / Objects.requireNonNull(lEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
-                enemyHealth.setTitle(lEntity.getName());
-                enemyHealth.setVisible(true);
+                setEnemyHealthCooldown();
+                updateEnemyHealth(Math.max(0.0,(lEntity.getHealth() - event.getFinalDamage()) / Objects.requireNonNull(lEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
             }
         }
     }
@@ -703,9 +713,7 @@ public class CTFPlayer implements Listener {
             }
         } else if (event.getEntity() instanceof LivingEntity lEntity) {
             if (lEntity != enemy) return;
-            enemyHealth.setProgress(Math.min(1.0,(lEntity.getHealth() + event.getAmount()) / Objects.requireNonNull(lEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
-            enemyHealth.setTitle(lEntity.getName());
-            enemyHealth.setVisible(true);
+            updateEnemyHealth(Math.min(1.0,(lEntity.getHealth() + event.getAmount()) / Objects.requireNonNull(lEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
         }
     }
 

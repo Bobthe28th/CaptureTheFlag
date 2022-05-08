@@ -15,6 +15,7 @@ import me.bobthe28th.capturethefart.ctf.classes.*;
 import net.md_5.bungee.api.chat.*;
 import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.boss.BossBar;
@@ -318,6 +319,15 @@ public class Main extends JavaPlugin implements Listener {
         }
 
         if (!event.isCancelled() && event.getEntity() instanceof Player player) {
+
+            if (customDamageCause.containsKey(player) && customDamageCause.get(player)[1] instanceof Player d && d != player) {
+                if (Main.CTFPlayers.containsKey(d)) {
+                    Main.CTFPlayers.get(d).setEnemy(player);
+                    Main.CTFPlayers.get(d).updateEnemyHealth(Math.max(0.0,(player.getHealth() - event.getFinalDamage()) / Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
+                    Main.CTFPlayers.get(d).setEnemyHealthCooldown();
+                }
+            }
+
             if (player.getHealth() - event.getFinalDamage() <= 0) {
                 boolean byEntity = eventE != null;
                 if (CTFPlayers.containsKey(player)) {
