@@ -13,8 +13,12 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.data.type.Door;
 import org.bukkit.block.data.type.TrapDoor;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.HandlerList;
@@ -56,6 +60,13 @@ public class CTFPlayer implements Listener {
     boolean selectingWizard = false;
     BukkitTask respawnTimer = null;
 
+    //TODO enemy bossbar needs testing like with respawn and other players
+
+    BossBar enemyHealth;
+    LivingEntity enemy;
+    double enemyHealthCooldown = 0.0;
+    boolean onEnemyHealthCooldown = false;
+
     int kills = 0;
     int deaths = 0;
 
@@ -87,6 +98,10 @@ public class CTFPlayer implements Listener {
             e.remove();
         }
         removeItems();
+        enemyHealth = Bukkit.createBossBar(new NamespacedKey(plugin,"ctfbossbar" + p.getName()),"",BarColor.RED,BarStyle.SEGMENTED_10);
+//        enemyHealth = Bukkit.createBossBar("",BarColor.RED,BarStyle.SEGMENTED_10);
+        enemyHealth.setVisible(false);
+        enemyHealth.addPlayer(player);
 
         cooldownTask = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
             int slot = player.getInventory().getHeldItemSlot();
@@ -490,6 +505,24 @@ public class CTFPlayer implements Listener {
         }.runTaskTimer(plugin, 2L, 2L);
     }
 
+    public void startEnemyHealthCooldown() {
+        onEnemyHealthCooldown = true;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                enemyHealthCooldown -= 0.1;
+                enemyHealthCooldown = Math.round(enemyHealthCooldown*10.0)/10.0;
+                if (enemyHealthCooldown <= 0) {
+                    enemyHealthCooldown = 0;
+                    enemy = null;
+                    onEnemyHealthCooldown = false;
+                    enemyHealth.setVisible(false);
+                    this.cancel();
+                }
+            }
+        }.runTaskTimer(plugin, 2L, 2L);
+    }
+
     @EventHandler
     public void onPlayerClick(PlayerInteractEvent event) {
         if (event.getPlayer() != player) return;
@@ -632,6 +665,29 @@ public class CTFPlayer implements Listener {
             if (!onHealCooldown) {
                 startHealCooldown();
             }
+        } else if (event.getEntity() instanceof LivingEntity lEntity) {
+            if (lEntity != enemy) return;
+            enemyHealth.setProgress(Math.max(0.0,(lEntity.getHealth() - event.getFinalDamage()) / Objects.requireNonNull(lEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
+            enemyHealth.setTitle(lEntity.getName());
+            enemyHealth.setVisible(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        if (event.getDamager() instanceof Player pDamager && event.getEntity() instanceof LivingEntity lEntity) {
+            if (pDamager != player) return;
+
+            if (lEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH) != null) {
+                enemy = lEntity;
+                enemyHealthCooldown = 4.0;
+                if (!onEnemyHealthCooldown) {
+                    startEnemyHealthCooldown();
+                }
+                enemyHealth.setProgress(Math.max(0.0,(lEntity.getHealth() - event.getFinalDamage()) / Objects.requireNonNull(lEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
+                enemyHealth.setTitle(lEntity.getName());
+                enemyHealth.setVisible(true);
+            }
         }
     }
 
@@ -642,6 +698,11 @@ public class CTFPlayer implements Listener {
             if (event.getRegainReason() == EntityRegainHealthEvent.RegainReason.SATIATED) {
                 event.setCancelled(true);
             }
+        } else if (event.getEntity() instanceof LivingEntity lEntity) {
+            if (lEntity != enemy) return;
+            enemyHealth.setProgress(Math.min(1.0,(lEntity.getHealth() + event.getAmount()) / Objects.requireNonNull(lEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
+            enemyHealth.setTitle(lEntity.getName());
+            enemyHealth.setVisible(true);
         }
     }
 

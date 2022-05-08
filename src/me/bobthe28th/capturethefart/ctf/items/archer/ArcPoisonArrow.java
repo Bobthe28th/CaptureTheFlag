@@ -19,7 +19,7 @@ public class ArcPoisonArrow extends CTFBuildUpItem {
     public ArcPoisonArrow(ArcBow bow_, CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
         super("Poison Arrow", Material.TIPPED_ARROW, 5, 4, 0, player_, plugin_, defaultSlot_);
         setPotionColor(PotionEffectType.POISON.getColor());
-        addPotionEffect(new PotionEffect(PotionEffectType.POISON,2400,1)); //*8 duration
+        addPotionEffect(new PotionEffect(PotionEffectType.POISON,300,1));
         bow = bow_;
     }
 

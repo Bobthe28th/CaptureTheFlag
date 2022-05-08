@@ -17,6 +17,8 @@ import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
+import org.bukkit.boss.BossBar;
+import org.bukkit.boss.KeyedBossBar;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -112,6 +114,8 @@ public class Main extends JavaPlugin implements Listener {
                 e.printStackTrace();
             }
         }
+
+        Bukkit.getBossBars().forEachRemaining(BossBar::removeAll);
 
         for(Player player : Bukkit.getOnlinePlayers()) {
             player.setPlayerListHeader("capture the FART!\n\uE238");
