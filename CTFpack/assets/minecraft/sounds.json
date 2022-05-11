@@ -3,5 +3,35 @@
   "boom": {
     "category": "master",
     "sounds": [ "custom/boom" ]
+  },
+  "halland_dalarna": {
+    "category": "music",
+    "sounds": [ "custom/halland_dalarna" ],
+    "stream": true
+  },
+  "glide": {
+    "category": "music",
+    "sounds": [ "custom/glide" ],
+    "stream": true
+  },
+  "bfg_division": {
+    "category": "music",
+    "sounds": [ "custom/bfg_division" ],
+    "stream": true
+  },
+  "bigger_ukulele": {
+    "category": "music",
+    "sounds": [ "custom/bigger_ukulele" ],
+    "stream": true
+  },
+  "loon_skirmish": {
+    "category": "music",
+    "sounds": [ "custom/loon_skirmish" ],
+    "stream": true
+  },
+  "ordinary_days": {
+    "category": "music",
+    "sounds": [ "custom/ordinary_days" ],
+    "stream": true
   }
 }

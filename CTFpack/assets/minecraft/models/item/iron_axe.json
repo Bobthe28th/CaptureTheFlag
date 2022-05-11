@@ -11,6 +11,10 @@
     {
       "predicate": { "custom_model_data": 2 },
       "model": "paladin/hammer"
+    },
+    {
+      "predicate": { "custom_model_data": 3 },
+      "model": "paladin/hammerthrow"
     }
   ]
 }
