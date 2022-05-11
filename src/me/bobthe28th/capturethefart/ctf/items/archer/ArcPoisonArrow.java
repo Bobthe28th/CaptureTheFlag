@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -27,6 +28,9 @@ public class ArcPoisonArrow extends CTFBuildUpItem {
         if (!isOnCooldown()) {
             startCooldown();
         }
+        arrow.setMetadata("ctfProjectile",new FixedMetadataValue(plugin,true));
+        arrow.setMetadata("ctfProjectileType",new FixedMetadataValue(plugin,"archerarrow"));
+        arrow.setMetadata("ArcherArrowType",new FixedMetadataValue(plugin,"poison"));
     }
 
     @Override

@@ -12,6 +12,8 @@ import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import me.bobthe28th.capturethefart.ctf.*;
 import me.bobthe28th.capturethefart.ctf.classes.*;
+import me.bobthe28th.capturethefart.ctf.damage.CTFDamage;
+import me.bobthe28th.capturethefart.ctf.damage.CTFDamageCause;
 import net.md_5.bungee.api.chat.*;
 import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.*;
@@ -19,7 +21,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.boss.BossBar;
-import org.bukkit.boss.KeyedBossBar;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -38,7 +39,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
@@ -49,8 +49,8 @@ public class Main extends JavaPlugin implements Listener {
     public static ArrayList<Integer> tornado = new ArrayList<>();
     public static HashMap<Snowball, Integer> snowBallEffect = new HashMap<>();
     public static ArrayList<Player> disableFall = new ArrayList<>();
-    public static HashMap<Player,Object[]> customDamageCause = new HashMap<>();
     public static HashMap<Block,CTFTeam> breakableBlocks = new HashMap<>();
+    public static HashMap<Player, CTFDamage> customDamageCause = new HashMap<>();
 
     public static CTFTeam[] CTFTeams;
     public static CTFFlag[] CTFFlags;
@@ -150,7 +150,7 @@ public class Main extends JavaPlugin implements Listener {
                         if (CTFPlayers.containsKey(pS) && CTFPlayers.containsKey(pd)) {
                             if (CTFPlayers.get(pS).getTeam() != CTFPlayers.get(pd).getTeam()) {
                                 if (pd.getGameMode() != GameMode.SPECTATOR && pd.getGameMode() != GameMode.CREATIVE) {
-                                    customDamageCause.put(pd,new Object[]{"wizardShowChunk",pS});
+                                    customDamageCause.put(pd,new CTFDamage(CTFPlayers.get(pS),CTFDamageCause.WIZARD_SNOW_CHUNK));
                                     pd.damage(1.0,pS);
                                     pd.setNoDamageTicks(0);
                                 }
@@ -199,86 +199,111 @@ public class Main extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onProjectileHit(ProjectileHitEvent event) {
-        Projectile p = event.getEntity();
-        if (p instanceof Snowball) {
-            if (p.getMetadata("hammer").get(0).asBoolean()) {
+        Projectile projectile = event.getEntity();
 
-                Material particleM = (event.getHitBlock() != null) ? event.getHitBlock().getType() : Material.REDSTONE_BLOCK;
+        Player shooter = null;
+        if (projectile.getShooter() instanceof Player p) {
+            shooter = p;
+        }
+        CTFPlayer CTFshooter = null;
+        if (shooter != null && CTFPlayers.containsKey(shooter)) {
+            CTFshooter = CTFPlayers.get(shooter);
+        }
+        Player hitPlayer = null;
+        if (event.getHitEntity() instanceof Player p) {
+            hitPlayer = p;
+        }
 
-                for (Player particleP : Bukkit.getOnlinePlayers()) {
-                    particleP.spawnParticle(Particle.BLOCK_DUST,p.getLocation(),40,0.2,0.2,0.2,1.0,particleM.createBlockData());
-                }
+        CTFPlayer CTFhitPlayer = null;
+        if (hitPlayer != null && CTFPlayers.containsKey(hitPlayer)) {
+            CTFhitPlayer = CTFPlayers.get(hitPlayer);
+        }
 
-                if (p.getShooter() instanceof Player shooter && Main.CTFPlayers.containsKey(shooter)) {
-                    for (Entity e : p.getWorld().getNearbyEntities(p.getLocation(), 4, 4, 4)) {
-                        if (e instanceof Player pl && p.getLocation().distance(pl.getLocation()) <= 4 && Main.CTFPlayers.containsKey(pl)) {
-                            if (Main.CTFPlayers.get(pl).getTeam() != Main.CTFPlayers.get(shooter).getTeam()) {
-                                Main.customDamageCause.put(pl, new Object[]{"hammerThrow", shooter});
-                                pl.damage(2, shooter);
-                                pl.setVelocity(new Vector(0, pl.getVelocity().getY() + 0.05, 0));
-                                pl.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 2, true, true, true));
-                                pl.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 0, true, true, true));
+        if (projectile.hasMetadata("ctfProjectile")) {
+            if (projectile.hasMetadata("ctfProjectileType")) {
+                Location loc;
+                switch (projectile.getMetadata("ctfProjectileType").get(0).asString()) {
+                    case "hammer":
+                        Material particleM = (event.getHitBlock() != null) ? event.getHitBlock().getType() : Material.REDSTONE_BLOCK;
+
+                        for (Player particleP : Bukkit.getOnlinePlayers()) {
+                            particleP.spawnParticle(Particle.BLOCK_DUST, projectile.getLocation(), 40, 0.2, 0.2, 0.2, 1.0, particleM.createBlockData());
+                        }
+
+                        if (CTFshooter != null) {
+                            for (Entity e : projectile.getWorld().getNearbyEntities(projectile.getLocation(), 4, 4, 4)) {
+                                if (e instanceof Player pl && projectile.getLocation().distance(pl.getLocation()) <= 4 && CTFPlayers.containsKey(pl)) {
+                                    if (CTFPlayers.get(pl).getTeam() != CTFshooter.getTeam()) {
+                                        customDamageCause.put(pl, new CTFDamage(CTFshooter, CTFDamageCause.PALADIN_HAMMER_THROW));
+                                        pl.damage(2, shooter);
+                                        pl.setVelocity(new Vector(0, pl.getVelocity().getY() + 0.05, 0));
+                                        pl.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 2, true, true, true));
+                                        pl.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 0, true, true, true));
+                                    }
+                                }
                             }
                         }
-                    }
-                }
-                for (Entity e : p.getPassengers()) {
-                    p.removePassenger(e);
-                    e.remove();
-                }
-            } else {
-                if (p.getShooter() instanceof Player shooter && event.getHitEntity() instanceof Player player) {
-                    if (CTFPlayers.containsKey(shooter) && CTFPlayers.containsKey(player)) {
-                        if (CTFPlayers.get(shooter).getTeam() != CTFPlayers.get(player).getTeam()) {
-                            customDamageCause.put(player,new Object[]{"wizardSnowball",shooter});
-                            player.damage(1.0, shooter);
-                            player.setFreezeTicks(Math.min(player.getFreezeTicks() + 50,p.getMaxFreezeTicks() + 60));
+                        for (Entity e : projectile.getPassengers()) {
+                            projectile.removePassenger(e);
+                            e.remove();
                         }
-                    }
+                        break;
+                    case "snowball":
+                        if (CTFshooter != null && CTFhitPlayer != null) {
+                            if (CTFshooter.getTeam() != CTFhitPlayer.getTeam()) {
+                                customDamageCause.put(hitPlayer, new CTFDamage(CTFshooter, CTFDamageCause.WIZARD_SNOWBALL));
+                                hitPlayer.damage(1.0, shooter);
+                                hitPlayer.setFreezeTicks(Math.min(hitPlayer.getFreezeTicks() + 50, hitPlayer.getMaxFreezeTicks() + 60));
+                            }
+                        }
+                        break;
+                    case "bombarrow":
+                        if (hitPlayer != null) {
+                            loc = hitPlayer.getLocation();
+                        } else {
+                            if (event.getHitBlock() != null && event.getHitBlockFace() != null) {
+                                loc = event.getHitBlock().getRelative(event.getHitBlockFace()).getLocation();
+                            } else {
+                                loc = projectile.getLocation();
+                            }
+                        }
+                        //TODO knockback (rocket jump!)
+                        projectile.getWorld().createExplosion(loc, 4F, false, false, shooter);
+                        projectile.remove();
+                        break;
+                    case "fireball":
+                        loc = projectile.getLocation();
+                        if (event.getHitEntity() != null) {
+                            loc = event.getHitEntity().getLocation();
+                        }
+                        if (shooter != null) {
+                            projectile.getWorld().createExplosion(loc, 4F, false, false, shooter);
+                        }
+                        break;
+                    case "archerarrow":
+                        if (hitPlayer != null && CTFshooter != null && projectile.hasMetadata("ArcherArrowType")) {
+                            String name = projectile.getMetadata("ArcherArrowType").get(0).asString();
+                            switch (name) {
+                                case "arrow" -> customDamageCause.put(hitPlayer, new CTFDamage(CTFshooter, CTFDamageCause.ARCHER_ARROW));
+                                case "sonic" -> customDamageCause.put(hitPlayer, new CTFDamage(CTFshooter, CTFDamageCause.ARCHER_SONIC_ARROW));
+                                case "poison" -> customDamageCause.put(hitPlayer, new CTFDamage(CTFshooter, CTFDamageCause.ARCHER_POISON_ARROW));
+                                default -> {
+                                }
+                            }
+                        }
+                        break;
                 }
             }
-        }
 
-        if (p instanceof Arrow && p.hasMetadata("bombArrow")) {
-            if (p.getMetadata("bombArrow").get(0).asBoolean()) {
-
-                Location loc;
-
-                if (event.getHitEntity() != null) {
-                    loc = event.getHitEntity().getLocation();
-                } else {
-                    if (event.getHitBlock() != null && event.getHitBlockFace() != null) {
-                        loc = event.getHitBlock().getRelative(event.getHitBlockFace()).getLocation();
-                    } else {
-                        loc = p.getLocation();
-                    }
-                }
-
-                p.getWorld().createExplosion(loc,4F, false, false, Bukkit.getPlayer(p.getMetadata("playerSent").get(0).asString()));
-                p.remove();
+            if (projectile instanceof Arrow && !projectile.hasMetadata("dontKillOnLand")) {
+                projectile.remove();
             }
         }
-
-        if (p instanceof Arrow && !p.hasMetadata("dontKillOnLand")) {
-            p.remove();
-        }
-
-        if (p instanceof Fireball) {
-            Location loc = p.getLocation();
-            if (event.getHitEntity() != null) {
-                loc = event.getHitEntity().getLocation();
-            }
-            if (p.hasMetadata("playerSent")) {
-                p.getWorld().createExplosion(loc,4F, false, false, Bukkit.getPlayer(p.getMetadata("playerSent").get(0).asString()));
-            } else {
-                p.getWorld().createExplosion(loc,4F, false, false);
-            }
-        }
-
     }
 
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
+        //Disable fall
         if (event.getEntity() instanceof Player && disableFall.contains((Player)event.getEntity())) {
             if (event.getCause() == DamageCause.FALL) {
                 event.setCancelled(true);
@@ -286,84 +311,109 @@ public class Main extends JavaPlugin implements Listener {
             }
         }
 
-        EntityDamageByEntityEvent eventE = null;
+
+        EntityDamageByEntityEvent damageByEntityEvent = null;
         if (event instanceof EntityDamageByEntityEvent) {
-            eventE = (EntityDamageByEntityEvent) event;
+            damageByEntityEvent = (EntityDamageByEntityEvent) event;
         }
 
-        if (event.getEntity() instanceof Player player && eventE != null && eventE.getDamager().getType() == EntityType.PRIMED_TNT && event.getCause() == DamageCause.ENTITY_EXPLOSION) {
-            TNTPrimed tnt = (TNTPrimed) eventE.getDamager();
-            if (tnt.hasMetadata("playerSent")) {
-                String pSent = tnt.getMetadata("playerSent").get(0).asString();
-                Player pS = Bukkit.getPlayer(pSent);
-                if (pS != null) {
-                    if (CTFPlayers.containsKey(pS) && CTFPlayers.containsKey(player)) {
-                        if (CTFPlayers.get(pS).getTeam() == CTFPlayers.get(player).getTeam()) {
-                            if (player == pS) {
-                                double xPos = player.getLocation().getBlockX() - tnt.getLocation().getBlockX();
-                                double yPos = player.getLocation().getBlockY() + 1.0 - tnt.getLocation().getBlockY();
-                                double zPos = player.getLocation().getBlockZ() - tnt.getLocation().getBlockZ();
-                                double div = 1.5;
-                                player.setVelocity(player.getVelocity().add(new Vector(xPos/div, yPos/div, zPos/div)));
-                                customDamageCause.put(player,new Object[]{"demoTNT",pS});
-                                event.setDamage(event.getFinalDamage()/5.0);
-                            } else {
-                                event.setCancelled(true);
+        if (event.getEntity() instanceof Player recipient) {
+
+            if (damageByEntityEvent != null) {
+
+                if (damageByEntityEvent.getDamager().getType() == EntityType.PRIMED_TNT && event.getCause() == DamageCause.ENTITY_EXPLOSION) {
+                    TNTPrimed tnt = (TNTPrimed) damageByEntityEvent.getDamager();
+                    if (tnt.hasMetadata("playerSent")) {
+                        Player damager = Bukkit.getPlayer(tnt.getMetadata("playerSent").get(0).asString());
+                        if (damager != null) {
+                            if (CTFPlayers.containsKey(damager) && CTFPlayers.containsKey(recipient)) {
+                                if (CTFPlayers.get(damager).getTeam() == CTFPlayers.get(recipient).getTeam()) {
+                                    if (recipient == damager) {
+                                        double xPos = recipient.getLocation().getBlockX() - tnt.getLocation().getBlockX();
+                                        double yPos = recipient.getLocation().getBlockY() + 1.0 - tnt.getLocation().getBlockY();
+                                        double zPos = recipient.getLocation().getBlockZ() - tnt.getLocation().getBlockZ();
+                                        double div = 1.5;
+                                        recipient.setVelocity(recipient.getVelocity().add(new Vector(xPos/div, yPos/div, zPos/div)));
+                                        customDamageCause.put(recipient,new CTFDamage(CTFPlayers.get(damager),CTFDamageCause.DEMO_TNT));
+                                        event.setDamage(event.getDamage()/5.0);
+                                    } else {
+                                        event.setCancelled(true);
+                                        return;
+                                    }
+                                } else {
+                                    customDamageCause.put(recipient,new CTFDamage(CTFPlayers.get(damager),CTFDamageCause.DEMO_TNT));
+                                    event.setDamage(event.getDamage()/2.0);
+                                }
+                            } else if (CTFPlayers.containsKey(damager) ) {
+                                customDamageCause.put(recipient,new CTFDamage(CTFPlayers.get(damager),CTFDamageCause.DEMO_TNT));
+                                event.setDamage(event.getDamage()/2.0);
                             }
-                        } else {
-                            customDamageCause.put(player,new Object[]{"demoTNT",pS});
                         }
                     }
                 }
-            }
-        }
 
-        if (!event.isCancelled() && event.getEntity() instanceof Player player) {
+                //I hate this
+                if (damageByEntityEvent.getDamager() instanceof Player damager && event.getCause() == DamageCause.ENTITY_EXPLOSION && CTFPlayers.containsKey(damager)) {
+                    switch (CTFPlayers.get(damager).getpClass().getName()) {
+                        case "Demolitionist" -> customDamageCause.put(recipient, new CTFDamage(CTFPlayers.get(damager), CTFDamageCause.DEMO_ARROW));
+                        case "Fire Wizard" -> customDamageCause.put(recipient, new CTFDamage(CTFPlayers.get(damager), CTFDamageCause.WIZARD_FIREBALL));
+                        default -> {
+                        }
+                    }
+                }
 
-            if (customDamageCause.containsKey(player) && customDamageCause.get(player)[1] instanceof Player d && d != player) {
-                if (Main.CTFPlayers.containsKey(d)) {
-                    Main.CTFPlayers.get(d).setEnemy(player);
-                    Main.CTFPlayers.get(d).updateEnemyHealth(Math.max(0.0,(player.getHealth() - event.getFinalDamage()) / Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
-                    Main.CTFPlayers.get(d).setEnemyHealthCooldown();
+                //Update damager enemy
+                if (customDamageCause.containsKey(recipient) && customDamageCause.get(recipient).getDamager().getPlayer() != recipient) {
+                    CTFPlayer customDamager = customDamageCause.get(recipient).getDamager();
+                    customDamager.setEnemy(recipient);
+                    customDamager.updateEnemyHealth(Math.max(0.0,(recipient.getHealth() - event.getFinalDamage()) / Objects.requireNonNull(recipient.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
+                    customDamager.setEnemyHealthCooldown();
                 }
             }
 
-            if (player.getHealth() - event.getFinalDamage() <= 0) {
-                boolean byEntity = eventE != null;
-                if (CTFPlayers.containsKey(player)) {
-                    CTFPlayers.get(player).death(byEntity);
+            //If died
+            if (recipient.getHealth() - event.getFinalDamage() <= 0) {
+                boolean byEntity = damageByEntityEvent != null;
+                CTFPlayer CTFrecipient = null;
+                if (CTFPlayers.containsKey(recipient)) {
+                    CTFrecipient = CTFPlayers.get(recipient);
+                    CTFrecipient.death(byEntity);
                 }
-                event.setCancelled(true);
-                player.setHealth(0.1);
-                player.setGameMode(GameMode.SPECTATOR);
-                player.setFreezeTicks(0);
+                event.setCancelled(true); // dont dieee
+                recipient.setHealth(0.1);
+                recipient.setGameMode(GameMode.SPECTATOR);
+                recipient.setFreezeTicks(0);
+                for (PotionEffect pEffect : recipient.getActivePotionEffects()) {
+                    recipient.removePotionEffect(pEffect.getType());
+                }
+
                 String damageType;
                 Entity damager = null;
+                CTFPlayer CTFdamager = null;
 
-                if (customDamageCause.containsKey(player)) {
-                    damageType = (String) customDamageCause.get(player)[0];
-                    damager = (Entity) customDamageCause.get(player)[1];
+                if (customDamageCause.containsKey(recipient)) {
+                    damageType = customDamageCause.get(recipient).getCause().toString();
+                    CTFdamager = customDamageCause.get(recipient).getDamager();
+                    if (CTFrecipient != null) {
+                        CTFdamager.kill(CTFrecipient);
+                    }
                 } else {
                     damageType = event.getCause().toString();
                 }
 
                 if (byEntity) {
-                    if (damager == null) {
-                        damager = eventE.getDamager();
+                    if (CTFdamager == null) {
+                        damager = damageByEntityEvent.getDamager();
                     }
-                    if (damager instanceof Player && CTFPlayers.containsKey(damager) && CTFPlayers.containsKey(player)) {
-                        CTFPlayers.get(damager).kill(CTFPlayers.get(player));
-                    }
-                    Bukkit.broadcastMessage(deathMessages.getMessage(true,damageType).replace("$1",ChatColor.RED + event.getEntity().getName() + ChatColor.RESET).replace("$2",ChatColor.BLUE + damager.getName() + ChatColor.RESET));
+                    Bukkit.broadcastMessage(deathMessages.getMessage(true,damageType).replace("$1",(CTFrecipient != null ? CTFrecipient.getTeam().getChatColor() : ChatColor.RED) + recipient.getName() + ChatColor.RESET).replace("$2",(CTFdamager != null ? CTFdamager.getTeam().getChatColor() + CTFdamager.getPlayer().getName() : ChatColor.BLUE + damager.getName()) + ChatColor.RESET));
                 } else {
-                    Bukkit.broadcastMessage(deathMessages.getMessage(false,damageType).replace("$1",ChatColor.RED + event.getEntity().getName() + ChatColor.RESET));
+                    Bukkit.broadcastMessage(deathMessages.getMessage(false,damageType).replace("$1",(CTFrecipient != null ? CTFrecipient.getTeam().getChatColor() : ChatColor.RED) + recipient.getName() + ChatColor.RESET));
                 }
             }
-            customDamageCause.remove(player);
+            customDamageCause.remove(recipient);
         }
 
     }
-
     public static Entity getLookedAtPlayer(Player player, double threshold) {
         Entity target = null;
         for (Entity other : Objects.requireNonNull(player.getPlayer()).getWorld().getPlayers()) {

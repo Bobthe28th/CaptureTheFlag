@@ -29,6 +29,9 @@ public class ArcSonicArrow extends CTFBuildUpItem {
             startCooldown();
         }
         arrow.setMetadata("dontKillOnLand", new FixedMetadataValue(plugin, true));
+        arrow.setMetadata("ctfProjectile",new FixedMetadataValue(plugin,true));
+        arrow.setMetadata("ctfProjectileType",new FixedMetadataValue(plugin,"archerarrow"));
+        arrow.setMetadata("ArcherArrowType",new FixedMetadataValue(plugin,"sonic"));
         arrow.setCritical(false);
         new BukkitRunnable() {
             public void run() {

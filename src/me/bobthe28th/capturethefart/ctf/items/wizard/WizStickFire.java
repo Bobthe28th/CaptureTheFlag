@@ -3,6 +3,8 @@ package me.bobthe28th.capturethefart.ctf.items.wizard;
 import java.util.Objects;
 import java.util.Random;
 
+import me.bobthe28th.capturethefart.ctf.damage.CTFDamage;
+import me.bobthe28th.capturethefart.ctf.damage.CTFDamageCause;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFDoubleCooldownItem;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -51,7 +53,7 @@ public class WizStickFire extends CTFDoubleCooldownItem {
 
                                 if (orthDist < cRad && cDist >= 0 && cDist <= coneHeight) {
                                     pN.setFireTicks(70);
-                                    Main.customDamageCause.put(pN,new Object[]{"wizardShotty",p});
+                                    Main.customDamageCause.put(pN,new CTFDamage(player, CTFDamageCause.WIZARD_SOLAR_BLAST));
                                     pN.damage(2,p);
                                 }
 
@@ -85,6 +87,8 @@ public class WizStickFire extends CTFDoubleCooldownItem {
                     f.setShooter(p);
                     f.setYield(0);
                     f.setIsIncendiary(false);
+                    f.setMetadata("ctfProjectile",new FixedMetadataValue(plugin,true));
+                    f.setMetadata("ctfProjectileType",new FixedMetadataValue(plugin,"fireball"));
                     f.setMetadata("playerSent", new FixedMetadataValue(plugin, Objects.requireNonNull(p.getPlayer()).getName()));
                 }
                 break;
