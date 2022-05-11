@@ -245,9 +245,6 @@ public class CTFPlayer implements Listener {
     }
 
     public void death(boolean byEntity) {
-        for (PotionEffect pEffect : player.getActivePotionEffects()) {
-            player.removePotionEffect(pEffect.getType());
-        }
         isAlive = false;
         Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,team);
         deaths ++;

@@ -2,6 +2,8 @@ package me.bobthe28th.capturethefart.ctf.items.archer;
 
 import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
+import me.bobthe28th.capturethefart.ctf.damage.CTFDamage;
+import me.bobthe28th.capturethefart.ctf.damage.CTFDamageCause;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFBuildUpItem;
 import org.bukkit.*;
 import org.bukkit.entity.Arrow;
@@ -48,7 +50,7 @@ public class ArcGhostArrow extends CTFBuildUpItem {
                         if (e instanceof Player p) {
                             if (Main.CTFPlayers.containsKey(p)) {
                                 if (Main.CTFPlayers.get(p).getTeam() != player.getTeam()) {
-                                    Main.customDamageCause.put(p,new Object[]{"ghostarrow",player.getPlayer()});
+                                    Main.customDamageCause.put(p,new CTFDamage(player, CTFDamageCause.ARCHER_GHOST_ARROW));
                                     p.damage(3.0,player.getPlayer());
                                     Main.CTFPlayers.get(p).addGlow("ghost");
                                     Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {

@@ -78,8 +78,10 @@ public class Demo extends CTFClass implements Listener {
                 arrow.startCooldown();
             }
             ((Arrow) event.getProjectile()).setCritical(false);
-            event.getProjectile().setMetadata("bombArrow", new FixedMetadataValue(plugin, true));
-            event.getProjectile().setMetadata("playerSent", new FixedMetadataValue(plugin, Objects.requireNonNull(player.getPlayer()).getName()));
+            event.getProjectile().setMetadata("ctfProjectile",new FixedMetadataValue(plugin,true));
+            event.getProjectile().setMetadata("ctfProjectileType",new FixedMetadataValue(plugin,"bombarrow"));
+//            event.getProjectile().setMetadata("bombArrow", new FixedMetadataValue(plugin, true));
+//            event.getProjectile().setMetadata("playerSent", new FixedMetadataValue(plugin, Objects.requireNonNull(player.getPlayer()).getName()));
 
             new BukkitRunnable() {
                 final Arrow a = (Arrow) event.getProjectile();

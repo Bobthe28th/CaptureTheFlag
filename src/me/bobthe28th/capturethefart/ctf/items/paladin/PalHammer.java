@@ -34,8 +34,10 @@ public class PalHammer extends CTFToolCooldownItem {
             Snowball hammer = player.getPlayer().launchProjectile(Snowball.class);
             hammer.setShooter(player.getPlayer());
             hammer.setVelocity(player.getPlayer().getLocation().getDirection().multiply(0.9));
-            hammer.setMetadata("hammer", new FixedMetadataValue(plugin, true));
-            hammer.setMetadata("playerSent", new FixedMetadataValue(plugin, player.getPlayer().getName()));
+//            hammer.setMetadata("hammer", new FixedMetadataValue(plugin, true));
+            hammer.setMetadata("ctfProjectile", new FixedMetadataValue(plugin, true));
+            hammer.setMetadata("ctfProjectileType", new FixedMetadataValue(plugin, "hammer"));
+//            hammer.setMetadata("playerSent", new FixedMetadataValue(plugin, player.getPlayer().getName()));
             ItemStack item = new ItemStack(Material.IRON_AXE);
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
