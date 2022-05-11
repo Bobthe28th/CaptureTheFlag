@@ -2141,7 +2141,7 @@
   "item.minecraft.glow_item_frame": "Glow Item Frame",
   "container.inventory": "Inventory",
   "container.hopper": "Item Hopper",
-  "container.crafting": "Crafting",
+  "container.crafting": "",
   "container.dispenser": "Dispenser",
   "container.dropper": "Dropper",
   "container.furnace": "Furnace",

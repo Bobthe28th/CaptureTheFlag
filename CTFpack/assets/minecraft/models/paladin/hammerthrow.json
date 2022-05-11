@@ -1,0 +1,28 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "paladin/hammerthrow"
+  },
+  "display": {
+    "firstperson_righthand": {
+      "rotation": [ 0, -90, 25 ],
+      "translation": [ 1.13, 3.2, 1.13 ],
+      "scale": [ 1, 1, 1 ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [ 0, -90, 55 ],
+      "translation": [ 0, 7.0, 0.5 ],
+      "scale": [ 1.5, 1.5, 1.5 ]
+    },
+    "head": {
+      "rotation": [ 0, 90, 0 ],
+      "translation": [ 0, 0, 0 ],
+      "scale": [ 3, 3, 3 ]
+    },
+    "ground": {
+      "rotation": [ 1, 1, 1 ],
+      "translation": [ 0, 0, 0 ],
+      "scale": [ 2, 2, 2 ]
+    }
+  }
+}

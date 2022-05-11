@@ -1,0 +1,24 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "item/clay_ball"
+  },
+  "overrides": [
+    {
+      "predicate": { "custom_model_data": 1 },
+      "model": "wizard/selecticons/fire"
+    },
+    {
+      "predicate": { "custom_model_data": 2 },
+      "model": "wizard/selecticons/ice"
+    },
+    {
+      "predicate": { "custom_model_data": 3 },
+      "model": "wizard/selecticons/wind"
+    },
+    {
+      "predicate": { "custom_model_data": 4 },
+      "model": "wizard/selecticons/end"
+    }
+  ]
+}
