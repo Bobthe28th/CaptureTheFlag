@@ -259,6 +259,7 @@ public class CTFPlayer implements Listener {
         player.teleport(team.getSpawnLocation());
         player.setGameMode(GameMode.SURVIVAL);
         player.setHealth(20.0);
+        player.setFreezeTicks(0);
         for (PotionEffect pEffect : player.getActivePotionEffects()) {
             player.removePotionEffect(pEffect.getType());
         }

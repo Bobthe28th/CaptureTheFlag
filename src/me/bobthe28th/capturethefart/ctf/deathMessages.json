@@ -6,6 +6,7 @@
   "deathbe": {
     "default": ["$1 was killed by $2","$1 could not handle the awesomeness of $2","$1 got fuccking died by $2"],
     "WIZARD_ZAP": ["$1 got zapped by $2","$1 got electrocuted to fucking death by $2","$1 got absolutely smited to death by $2"],
+    "WIZARD_LIGHTNING": ["$1 got lightning stroke by $2"],
     "WIZARD_FIREBALL": ["fireball"],
     "WIZARD_SOLAR_BLAST": ["$1 was incinerated by $2","$1 got fucking scorched by $2","$1 burnt to a crisp due to $2"],
     "WIZARD_FREEZE": ["$1 frozed to death by $2","$1 god frostbitted by $2","$1 hit absolute zero from $2"],
