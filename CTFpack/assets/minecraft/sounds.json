@@ -4,6 +4,10 @@
     "category": "master",
     "sounds": [ "custom/boom" ]
   },
+  "bwoink": {
+    "category": "master",
+    "sounds": [ "custom/sound_effects_adminhelp" ]
+  },
   "halland_dalarna": {
     "category": "music",
     "sounds": [ "custom/halland_dalarna" ],
