@@ -583,7 +583,7 @@ public class CTFPlayer implements Listener {
 
         if (!canUse) {
             event.setCancelled(true);
-        } else {
+        } else if (player.getGameMode() != GameMode.SPECTATOR) {
             int slot = player.getInventory().getHeldItemSlot();
             if (getItem(slot) != null) {
                 getItem(slot).onclickAction(event);
