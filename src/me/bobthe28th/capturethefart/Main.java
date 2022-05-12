@@ -62,7 +62,7 @@ public class Main extends JavaPlugin implements Listener {
     public static String[] musicLink = new String[]{"https://youtu.be/qa0LLO8xz9g","https://youtu.be/TFAfyMc-W3w","https://youtu.be/QHRuTYtSbJQ","https://youtu.be/r2JeL1ibBI0","https://youtu.be/372g0DPPUHY","https://youtu.be/rpGIXmaQ2Ak"};
     public static String[] music = new String[]{"halland_dalarna","glide","bfg_division","bigger_ukulele","loon_skirmish","ordinary_days"};
     public static Long[] musicLength = new Long[]{3440L,3360L,10120L,6040L,3500L,7120L};
-    static String currentMusic;
+    public static ArrayList<String> musicQueue = new ArrayList<>();
     static boolean musicPlaying = false;
     static BukkitTask musicRunnable;
     public static CTFGameController gameController;
@@ -603,21 +603,43 @@ public class Main extends JavaPlugin implements Listener {
         }
     }
 
-    public static void playMusic(String song,Main plugin, boolean announce) {
-        if (!Arrays.asList(music).contains(song)) return;
-        if (currentMusic != null) {
+    public static void playMusic(String song, String when,Main plugin, boolean announce) {
+        if (!Arrays.asList(music).contains(song) && song != null) return;
+        if (musicQueue.size() > 0 && when.equals("now")) {
             for (Player p : Bukkit.getOnlinePlayers()) {
-                p.stopSound(currentMusic,SoundCategory.MUSIC);
+                p.stopSound(musicQueue.get(0),SoundCategory.MUSIC);
             }
         }
-        currentMusic = song;
         musicPlaying = true;
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            p.playSound(p.getLocation(),song,SoundCategory.MUSIC,1F,1F);
+        if (song != null) {
+            if (when.equals("now")) {
+                musicQueue.add(0, song);
+            } else if (when.equals("queue")) {
+                musicQueue.add(song);
+            }
+        } else {
+            song = musicQueue.get(0);
         }
+        if (musicQueue.size() == 1 || when.equals("now")) {
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.playSound(p.getLocation(),song,SoundCategory.MUSIC,1F,1F);
+            }
+
+            if (musicRunnable != null) musicRunnable.cancel();
+            musicRunnable = new BukkitRunnable() {
+                @Override
+                public void run() {
+                    musicQueue.remove(0);
+                    if (musicQueue.size() > 0) {
+                        playMusic(musicQueue.get(0), "now", plugin, false);
+                    }
+                }
+            }.runTaskLater(plugin,musicLength[Arrays.asList(music).indexOf(song)]);
+        }
+
         if (announce) {
             for (Player pM : Bukkit.getOnlinePlayers()) {
-                TextComponent text = new TextComponent(ChatColor.YELLOW + "Now Playing: ");
+                TextComponent text = new TextComponent(ChatColor.YELLOW + (when.equals("queue") ? "Added to Queue: " : "Now Playing: "));
                 TextComponent link = new TextComponent(ChatColor.RED + musicTitle[Arrays.asList(music).indexOf(song)]);
                 link.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, musicLink[Arrays.asList(music).indexOf(song)]));
                 link.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Music Link")));
@@ -625,34 +647,69 @@ public class Main extends JavaPlugin implements Listener {
                 pM.spigot().sendMessage(text);
             }
         }
-        if (musicRunnable != null) musicRunnable.cancel();
-        musicRunnable = new BukkitRunnable() {
-            @Override
-            public void run() {
-                playMusic(song,plugin,false);
+    }
+
+    public static void skipMusic(int amount,Main plugin, boolean announce) {
+        if (musicQueue.size() > 0) {
+            String firstSong = musicQueue.get(0);
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.stopSound(musicQueue.get(0),SoundCategory.MUSIC);
             }
-        }.runTaskLater(plugin,musicLength[Arrays.asList(music).indexOf(song)]);
+            if (amount > musicQueue.size()) {
+                amount = musicQueue.size();
+            }
+            musicQueue.subList(0, amount).clear();
+            if (announce) {
+                if (amount > 1) {
+                    for (Player pM : Bukkit.getOnlinePlayers()) {
+                        TextComponent text = new TextComponent(ChatColor.YELLOW + "Skipped: ");
+                        TextComponent num = new TextComponent(ChatColor.RED + Integer.toString(amount) + " songs");
+                        text.addExtra(num);
+                        pM.spigot().sendMessage(text);
+                    }
+                } else {
+                    for (Player pM : Bukkit.getOnlinePlayers()) {
+                        TextComponent text = new TextComponent(ChatColor.YELLOW + "Skipped: ");
+                        TextComponent link = new TextComponent(ChatColor.RED + musicTitle[Arrays.asList(music).indexOf(firstSong)]);
+                        link.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, musicLink[Arrays.asList(music).indexOf(firstSong)]));
+                        link.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Music Link")));
+                        text.addExtra(link);
+                        pM.spigot().sendMessage(text);
+                    }
+                }
+            }
+            if (musicQueue.size() > 0) {
+                playMusic(null,"now",plugin,announce);
+            }
+        }
     }
 
     public static void stopMusic(boolean announce) {
         musicPlaying = false;
-        musicRunnable.cancel();
-        if (currentMusic != null) {
+        if (musicRunnable != null) {
+            musicRunnable.cancel();
+        }
+        if (musicQueue.size() > 0) {
             for (Player p : Bukkit.getOnlinePlayers()) {
-                p.stopSound(currentMusic,SoundCategory.MUSIC);
+                p.stopSound(musicQueue.get(0),SoundCategory.MUSIC);
+                if (announce) {
+                    if (musicQueue.size() > 1) {
+                        TextComponent text = new TextComponent(ChatColor.YELLOW + "Stopped Playing: ");
+                        TextComponent allmusic = new TextComponent(ChatColor.RED + "All Music");
+                        text.addExtra(allmusic);
+                        p.spigot().sendMessage(text);
+                    } else {
+                        TextComponent text = new TextComponent(ChatColor.YELLOW + "Stopped Playing: ");
+                        TextComponent link = new TextComponent(ChatColor.RED + musicTitle[Arrays.asList(music).indexOf(musicQueue.get(0))]);
+                        link.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, musicLink[Arrays.asList(music).indexOf(musicQueue.get(0))]));
+                        link.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Music Link")));
+                        text.addExtra(link);
+                        p.spigot().sendMessage(text);
+                    }
+                }
             }
         }
-        if (announce) {
-            for (Player pM : Bukkit.getOnlinePlayers()) {
-                TextComponent text = new TextComponent(ChatColor.YELLOW + "Stopped Playing: ");
-                TextComponent link = new TextComponent(ChatColor.RED + musicTitle[Arrays.asList(music).indexOf(currentMusic)]);
-                link.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, musicLink[Arrays.asList(music).indexOf(currentMusic)]));
-                link.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Music Link")));
-                text.addExtra(link);
-                pM.spigot().sendMessage(text);
-            }
-        }
-        currentMusic = null;
+        musicQueue.clear();
     }
 
 }
