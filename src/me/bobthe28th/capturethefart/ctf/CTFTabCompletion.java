@@ -80,11 +80,20 @@ public class CTFTabCompletion implements TabCompleter {
                 switch (args.length) {
                     case 1:
                         List<String> arguments = new ArrayList<>();
-                        Collections.addAll(arguments, "play","stop");
+                        Collections.addAll(arguments, "play","stop","skip","queue");
                         return arguments;
                     case 2:
                         if (args[0] != null) {
-                            if (!args[0].equals("stop")) {
+                            if (args[0].equals("play")) {
+                                List<String> arguments2 = new ArrayList<>();
+                                Collections.addAll(arguments2, "now","queue");
+                                return arguments2;
+                            }
+                        }
+                        break;
+                    case 3:
+                        if (args[0] != null) {
+                            if (args[0].equals("play")) {
                                 List<String> arguments2 = new ArrayList<>();
                                 Collections.addAll(arguments2, Main.music);
                                 return arguments2;

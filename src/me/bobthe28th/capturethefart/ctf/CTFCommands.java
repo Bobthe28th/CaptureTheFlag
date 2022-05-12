@@ -13,6 +13,8 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Constructor;
 import java.util.*;
 
+import static java.lang.Integer.parseInt;
+
 
 public class CTFCommands implements CommandExecutor {
     Main plugin;
@@ -285,9 +287,9 @@ public class CTFCommands implements CommandExecutor {
                 if (args.length > 0) {
                     switch (args[0]) {
                         case "play":
-                            if (args.length > 1) {
-                                if (Arrays.asList(Main.music).contains(args[1])) {
-                                    Main.playMusic(args[1],plugin,true);
+                            if (args.length > 2) {
+                                if (Arrays.asList(Main.music).contains(args[2])) {
+                                    Main.playMusic(args[2],args[1],plugin,true);
                                 } else {
                                     player.sendMessage(ChatColor.RED + "Please specify a REAL song." + ChatColor.RESET);
                                 }
@@ -295,9 +297,25 @@ public class CTFCommands implements CommandExecutor {
                                 player.sendMessage(ChatColor.RED + "Please specify a song." + ChatColor.RESET);
                             }
                             return true;
+                        case "skip":
+                            int amount = 1;
+                            if (args.length > 1) {
+                                try {
+                                    amount = Math.max(1,parseInt(args[1]));
+                                } catch (NumberFormatException ignored) {}
+                            }
+                            Main.skipMusic(amount,plugin,true);
+                            return true;
                         case "stop":
                             Main.stopMusic(true);
                             return true;
+                        case "queue":
+                            if (Main.musicQueue.size() > 0) {
+                                player.sendMessage(ChatColor.YELLOW + "Queue:");
+                                Main.musicQueue.forEach(music -> player.sendMessage(ChatColor.YELLOW + " - " + ChatColor.RED + Main.musicTitle[Arrays.asList(Main.music).indexOf(music)]));
+                            } else {
+                                player.sendMessage(ChatColor.YELLOW + "Queue is empty.");
+                            }
                         default:
                             return true;
                     }
