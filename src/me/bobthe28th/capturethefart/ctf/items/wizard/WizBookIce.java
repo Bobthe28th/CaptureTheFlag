@@ -1,14 +1,13 @@
 package me.bobthe28th.capturethefart.ctf.items.wizard;
 
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFDoubleCooldownItem;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -59,7 +58,7 @@ public class WizBookIce extends CTFDoubleCooldownItem {
                 if (getCooldown(1) == 0) {
                     startAction(1);
                     Vector pvS = p.getVelocity().clone().setY(0.0);
-
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) Math.ceil(getCooldown(1)),1,true,false,true));
                     new BukkitRunnable() {
                         int t = 0;
                         final double y = p.getLocation().getY() - 1.0;
@@ -70,20 +69,26 @@ public class WizBookIce extends CTFDoubleCooldownItem {
                                 this.cancel();
                             }
 
-                            if (t % 10 == 1) {
-                                if (t == 1) {
-                                    Location tLoc = p.getLocation().clone();
-                                    tLoc.setY(y + 1.0);
-                                    p.teleport(tLoc);
-                                    p.setVelocity(pvS);
-                                }
-                                p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, (float) 1000.0, (float) t / 60);
+                            if (p.getGameMode() == GameMode.SPECTATOR) {
+                                this.cancel();
                             }
 
-                            Location l = p.getLocation();
-                            l.setY(y);
-                            if (l.getBlock().getType() == Material.AIR) {
-                                Main.createFadingBlock(l, Material.FROSTED_ICE, Material.AIR, 3, (int)(Math.random() * 22 + 18), plugin);
+                            if (!isCancelled()) {
+                                if (t % 10 == 1) {
+                                    if (t == 1) {
+                                        Location tLoc = p.getLocation().clone();
+                                        tLoc.setY(y + 1.0);
+                                        p.teleport(tLoc);
+                                        p.setVelocity(pvS);
+                                    }
+                                    p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, (float) 1000.0, (float) t / 60);
+                                }
+
+                                Location l = p.getLocation();
+                                l.setY(y);
+                                if (l.getBlock().getType() == Material.AIR) {
+                                    Main.createFadingBlock(l, Material.FROSTED_ICE, Material.AIR, 3, (int) (Math.random() * 22 + 18), plugin);
+                                }
                             }
                         }
                     }.runTaskTimer(plugin,0,1);

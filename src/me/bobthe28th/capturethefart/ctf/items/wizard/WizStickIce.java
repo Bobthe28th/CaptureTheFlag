@@ -40,6 +40,8 @@ public class WizStickIce extends CTFDoubleCooldownItem {
                     Snowball ball = p.getWorld().spawn(p.getEyeLocation(), Snowball.class);
                     ball.setShooter(p);
                     ball.setVelocity(p.getLocation().getDirection().multiply(1.8));
+                    ball.setMetadata("ctfProjectile",new FixedMetadataValue(plugin,true));
+                    ball.setMetadata("ctfProjectileType",new FixedMetadataValue(plugin,"snowball"));
                     if (Main.snowBallEffect.get(ball) == null) {
                         Main.snowBallEffect.put(ball, Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
                             final Snowball s = ball;
@@ -68,8 +70,8 @@ public class WizStickIce extends CTFDoubleCooldownItem {
                         loc = target.getLocation();
                     }
 
-                    int sizeR = 3;
-                    int height = 3;
+                    int sizeR = 5;
+                    int height = 4;
                     for (int z = 0; z < sizeR; z++) {
                         for (int x = 0; x < sizeR; x++) {
                             Location l = loc.clone().add(new Vector(x - (sizeR - 1.0)/2, height, z - (sizeR - 1.0)/2));
