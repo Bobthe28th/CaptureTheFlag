@@ -56,7 +56,7 @@ public class Alchemist extends CTFClass implements Listener {
         potions.put("Debuff Potion", new AlcPotion(player,plugin,1,"Debuff Potion",Material.SPLASH_POTION,5,PotionEffectType.POISON.getColor(),new PotionEffect[]{new PotionEffect(PotionEffectType.SLOW,40,0),new PotionEffect(PotionEffectType.POISON,40,1),new PotionEffect(PotionEffectType.WEAKNESS,140,0)},false,true));
         potions.put("Heal Potion", new AlcPotion(player,plugin,2,"Heal Potion",Material.SPLASH_POTION,5,PotionEffectType.HEAL.getColor(),new PotionEffect[]{new PotionEffect(PotionEffectType.HEAL,20,0)},true,false));
         potions.put("Attack Potion", new AlcPotion(player,plugin,3,"Attack Potion",Material.SPLASH_POTION,5,PotionEffectType.INCREASE_DAMAGE.getColor(),new PotionEffect[]{new PotionEffect(PotionEffectType.INCREASE_DAMAGE,160,0),new PotionEffect(PotionEffectType.ABSORPTION,160,0)},true,false));
-        potions.put("Movement Potion", new AlcPotion(player,plugin,4,"Movement Potion",Material.LINGERING_POTION,5,PotionEffectType.JUMP.getColor(),new PotionEffect[]{new PotionEffect(PotionEffectType.JUMP,20,6),new PotionEffect(PotionEffectType.SPEED,140,1),new PotionEffect(PotionEffectType.LUCK,20,0,true,false,false)},true,false)); //TODO disable fall damage
+        potions.put("Movement Potion", new AlcPotion(player,plugin,4,"Movement Potion",Material.LINGERING_POTION,5,PotionEffectType.JUMP.getColor(),new PotionEffect[]{new PotionEffect(PotionEffectType.JUMP,20,6),new PotionEffect(PotionEffectType.SPEED,140,1),new PotionEffect(PotionEffectType.LUCK,20,0,true,false,false)},true,false));
 
         potions.forEach((k,v) -> player.giveItem(v));
     }
@@ -94,16 +94,16 @@ public class Alchemist extends CTFClass implements Listener {
         }
     }
 
-    @EventHandler
-    public void onLingeringPotionSplash(LingeringPotionSplashEvent event) {
-        if (event.getEntity().getShooter() != player.getPlayer()) return;
-        if (event.getEntity().hasMetadata("potionName")) {
-            String potionName = event.getEntity().getMetadata("potionName").get(0).asString();
-            if (potionName.equals("Movement Potion")) {
-                event.getAreaEffectCloud().setMetadata("movement",new FixedMetadataValue(plugin,true)); //TODO does nothing rn
-            }
-        }
-    }
+//    @EventHandler
+//    public void onLingeringPotionSplash(LingeringPotionSplashEvent event) {
+//        if (event.getEntity().getShooter() != player.getPlayer()) return;
+//        if (event.getEntity().hasMetadata("potionName")) {
+//            String potionName = event.getEntity().getMetadata("potionName").get(0).asString();
+//            if (potionName.equals("Movement Potion")) {
+//                event.getAreaEffectCloud().setMetadata("movement",new FixedMetadataValue(plugin,true)); //TODO does nothing rn
+//            }
+//        }
+//    }
 
     @EventHandler
     public void onProjectileLaunch(ProjectileLaunchEvent event) {
