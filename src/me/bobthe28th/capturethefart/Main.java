@@ -311,114 +311,116 @@ public class Main extends JavaPlugin implements Listener {
             }
         }
 
-        EntityDamageByEntityEvent damageByEntityEvent = null;
-        if (event instanceof EntityDamageByEntityEvent) {
-            damageByEntityEvent = (EntityDamageByEntityEvent) event;
-        }
+        if (!event.isCancelled()) {
+            EntityDamageByEntityEvent damageByEntityEvent = null;
+            if (event instanceof EntityDamageByEntityEvent) {
+                damageByEntityEvent = (EntityDamageByEntityEvent) event;
+            }
 
-        if (event.getEntity() instanceof Player recipient) {
+            if (event.getEntity() instanceof Player recipient) {
 
-            if (damageByEntityEvent != null) {
+                if (damageByEntityEvent != null) {
 
-                if (damageByEntityEvent.getDamager().getType() == EntityType.PRIMED_TNT && event.getCause() == DamageCause.ENTITY_EXPLOSION) {
-                    TNTPrimed tnt = (TNTPrimed) damageByEntityEvent.getDamager();
-                    if (tnt.hasMetadata("playerSent")) {
-                        Player damager = Bukkit.getPlayer(tnt.getMetadata("playerSent").get(0).asString());
-                        if (damager != null) {
-                            if (CTFPlayers.containsKey(damager) && CTFPlayers.containsKey(recipient)) {
-                                if (CTFPlayers.get(damager).getTeam() == CTFPlayers.get(recipient).getTeam()) {
-                                    if (recipient == damager) {
-                                        double xPos = recipient.getLocation().getBlockX() - tnt.getLocation().getBlockX();
-                                        double yPos = recipient.getLocation().getBlockY() + 1.0 - tnt.getLocation().getBlockY();
-                                        double zPos = recipient.getLocation().getBlockZ() - tnt.getLocation().getBlockZ();
-                                        double div = 1.5;
-                                        recipient.setVelocity(recipient.getVelocity().add(new Vector(xPos/div, yPos/div, zPos/div)));
-                                        customDamageCause.put(recipient,new CTFDamage(CTFPlayers.get(damager),CTFDamageCause.DEMO_TNT));
-                                        event.setDamage(event.getDamage()/5.0);
+                    if (damageByEntityEvent.getDamager().getType() == EntityType.PRIMED_TNT && event.getCause() == DamageCause.ENTITY_EXPLOSION) {
+                        TNTPrimed tnt = (TNTPrimed) damageByEntityEvent.getDamager();
+                        if (tnt.hasMetadata("playerSent")) {
+                            Player damager = Bukkit.getPlayer(tnt.getMetadata("playerSent").get(0).asString());
+                            if (damager != null) {
+                                if (CTFPlayers.containsKey(damager) && CTFPlayers.containsKey(recipient)) {
+                                    if (CTFPlayers.get(damager).getTeam() == CTFPlayers.get(recipient).getTeam()) {
+                                        if (recipient == damager) {
+                                            double xPos = recipient.getLocation().getBlockX() - tnt.getLocation().getBlockX();
+                                            double yPos = recipient.getLocation().getBlockY() + 1.0 - tnt.getLocation().getBlockY();
+                                            double zPos = recipient.getLocation().getBlockZ() - tnt.getLocation().getBlockZ();
+                                            double div = 1.5;
+                                            recipient.setVelocity(recipient.getVelocity().add(new Vector(xPos / div, yPos / div, zPos / div)));
+                                            customDamageCause.put(recipient, new CTFDamage(CTFPlayers.get(damager), CTFDamageCause.DEMO_TNT));
+                                            event.setDamage(event.getDamage() / 5.0);
+                                        } else {
+                                            event.setCancelled(true);
+                                            return;
+                                        }
                                     } else {
-                                        event.setCancelled(true);
-                                        return;
+                                        customDamageCause.put(recipient, new CTFDamage(CTFPlayers.get(damager), CTFDamageCause.DEMO_TNT));
+                                        event.setDamage(event.getDamage() / 2.0);
                                     }
-                                } else {
-                                    customDamageCause.put(recipient,new CTFDamage(CTFPlayers.get(damager),CTFDamageCause.DEMO_TNT));
-                                    event.setDamage(event.getDamage()/2.0);
+                                } else if (CTFPlayers.containsKey(damager)) {
+                                    customDamageCause.put(recipient, new CTFDamage(CTFPlayers.get(damager), CTFDamageCause.DEMO_TNT));
+                                    event.setDamage(event.getDamage() / 2.0);
                                 }
-                            } else if (CTFPlayers.containsKey(damager) ) {
-                                customDamageCause.put(recipient,new CTFDamage(CTFPlayers.get(damager),CTFDamageCause.DEMO_TNT));
-                                event.setDamage(event.getDamage()/2.0);
                             }
                         }
                     }
-                }
 
-                //I hate this
-                if (damageByEntityEvent.getDamager() instanceof Player damager && event.getCause() == DamageCause.ENTITY_EXPLOSION && CTFPlayers.containsKey(damager)) {
-                    switch (CTFPlayers.get(damager).getpClass().getName()) {
-                        case "Demolitionist" -> customDamageCause.put(recipient, new CTFDamage(CTFPlayers.get(damager), CTFDamageCause.DEMO_ARROW));
-                        case "Fire Wizard" -> customDamageCause.put(recipient, new CTFDamage(CTFPlayers.get(damager), CTFDamageCause.WIZARD_FIREBALL));
-                        default -> {
+                    //I hate this
+                    if (damageByEntityEvent.getDamager() instanceof Player damager && event.getCause() == DamageCause.ENTITY_EXPLOSION && CTFPlayers.containsKey(damager)) {
+                        switch (CTFPlayers.get(damager).getpClass().getName()) {
+                            case "Demolitionist" -> customDamageCause.put(recipient, new CTFDamage(CTFPlayers.get(damager), CTFDamageCause.DEMO_ARROW));
+                            case "Fire Wizard" -> customDamageCause.put(recipient, new CTFDamage(CTFPlayers.get(damager), CTFDamageCause.WIZARD_FIREBALL));
+                            default -> {
+                            }
                         }
                     }
-                }
 
-                if (damageByEntityEvent.getDamager() instanceof Player damager && event.getCause() == DamageCause.ENTITY_ATTACK) {
-                    if (damager.getInventory().getItemInMainHand().hasItemMeta() && damager.getInventory().getItemInMainHand().getItemMeta() != null && damager.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(this,"nohit"),PersistentDataType.BYTE)) {
-                        Byte noHit = damager.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(this,"nohit"),PersistentDataType.BYTE);
-                        if (noHit != null && noHit == (byte)1) {
-                            event.setCancelled(true);
+                    if (damageByEntityEvent.getDamager() instanceof Player damager && event.getCause() == DamageCause.ENTITY_ATTACK) {
+                        if (damager.getInventory().getItemInMainHand().hasItemMeta() && damager.getInventory().getItemInMainHand().getItemMeta() != null && damager.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(this, "nohit"), PersistentDataType.BYTE)) {
+                            Byte noHit = damager.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(this, "nohit"), PersistentDataType.BYTE);
+                            if (noHit != null && noHit == (byte) 1) {
+                                event.setCancelled(true);
+                            }
                         }
                     }
-                }
 
-                //Update damager enemy
-                if (!event.isCancelled() && customDamageCause.containsKey(recipient) && customDamageCause.get(recipient).getDamager().getPlayer() != recipient) {
-                    CTFPlayer customDamager = customDamageCause.get(recipient).getDamager();
-                    customDamager.setEnemy(recipient);
-                    customDamager.updateEnemyHealth(Math.max(0.0,(recipient.getHealth() - event.getFinalDamage()) / Objects.requireNonNull(recipient.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
-                    customDamager.setEnemyHealthCooldown();
-                }
-            }
-
-            //If died
-            if (recipient.getHealth() - event.getFinalDamage() <= 0) {
-                boolean byEntity = damageByEntityEvent != null;
-                CTFPlayer CTFrecipient = null;
-                if (CTFPlayers.containsKey(recipient)) {
-                    CTFrecipient = CTFPlayers.get(recipient);
-                    CTFrecipient.death(byEntity);
-                }
-                event.setCancelled(true); // dont dieee
-                recipient.setHealth(0.1);
-                recipient.setGameMode(GameMode.SPECTATOR);
-                recipient.setFreezeTicks(0);
-                for (PotionEffect pEffect : recipient.getActivePotionEffects()) {
-                    recipient.removePotionEffect(pEffect.getType());
-                }
-
-                String damageType;
-                Entity damager = null;
-                CTFPlayer CTFdamager = null;
-
-                if (customDamageCause.containsKey(recipient)) {
-                    damageType = customDamageCause.get(recipient).getCause().toString();
-                    CTFdamager = customDamageCause.get(recipient).getDamager();
-                    if (CTFrecipient != null) {
-                        CTFdamager.kill(CTFrecipient);
+                    //Update damager enemy
+                    if (!event.isCancelled() && customDamageCause.containsKey(recipient) && customDamageCause.get(recipient).getDamager().getPlayer() != recipient) {
+                        CTFPlayer customDamager = customDamageCause.get(recipient).getDamager();
+                        customDamager.setEnemy(recipient);
+                        customDamager.updateEnemyHealth(Math.max(0.0, (recipient.getHealth() - event.getFinalDamage()) / Objects.requireNonNull(recipient.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
+                        customDamager.setEnemyHealthCooldown();
                     }
-                } else {
-                    damageType = event.getCause().toString();
                 }
 
-                if (byEntity) {
-                    if (CTFdamager == null) {
-                        damager = damageByEntityEvent.getDamager();
+                //If died
+                if (recipient.getHealth() - event.getFinalDamage() <= 0) {
+                    boolean byEntity = damageByEntityEvent != null;
+                    CTFPlayer CTFrecipient = null;
+                    if (CTFPlayers.containsKey(recipient)) {
+                        CTFrecipient = CTFPlayers.get(recipient);
+                        CTFrecipient.death(byEntity);
                     }
-                    Bukkit.broadcastMessage(deathMessages.getMessage(true,damageType).replace("$1",(CTFrecipient != null ? CTFrecipient.getTeam().getChatColor() : ChatColor.RED) + recipient.getName() + ChatColor.RESET).replace("$2",(CTFdamager != null ? CTFdamager.getTeam().getChatColor() + CTFdamager.getPlayer().getName() : ChatColor.BLUE + damager.getName()) + ChatColor.RESET));
-                } else {
-                    Bukkit.broadcastMessage(deathMessages.getMessage(false,damageType).replace("$1",(CTFrecipient != null ? CTFrecipient.getTeam().getChatColor() : ChatColor.RED) + recipient.getName() + ChatColor.RESET));
+                    event.setCancelled(true); // dont dieee
+                    recipient.setHealth(0.1);
+                    recipient.setGameMode(GameMode.SPECTATOR);
+                    recipient.setFreezeTicks(0);
+                    for (PotionEffect pEffect : recipient.getActivePotionEffects()) {
+                        recipient.removePotionEffect(pEffect.getType());
+                    }
+
+                    String damageType;
+                    Entity damager = null;
+                    CTFPlayer CTFdamager = null;
+
+                    if (customDamageCause.containsKey(recipient)) {
+                        damageType = customDamageCause.get(recipient).getCause().toString();
+                        CTFdamager = customDamageCause.get(recipient).getDamager();
+                        if (CTFrecipient != null) {
+                            CTFdamager.kill(CTFrecipient);
+                        }
+                    } else {
+                        damageType = event.getCause().toString();
+                    }
+
+                    if (byEntity) {
+                        if (CTFdamager == null) {
+                            damager = damageByEntityEvent.getDamager();
+                        }
+                        Bukkit.broadcastMessage(deathMessages.getMessage(true, damageType).replace("$1", (CTFrecipient != null ? CTFrecipient.getTeam().getChatColor() : ChatColor.RED) + recipient.getName() + ChatColor.RESET).replace("$2", (CTFdamager != null ? CTFdamager.getTeam().getChatColor() + CTFdamager.getPlayer().getName() : ChatColor.BLUE + damager.getName()) + ChatColor.RESET));
+                    } else {
+                        Bukkit.broadcastMessage(deathMessages.getMessage(false, damageType).replace("$1", (CTFrecipient != null ? CTFrecipient.getTeam().getChatColor() : ChatColor.RED) + recipient.getName() + ChatColor.RESET));
+                    }
                 }
+                customDamageCause.remove(recipient);
             }
-            customDamageCause.remove(recipient);
         }
 
     }
