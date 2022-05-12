@@ -26,6 +26,7 @@ public class WizStickFire extends CTFDoubleCooldownItem {
         super("Fire Staff", Material.STICK, 3, "Solar Blast", 1.5, "Fire Ball", 3, player_, plugin_, defaultSlot_);
         plugin = plugin_;
         player = player_;
+        setNoHit(true);
     }
 
     @Override
