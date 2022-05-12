@@ -311,7 +311,6 @@ public class Main extends JavaPlugin implements Listener {
             }
         }
 
-
         EntityDamageByEntityEvent damageByEntityEvent = null;
         if (event instanceof EntityDamageByEntityEvent) {
             damageByEntityEvent = (EntityDamageByEntityEvent) event;
@@ -362,8 +361,17 @@ public class Main extends JavaPlugin implements Listener {
                     }
                 }
 
+                if (damageByEntityEvent.getDamager() instanceof Player damager && event.getCause() == DamageCause.ENTITY_ATTACK) {
+                    if (damager.getInventory().getItemInMainHand().hasItemMeta() && damager.getInventory().getItemInMainHand().getItemMeta() != null && damager.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(this,"nohit"),PersistentDataType.BYTE)) {
+                        Byte noHit = damager.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(this,"nohit"),PersistentDataType.BYTE);
+                        if (noHit != null && noHit == (byte)1) {
+                            event.setCancelled(true);
+                        }
+                    }
+                }
+
                 //Update damager enemy
-                if (customDamageCause.containsKey(recipient) && customDamageCause.get(recipient).getDamager().getPlayer() != recipient) {
+                if (!event.isCancelled() && customDamageCause.containsKey(recipient) && customDamageCause.get(recipient).getDamager().getPlayer() != recipient) {
                     CTFPlayer customDamager = customDamageCause.get(recipient).getDamager();
                     customDamager.setEnemy(recipient);
                     customDamager.updateEnemyHealth(Math.max(0.0,(recipient.getHealth() - event.getFinalDamage()) / Objects.requireNonNull(recipient.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
