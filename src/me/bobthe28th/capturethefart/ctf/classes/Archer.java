@@ -75,12 +75,14 @@ public class Archer extends CTFClass implements Listener {
             if (p != player.getPlayer()) return;
 
             event.setConsumeItem(false);
+
+            Arrow a = (Arrow) event.getProjectile();
+
             if (event.getConsumable() != null) {
-                if (p.getInventory().getItem(EquipmentSlot.OFF_HAND) != null && Objects.requireNonNull(p.getInventory().getItem(EquipmentSlot.OFF_HAND)).getType() == event.getConsumable().getType()) {
-                    if (event.getProjectile() instanceof Arrow && event.getConsumable().getItemMeta() != null && event.getConsumable().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(plugin,"ctfname"),  PersistentDataType.STRING)) {
-                        String name = event.getConsumable().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,"ctfname"),  PersistentDataType.STRING);
+
+                if (p.getInventory().getItem(EquipmentSlot.OFF_HAND) != null && Objects.equals(p.getInventory().getItem(EquipmentSlot.OFF_HAND), event.getConsumable()) && event.getConsumable().getItemMeta() != null) {
+                    String name = event.getConsumable().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,"ctfname"),  PersistentDataType.STRING);
                         if (name != null) {
-                            Arrow a = (Arrow) event.getProjectile();
                             switch (name) {
                                 case "Arrow" -> arrow.shoot(a);
                                 case "Ghost Arrow" -> ghostArrow.shoot(a,event.getForce());
@@ -88,15 +90,39 @@ public class Archer extends CTFClass implements Listener {
                                 case "Sonic Arrow" -> sonicArrow.shoot(a);
                             }
                         }
-                    }
-                    if (event.getConsumable() != null) {
-                        event.getConsumable().setAmount(event.getConsumable().getAmount() - 1);
-                    }
                 } else {
-                    event.setCancelled(true);
-                    p.updateInventory();
+                    arrow.shoot(a);
                 }
+
+                event.getConsumable().setAmount(event.getConsumable().getAmount() - 1);
+                arrow.setSlot(40);
             }
+
+
+
+//            event.setConsumeItem(false);
+//            if (event.getConsumable() != null) {
+//                if (p.getInventory().getItem(EquipmentSlot.OFF_HAND) != null && Objects.requireNonNull(p.getInventory().getItem(EquipmentSlot.OFF_HAND)).getType() == event.getConsumable().getType()) {
+//                    if (event.getProjectile() instanceof Arrow && event.getConsumable().getItemMeta() != null && event.getConsumable().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(plugin,"ctfname"),  PersistentDataType.STRING)) {
+//                        String name = event.getConsumable().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(plugin,"ctfname"),  PersistentDataType.STRING);
+//                        if (name != null) {
+//                            Arrow a = (Arrow) event.getProjectile();
+//                            switch (name) {
+//                                case "Arrow" -> arrow.shoot(a);
+//                                case "Ghost Arrow" -> ghostArrow.shoot(a,event.getForce());
+//                                case "Poison Arrow" -> poisonArrow.shoot(a);
+//                                case "Sonic Arrow" -> sonicArrow.shoot(a);
+//                            }
+//                        }
+//                    }
+//                    if (event.getConsumable() != null) {
+//                        event.getConsumable().setAmount(event.getConsumable().getAmount() - 1);
+//                    }
+//                } else {
+//                    event.setCancelled(true);
+//                    p.updateInventory();
+//                }
+//            }
         }
     }
 }

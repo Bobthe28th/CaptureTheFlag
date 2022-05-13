@@ -14,7 +14,7 @@ public class ArcArrow extends CTFBuildUpItem {
     ArcBow bow;
 
     public ArcArrow(ArcBow bow_, CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("Arrow", Material.ARROW, 2, 16, 0, player_, plugin_, defaultSlot_);
+        super("Arrow", Material.ARROW, 0, 1, 0, player_, plugin_, defaultSlot_);
         bow = bow_;
     }
 
