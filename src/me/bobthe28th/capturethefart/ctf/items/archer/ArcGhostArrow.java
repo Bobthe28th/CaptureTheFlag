@@ -5,6 +5,7 @@ import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.damage.CTFDamage;
 import me.bobthe28th.capturethefart.ctf.damage.CTFDamageCause;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFBuildUpItem;
+import me.bobthe28th.capturethefart.ctf.itemtypes.CTFStackCooldownItem;
 import org.bukkit.*;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -14,18 +15,18 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-public class ArcGhostArrow extends CTFBuildUpItem {
+public class ArcGhostArrow extends CTFStackCooldownItem {
 
     ArcBow bow;
 
     public ArcGhostArrow(ArcBow bow_, CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("Ghost Arrow", Material.ARROW, 7, 2, 0, player_, plugin_, defaultSlot_);
+        super("Ghost Arrow", Material.ARROW, 2, "Ghost Arrow", 7, Material.STICK, player_, plugin_, defaultSlot_);
         bow = bow_;
     }
 
     public void shoot(Arrow arrow, Float force) {
 
-        if (!isOnCooldown()) {
+        if (getCooldown() == 0) {
             startCooldown();
         }
 
@@ -41,8 +42,7 @@ public class ArcGhostArrow extends CTFBuildUpItem {
                 }
 
                 for(Player p : Bukkit.getOnlinePlayers()){
-                    p.spawnParticle(Particle.REDSTONE,loc,1,0.0,0.0,0.0,0.0, new Particle.DustOptions(Color.ORANGE,0.5F));
-                    p.spawnParticle(Particle.REDSTONE,loc,1,0.0,0.0,0.0,0.0, new Particle.DustOptions(Color.BLUE,1F));
+                    p.spawnParticle(Particle.END_ROD,loc,1,0.0,0.0,0.0,0.001);
                 }
 
                 if (loc.getWorld() != null) {

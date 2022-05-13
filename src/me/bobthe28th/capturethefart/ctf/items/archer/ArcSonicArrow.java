@@ -3,6 +3,7 @@ package me.bobthe28th.capturethefart.ctf.items.archer;
 import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFBuildUpItem;
+import me.bobthe28th.capturethefart.ctf.itemtypes.CTFStackCooldownItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,17 +16,17 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class ArcSonicArrow extends CTFBuildUpItem {
+public class ArcSonicArrow extends CTFStackCooldownItem {
 
     ArcBow bow;
 
     public ArcSonicArrow(ArcBow bow_, CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("Sonic Arrow", Material.ARROW, 5, 2, 0, player_, plugin_, defaultSlot_);
+        super("Sonic Arrow", Material.ARROW, 3, "Sonic Arrow", 5, Material.STICK, player_, plugin_, defaultSlot_);
         bow = bow_;
     }
 
     public void shoot(Arrow arrow) {
-        if (!isOnCooldown()) {
+        if (getCooldown() == 0) {
             startCooldown();
         }
         arrow.setMetadata("dontKillOnLand", new FixedMetadataValue(plugin, true));

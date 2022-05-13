@@ -3,6 +3,7 @@ package me.bobthe28th.capturethefart.ctf.items.archer;
 import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFBuildUpItem;
+import me.bobthe28th.capturethefart.ctf.itemtypes.CTFStackCooldownItem;
 import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.event.block.Action;
@@ -13,19 +14,19 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
-public class ArcPoisonArrow extends CTFBuildUpItem {
+public class ArcPoisonArrow extends CTFStackCooldownItem {
 
     ArcBow bow;
 
     public ArcPoisonArrow(ArcBow bow_, CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("Poison Arrow", Material.TIPPED_ARROW, 5, 4, 0, player_, plugin_, defaultSlot_);
+        super("Poison Arrow", Material.TIPPED_ARROW, 0, "Poison Arrow", 5, Material.STICK, player_, plugin_, defaultSlot_);
         setPotionColor(PotionEffectType.POISON.getColor());
         addPotionEffect(new PotionEffect(PotionEffectType.POISON,300,1));
         bow = bow_;
     }
 
     public void shoot(Arrow arrow) {
-        if (!isOnCooldown()) {
+        if (getCooldown() == 0) {
             startCooldown();
         }
         arrow.setMetadata("ctfProjectile",new FixedMetadataValue(plugin,true));
