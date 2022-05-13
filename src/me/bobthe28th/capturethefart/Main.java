@@ -201,9 +201,22 @@ public class Main extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onEntityExplode(EntityExplodeEvent event) {
-        if (event.getEntity().getType() == EntityType.PRIMED_TNT) {
-            event.blockList().clear();
+        CTFTeam team = null;
+        if (event.getEntity().hasMetadata("playerSent")) {
+            CTFPlayer sender = Main.CTFPlayers.get(Bukkit.getPlayer(event.getEntity().getMetadata("playerSent").get(0).asString()));
+            if (sender != null) {
+                team = sender.getTeam();
+            }
         }
+        for (Block b : event.blockList()) {
+            if (breakableBlocks.containsKey(b)) {
+                if (team == null || team != breakableBlocks.get(b)) {
+                    b.setType(Material.AIR);
+                    breakableBlocks.remove(b);
+                }
+            }
+        }
+        event.blockList().clear();
     }
 
     @EventHandler

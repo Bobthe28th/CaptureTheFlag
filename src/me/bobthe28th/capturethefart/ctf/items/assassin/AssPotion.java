@@ -20,6 +20,7 @@ public class AssPotion extends CTFStackCooldownItem {
         super("Invisibility Potion", Material.POTION,0,"Invisibility Potion",20,Material.GLASS_BOTTLE,player_,plugin_,defaultSlot_);
         setPotionColor(PotionEffectType.INVISIBILITY.getColor());
         addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,1200,0));
+        addPotionEffect(new PotionEffect(PotionEffectType.SPEED,1200,1));
         knife = knife_;
     }
 

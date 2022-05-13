@@ -281,23 +281,26 @@ public class CTFCommands implements CommandExecutor {
                 }
                 return true;
             case "ctfhelp":
-                String className = args[1];
-                Class<?> cClass = null;
+                if (args.length > 0) {
+                    String className = args[0];
+                    Class<?> cClass = null;
 
-                String[] classNames = Main.CTFClassNames;
-                for (int i = 0; i < classNames.length; i++) {
-                    if (className.equals(classNames[i])) {
-                        cClass = Main.CTFClasses[i];
+                    String[] classNames = Main.CTFClassNames;
+                    for (int i = 0; i < classNames.length; i++) {
+                        if (className.equals(classNames[i])) {
+                            cClass = Main.CTFClasses[i];
+                        }
                     }
-                }
 
-                if (cClass != null) {
-                    //TODO book
-                    ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
-                    BookMeta bookMeta = (BookMeta) book.getItemMeta();
-                    if (bookMeta != null) {
-
-                        player.openBook(book);
+                    if (cClass != null) {
+                        //TODO book
+                        ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+                        BookMeta bookMeta = (BookMeta) book.getItemMeta();
+                        if (bookMeta != null) {
+                            player.openBook(book);
+                        }
+                    } else {
+                        player.sendMessage(ChatColor.RED + "Please specify a class." + ChatColor.RESET);
                     }
                 } else {
                     player.sendMessage(ChatColor.RED + "Please specify a class." + ChatColor.RESET);
