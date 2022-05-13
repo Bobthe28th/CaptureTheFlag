@@ -76,7 +76,13 @@ public class CTFTabCompletion implements TabCompleter {
                         Collections.addAll(arguments2, teamNames);
                         return arguments2;
                 }
-            case "music": {
+            case "ctfhelp":
+                if (args.length == 1) {
+                    List<String> arguments = new ArrayList<>();
+                    Collections.addAll(arguments, Main.CTFClassNames);
+                    return arguments;
+                }
+            case "music":
                 switch (args.length) {
                     case 1:
                         List<String> arguments = new ArrayList<>();
@@ -100,7 +106,6 @@ public class CTFTabCompletion implements TabCompleter {
                             }
                         }
                 }
-            }
         }
 
         return new ArrayList<>();

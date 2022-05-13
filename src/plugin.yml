@@ -45,3 +45,6 @@ commands:
   music:
     description: plays music
     usage: /<command> [play,stop] song
+  ctfhelp:
+    description: Gets a description of a class
+    usage: /<command> class

@@ -9,6 +9,7 @@ import org.bukkit.entity.*;
 
 import me.bobthe28th.capturethefart.Main;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
@@ -277,6 +278,32 @@ public class CTFCommands implements CommandExecutor {
                     }
                 } else {
                     player.sendMessage(ChatColor.RED + "Please specify a player." + ChatColor.RESET);
+                }
+                return true;
+            case "ctfhelp":
+                if (args.length > 0) {
+                    String className = args[0];
+                    Class<?> cClass = null;
+
+                    String[] classNames = Main.CTFClassNames;
+                    for (int i = 0; i < classNames.length; i++) {
+                        if (className.equals(classNames[i])) {
+                            cClass = Main.CTFClasses[i];
+                        }
+                    }
+
+                    if (cClass != null) {
+                        //TODO book
+                        ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+                        BookMeta bookMeta = (BookMeta) book.getItemMeta();
+                        if (bookMeta != null) {
+                            player.openBook(book);
+                        }
+                    } else {
+                        player.sendMessage(ChatColor.RED + "Please specify a class." + ChatColor.RESET);
+                    }
+                } else {
+                    player.sendMessage(ChatColor.RED + "Please specify a class." + ChatColor.RESET);
                 }
                 return true;
             case "fly":

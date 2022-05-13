@@ -14,7 +14,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 public class AssSmoke extends CTFStackCooldownItem {
 
     public AssSmoke(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("Smoke Bomb", Material.GREEN_DYE, 1, "Smoke Bomb", 10, Material.GRAY_DYE, player_, plugin_, defaultSlot_);
+        super("Smoke Bomb", Material.GREEN_DYE, 1, "Smoke Bomb", 20, Material.GRAY_DYE, player_, plugin_, defaultSlot_);
     }
 
     @Override
