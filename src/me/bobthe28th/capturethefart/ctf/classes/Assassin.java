@@ -5,6 +5,7 @@ import me.bobthe28th.capturethefart.ctf.CTFClass;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.items.assassin.AssKnife;
 import me.bobthe28th.capturethefart.ctf.items.assassin.AssPotion;
+import me.bobthe28th.capturethefart.ctf.items.assassin.AssSmoke;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -40,6 +41,7 @@ public class Assassin extends CTFClass implements Listener {
         player.giveItem(knife);
         potion = new AssPotion(knife,player,plugin,1);
         player.giveItem(potion);
+        player.giveItem(new AssSmoke(player,plugin,2));
     }
 
     @Override

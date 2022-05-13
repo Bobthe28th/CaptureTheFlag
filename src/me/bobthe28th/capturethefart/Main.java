@@ -310,6 +310,20 @@ public class Main extends JavaPlugin implements Listener {
                             }
                         }
                         break;
+                    case "smokebomb":
+                        if (CTFshooter != null) {
+                            double blindRadius = 3;
+                            for (Player p : Bukkit.getOnlinePlayers()) {
+                                p.spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, projectile.getLocation(), 2000, 1.5, 1.5, 1.5, 0);
+                                p.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, projectile.getLocation(), 1000, 0.5, 0.5, 0.5, 0.1);
+                                if (CTFPlayers.containsKey(p) && CTFPlayers.get(p).getTeam() != CTFshooter.getTeam()) {
+                                    if (p.getLocation().distance(projectile.getLocation()) <= blindRadius) {
+                                        p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 60, 0,false,false,true));
+                                    }
+                                }
+                            }
+                        }
+                        break;
                 }
             }
 
@@ -321,7 +335,7 @@ public class Main extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
-
+        //TODO melee custom damage
         //Disable fall
         if (event.getEntity() instanceof Player && disableFall.contains((Player)event.getEntity())) {
             if (event.getCause() == DamageCause.FALL) {
