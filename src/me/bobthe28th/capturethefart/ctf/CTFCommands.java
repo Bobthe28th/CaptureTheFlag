@@ -12,8 +12,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
@@ -88,7 +91,7 @@ public class CTFCommands implements CommandExecutor {
                 if (args.length > 0) {
                     target = Bukkit.getPlayer(args[0]);
                 } else {
-                    Bukkit.broadcastMessage(ChatColor.RED + "Please specify a player." + ChatColor.RESET);
+                    player.sendMessage(ChatColor.RED + "Please specify a player." + ChatColor.RESET);
                     return true;
                 }
                 if (target != null) {
@@ -356,6 +359,29 @@ public class CTFCommands implements CommandExecutor {
                 }
                 return true;
             case "test":
+
+//                ShulkerBullet fart = Bukkit.getPlayer("WhyLiam").launchProjectile(ShulkerBullet.class);
+                ShulkerBullet fart = player.getWorld().spawn(new Location(player.getWorld(), -344, 72, 296),ShulkerBullet.class);
+                fart.setGravity(false);
+
+                new BukkitRunnable() {
+
+                    final Player target = Bukkit.getPlayer("Bobthe29th");
+
+//                    Vector lastDirection = null;
+//                    final double degree = Math.toRadians(10.0);
+
+                    @Override
+                    public void run() {
+                        if (fart.isDead() || target == null) {
+                            this.cancel();
+                        } else {
+                            Vector direction = target.getLocation().toVector().subtract(fart.getLocation().toVector()).add(new Vector(0,1,0));
+                            fart.setVelocity(fart.getVelocity().add(direction.normalize().multiply(0.1)).normalize().multiply(0.5));
+                        }
+                    }
+                }.runTaskTimer(plugin,0,1L);
+
 //                Main.fakeClass(player,UUID.fromString("00000000-0000-0000-0000-000000000000"),70,new Demo(null,plugin),plugin);
 
 //                UUID uuid = UUID.fromString("00000000-0000-0000-0000-000000000000");

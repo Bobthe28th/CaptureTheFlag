@@ -18,6 +18,10 @@
     "ARCHER_ARROW": ["$1 arrowed by $2"],
     "ARCHER_GHOST_ARROW": ["$1 ghost arrowed by $2"],
     "ARCHER_POISON_ARROW": ["$1 poison arrowed by $2"],
-    "ARCHER_SONIC_ARROW": ["$1 sonic arrowed by $2"]
+    "ARCHER_SONIC_ARROW": ["$1 sonic arrowed by $2"],
+    "PALADIN_HAMMER": ["$1 got bonked by $2"],
+    "PALADIN_HAMMER_THROW": ["$1 got remote bonked by $2"],
+    "ASSASSIN_KNIFE": ["$1 got stabbed by $2"],
+    "ASSASSIN_KNIFE_STRONG": ["$1 got mega stabbed by $2"]
   }
 }

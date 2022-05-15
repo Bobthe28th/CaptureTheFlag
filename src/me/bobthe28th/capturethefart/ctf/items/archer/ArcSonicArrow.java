@@ -55,7 +55,7 @@ public class ArcSonicArrow extends CTFStackCooldownItem {
             p.spawnParticle(Particle.GLOW_SQUID_INK,loc,1,0.0,0.0,0.0,0.0);
         }
 
-        double radius = 5.0;
+        double radius = 10.0;
         long time = 80L;
         if (loc.getWorld() != null) {
             for (Entity e : loc.getWorld().getNearbyEntities(loc, radius, radius, radius)) {

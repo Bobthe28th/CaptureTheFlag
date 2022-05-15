@@ -2,28 +2,22 @@ package me.bobthe28th.capturethefart.ctf.items.paladin;
 
 import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
+import me.bobthe28th.capturethefart.ctf.damage.CTFDamageCause;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFToolCooldownItem;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
-
-import java.util.Objects;
 
 public class PalHammer extends CTFToolCooldownItem {
 
     public PalHammer (CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
         super("Paladin's Hammer", Material.IRON_AXE,2, "Throw",3.5,player_,plugin_, defaultSlot_);
+        setMeleeDeathMessage(CTFDamageCause.PALADIN_HAMMER);
     }
 
     @Override

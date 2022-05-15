@@ -22,6 +22,7 @@ public class WizStickWind extends CTFDoubleCooldownItem {
 
     public WizStickWind(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
         super("Lightning Staff",Material.STICK,1,"Zap",0.5,"Lightning Strike",20,player_,plugin_, defaultSlot_);
+        setNoHit(true);
     }
 
     @Override
@@ -79,7 +80,7 @@ public class WizStickWind extends CTFDoubleCooldownItem {
 
                     int range = 500;
 
-                    Entity target = Main.getLookedAtPlayer(p,1);
+                    Entity target = Main.getLookedAtPlayer(p,3);
 
                     Block b = p.getTargetBlock(null, range);
                     Location loc = b.getLocation().add(new Vector(0.5, 1, 0.5));

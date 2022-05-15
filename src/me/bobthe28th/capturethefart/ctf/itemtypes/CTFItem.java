@@ -1,6 +1,7 @@
 package me.bobthe28th.capturethefart.ctf.itemtypes;
 
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
+import me.bobthe28th.capturethefart.ctf.damage.CTFDamageCause;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
@@ -38,6 +39,7 @@ public abstract class CTFItem {
     public int slot;
     boolean noHit = false;
 
+    CTFDamageCause meleeDeathMessage;
     Color potionColor;
     ArrayList<PotionEffect> potionEffects = new ArrayList<>();
 
@@ -87,6 +89,10 @@ public abstract class CTFItem {
 
     public Material getMat() { return item; }
 
+    public void setMeleeDeathMessage(CTFDamageCause dm) {
+        meleeDeathMessage = dm;
+    }
+
     public ItemStack getItem() {
         ItemStack it = new ItemStack(item,amount);
         ItemMeta meta = it.getItemMeta();
@@ -107,6 +113,9 @@ public abstract class CTFItem {
             meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE, (byte) 1);
             meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfname"), PersistentDataType.STRING, itemName);
             meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "nohit"), PersistentDataType.BYTE, (byte)(noHit ? 1 : 0));
+            if (meleeDeathMessage != null) {
+                meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfmeleedamagecause"), PersistentDataType.STRING, meleeDeathMessage.toString());
+            }
             it.setItemMeta(meta);
             return it;
         } else {

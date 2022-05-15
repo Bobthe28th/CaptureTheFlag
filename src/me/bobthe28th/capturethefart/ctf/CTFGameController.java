@@ -155,7 +155,7 @@ public class CTFGameController implements Listener {
     }
 
     public void addScoreboard(CTFPlayer p) {
-        if (Bukkit.getScoreboardManager() != null) {
+        if (Bukkit.getScoreboardManager() != null && !pScoreboard.containsKey(p)) {
             pScoreboard.put(p,Bukkit.getScoreboardManager().getNewScoreboard());
             updateTeams(p);
             Objective o = pScoreboard.get(p).registerNewObjective("ctfscores", "dummy", "Capture The Fart");

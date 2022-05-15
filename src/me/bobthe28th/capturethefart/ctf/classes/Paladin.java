@@ -26,7 +26,8 @@ public class Paladin extends CTFClass implements Listener {
         if (player_ != null) {
             Bukkit.getPluginManager().registerEvents(this, plugin);
         }
-        setArmor(new Material[]{Material.IRON_HELMET,Material.IRON_LEGGINGS,Material.IRON_BOOTS});
+        setArmor(new Material[]{Material.IRON_INGOT,Material.IRON_LEGGINGS,Material.IRON_BOOTS});
+        setHelmetCustomModel(3);
     }
 
     @Override

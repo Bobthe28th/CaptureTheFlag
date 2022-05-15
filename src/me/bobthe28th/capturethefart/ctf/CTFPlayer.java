@@ -42,6 +42,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
+import org.spigotmc.event.entity.EntityDismountEvent;
 
 public class CTFPlayer implements Listener {
 
@@ -59,8 +60,6 @@ public class CTFPlayer implements Listener {
     boolean canUse = true;
     boolean selectingWizard = false;
     BukkitTask respawnTimer = null;
-
-    //TODO enemy bossbar needs testing like with respawn and other players
 
     BossBar enemyHealth;
     LivingEntity enemy;
@@ -435,6 +434,7 @@ public class CTFPlayer implements Listener {
         removeItems();
         pClass = null;
         giveArmor();
+        Main.gameController.removeScoreboard(this);
         for (PotionEffect pEffect : player.getActivePotionEffects()) {
             player.removePotionEffect(pEffect.getType());
         }
@@ -748,6 +748,16 @@ public class CTFPlayer implements Listener {
     public void onPlayerItemDamage(PlayerItemDamageEvent event) {
         if (event.getPlayer() != player) return;
         event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onEntityDismount(EntityDismountEvent event) {
+        if (event.getDismounted() instanceof Player p) {
+            if (p != player) return;
+            if (event.getEntity() == flagOnHead) {
+                event.setCancelled(true);
+            }
+        }
     }
 
     @EventHandler

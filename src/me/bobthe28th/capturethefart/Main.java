@@ -337,6 +337,18 @@ public class Main extends JavaPlugin implements Listener {
                             }
                         }
                         break;
+                    case "shulker":
+
+                        event.setCancelled(true);
+
+                        if (hitPlayer != null && shooter != null) {
+                            if (CTFshooter != null) {
+                                customDamageCause.put(hitPlayer,new CTFDamage(CTFshooter,CTFDamageCause.WIZARD_SHULKER));
+                            }
+                            hitPlayer.damage(3.0,shooter);
+                        }
+                        projectile.remove();
+                        break;
                 }
             }
 
@@ -408,7 +420,7 @@ public class Main extends JavaPlugin implements Listener {
                         }
                     }
 
-                    if (damageByEntityEvent.getDamager() instanceof Player damager && event.getCause() == DamageCause.ENTITY_ATTACK) {
+                    if (damageByEntityEvent.getDamager() instanceof Player damager && event.getCause() == DamageCause.ENTITY_ATTACK && !customDamageCause.containsKey(recipient)) {
                         if (damager.getInventory().getItemInMainHand().hasItemMeta() && damager.getInventory().getItemInMainHand().getItemMeta() != null && damager.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(this, "nohit"), PersistentDataType.BYTE)) {
                             Byte noHit = damager.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(this, "nohit"), PersistentDataType.BYTE);
                             if (noHit != null && noHit == (byte) 1) {
@@ -459,11 +471,24 @@ public class Main extends JavaPlugin implements Listener {
                     if (byEntity) {
                         if (CTFdamager == null) {
                             damager = damageByEntityEvent.getDamager();
+                            if (damager instanceof Player pdamager && CTFPlayers.containsKey(pdamager)) {
+                                CTFdamager = CTFPlayers.get(pdamager);
+                                if (damageType.equals(DamageCause.ENTITY_ATTACK.toString())) {
+                                    if (pdamager.getInventory().getItemInMainHand().hasItemMeta() && pdamager.getInventory().getItemInMainHand().getItemMeta() != null && pdamager.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(this, "ctfmeleedamagecause"), PersistentDataType.STRING)) {
+                                        String ctfmeleedamagecause = pdamager.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(this, "ctfmeleedamagecause"), PersistentDataType.STRING);
+                                        if (ctfmeleedamagecause != null) {
+                                            CTFDamageCause.valueOf(ctfmeleedamagecause);
+                                            damageType = ctfmeleedamagecause;
+                                        }
+                                    }
+                                }
+                            }
                         }
                         Bukkit.broadcastMessage(deathMessages.getMessage(true, damageType).replace("$1", (CTFrecipient != null ? CTFrecipient.getTeam().getChatColor() : ChatColor.RED) + recipient.getName() + ChatColor.RESET).replace("$2", (CTFdamager != null ? CTFdamager.getTeam().getChatColor() + CTFdamager.getPlayer().getName() : ChatColor.BLUE + damager.getName()) + ChatColor.RESET));
                     } else {
                         Bukkit.broadcastMessage(deathMessages.getMessage(false, damageType).replace("$1", (CTFrecipient != null ? CTFrecipient.getTeam().getChatColor() : ChatColor.RED) + recipient.getName() + ChatColor.RESET));
                     }
+                    Bukkit.broadcastMessage(damageType);
                 }
                 customDamageCause.remove(recipient);
             }

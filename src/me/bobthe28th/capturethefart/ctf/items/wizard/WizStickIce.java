@@ -24,8 +24,7 @@ public class WizStickIce extends CTFDoubleCooldownItem {
 
     public WizStickIce(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
         super("Snow Staff",Material.STICK, 2,"Snowball", 0.5,"Snow Chunk", 20, player_,plugin_, defaultSlot_);
-        plugin = plugin_;
-        player = player_;
+        setNoHit(true);
     }
 
     @Override
@@ -64,7 +63,7 @@ public class WizStickIce extends CTFDoubleCooldownItem {
                     Block b = p.getTargetBlock(null, 20);
                     Location loc = b.getLocation().add(new Vector(0.5, 1.0, 0.5));
 
-                    Entity target = Main.getLookedAtPlayer(p,1);
+                    Entity target = Main.getLookedAtPlayer(p,0.0001);
 
                     if (target != null) {
                         loc = target.getLocation();

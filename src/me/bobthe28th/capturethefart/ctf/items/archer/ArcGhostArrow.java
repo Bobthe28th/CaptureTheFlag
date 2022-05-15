@@ -46,7 +46,8 @@ public class ArcGhostArrow extends CTFStackCooldownItem {
                 }
 
                 if (loc.getWorld() != null) {
-                    for (Entity e : loc.getWorld().getNearbyEntities(loc, 0.5, 0.5, 0.5)) {
+                    double radius = 1.0;
+                    for (Entity e : loc.getWorld().getNearbyEntities(loc, radius, radius, radius)) {
                         if (e instanceof Player p) {
                             if (Main.CTFPlayers.containsKey(p)) {
                                 if (Main.CTFPlayers.get(p).getTeam() != player.getTeam()) {

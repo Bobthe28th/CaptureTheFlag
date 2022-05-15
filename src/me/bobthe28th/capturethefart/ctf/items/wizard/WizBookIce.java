@@ -58,7 +58,7 @@ public class WizBookIce extends CTFDoubleCooldownItem {
                 if (getCooldown(1) == 0) {
                     startAction(1);
                     Vector pvS = p.getVelocity().clone().setY(0.0);
-                    p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) Math.ceil(getCooldown(1)),1,true,false,true));
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60,1,true,false,true));
                     new BukkitRunnable() {
                         int t = 0;
                         final double y = p.getLocation().getY() - 1.0;

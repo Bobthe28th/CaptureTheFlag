@@ -3,6 +3,7 @@ package me.bobthe28th.capturethefart.ctf.classes;
 import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFClass;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
+import me.bobthe28th.capturethefart.ctf.items.wizard.WizStickEnd;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -25,6 +26,7 @@ public class WizardEnd extends CTFClass implements Listener {
     @Override
     public void giveItems() {
         player.removeItems();
+        player.giveItem(new WizStickEnd(player,plugin,0));
     }
 
     @Override

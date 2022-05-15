@@ -3,6 +3,8 @@ package me.bobthe28th.capturethefart.ctf.classes;
 import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFClass;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
+import me.bobthe28th.capturethefart.ctf.damage.CTFDamage;
+import me.bobthe28th.capturethefart.ctf.damage.CTFDamageCause;
 import me.bobthe28th.capturethefart.ctf.items.assassin.AssKnife;
 import me.bobthe28th.capturethefart.ctf.items.assassin.AssPotion;
 import me.bobthe28th.capturethefart.ctf.items.assassin.AssSmoke;
@@ -11,6 +13,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -64,13 +67,14 @@ public class Assassin extends CTFClass implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onEntityDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player pf) {
             if (event instanceof EntityDamageByEntityEvent eEvent) {
                 if (eEvent.getDamager() instanceof Player pA) {
                     if (pA == player.getPlayer() && player.getPlayer().hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-                        event.setDamage(event.getFinalDamage() * 2);
+                        Main.customDamageCause.put(pf,new CTFDamage(player, CTFDamageCause.ASSASSIN_KNIFE_STRONG));
+                        event.setDamage(event.getDamage() * 2);
                         player.getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
                     }
                 }
