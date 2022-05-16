@@ -6,7 +6,9 @@ import me.bobthe28th.capturethefart.ctf.classes.WizardPreview;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,6 +28,8 @@ public class CTFGameController implements Listener {
     static Main plugin;
 
     HashMap<CTFPlayer,Scoreboard> pScoreboard = new HashMap<>();
+
+    CTFMap map;
 
     Location teamStart;
     Location[] teamSelect;
@@ -49,7 +53,6 @@ public class CTFGameController implements Listener {
         plugin = plugin_;
         Bukkit.getPluginManager().registerEvents(this, plugin);
         teamStart = new Location(w, 68.5, 81, -226.5, -90F, 0F);
-//        teamStart.setYaw(-90F);
         teamSelect = new Location[Main.CTFTeams.length];
         classStart = new Location[Main.CTFClasses.length];
         classSelect = new Location[Main.CTFTeams.length][Main.CTFClasses.length];
@@ -79,6 +82,28 @@ public class CTFGameController implements Listener {
                 new Location(w,68.5, 81, -239.5),
                 new Location(w,63.5, 81, -239.5)
         };
+
+        setMap(Main.CTFMaps[0]);
+    }
+
+    public boolean getSelectingTeam() {
+        return selectingTeam;
+    }
+
+    public void setMap(CTFMap m) {
+        map = m;
+        map.set();
+    }
+
+    public CTFMap getMap() {
+        return map;
+    }
+
+    public void removeBreakableBlocks() {
+        for (Block b : Main.breakableBlocks.keySet()) {
+            b.setType(Material.AIR);
+            Main.breakableBlocks.remove(b);
+        }
     }
 
     public void updateScoreboard(CTFPlayer p, ScoreboardRow r) {
@@ -193,6 +218,9 @@ public class CTFGameController implements Listener {
             updateTeams(p);
             for (CTFTeam t : Main.CTFTeams) {
                 updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,t);
+            }
+            if (!pScoreboard.containsKey(p) || pScoreboard.get(p) == null) {
+                addScoreboard(p);
             }
             p.getPlayer().setScoreboard(pScoreboard.get(p));
         }
@@ -423,44 +451,46 @@ public class CTFGameController implements Listener {
 
         } else if (selectingClass) {
             blockPos.setY(classSelectY);
-            int teamid = player.getTeam().getId();
+            if (player.getTeam() != null) {
+                int teamid = player.getTeam().getId();
 
-            boolean inSelect = false;
-            for (int i = 0; i < classSelect[teamid].length; i++) {
-                if (blockPos.distance(classSelect[teamid][i]) < classSelectRadius) {
-                    if (i >= Main.CTFClasses.length - 4) {
-                        selectClassJoin(player,null,i);
-                    } else {
-                        selectClassJoin(player,Main.CTFClasses[i],i);
-                    }
-                    inSelect = true;
-                }
-            }
-            if (!inSelect) {
-                if (player.getpClass() != null || player.getSelectingWizard()) {
-                    if (player.getSelectingWizard()) {
-                        int index = Main.CTFClasses.length - 4;
-                        for (CTFPlayer p : Main.CTFPlayers.values()) {
-                            if (p.getTeam() == player.getTeam()) {
-                                Main.fakeClass(p.getPlayer(), new UUID(0, index), 70 + index, classSelect[player.getTeam().getId()][index], 0F, 90F, WizardPreview.class, player.getTeam(), plugin);
-                            }
+                boolean inSelect = false;
+                for (int i = 0; i < classSelect[teamid].length; i++) {
+                    if (blockPos.distance(classSelect[teamid][i]) < classSelectRadius) {
+                        if (i >= Main.CTFClasses.length - 4) {
+                            selectClassJoin(player, null, i);
+                        } else {
+                            selectClassJoin(player, Main.CTFClasses[i], i);
                         }
-                    } else {
-                        int index = Arrays.asList(Main.CTFClasses).indexOf(player.getpClass().getClass());
-                        if (index != -1) {
+                        inSelect = true;
+                    }
+                }
+                if (!inSelect) {
+                    if (player.getpClass() != null || player.getSelectingWizard()) {
+                        if (player.getSelectingWizard()) {
+                            int index = Main.CTFClasses.length - 4;
                             for (CTFPlayer p : Main.CTFPlayers.values()) {
                                 if (p.getTeam() == player.getTeam()) {
-                                    Main.fakeClass(p.getPlayer(), new UUID(0, index), 70 + index, classSelect[player.getTeam().getId()][index], 0F, 90F,Main.CTFClasses[index], player.getTeam(), plugin);
+                                    Main.fakeClass(p.getPlayer(), new UUID(0, index), 70 + index, classSelect[player.getTeam().getId()][index], 0F, 90F, WizardPreview.class, player.getTeam(), plugin);
+                                }
+                            }
+                        } else {
+                            int index = Arrays.asList(Main.CTFClasses).indexOf(player.getpClass().getClass());
+                            if (index != -1) {
+                                for (CTFPlayer p : Main.CTFPlayers.values()) {
+                                    if (p.getTeam() == player.getTeam()) {
+                                        Main.fakeClass(p.getPlayer(), new UUID(0, index), 70 + index, classSelect[player.getTeam().getId()][index], 0F, 90F, Main.CTFClasses[index], player.getTeam(), plugin);
+                                    }
                                 }
                             }
                         }
+
+                        player.setSelectingWizard(false);
+
+                        player.leaveClass();
                     }
-
-                    player.setSelectingWizard(false);
-
-                    player.leaveClass();
+                    stopClassSelectTimer();
                 }
-                stopClassSelectTimer();
             }
         }
     }

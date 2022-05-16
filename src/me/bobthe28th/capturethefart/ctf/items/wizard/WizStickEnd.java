@@ -4,7 +4,7 @@ import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFDoubleCooldownItem;
 import org.bukkit.*;
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ShulkerBullet;
 import org.bukkit.event.block.Action;
@@ -13,13 +13,10 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.Random;
-
 public class WizStickEnd extends CTFDoubleCooldownItem {
 
     public WizStickEnd(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("End Staff", Material.STICK, 4, "Shulker Shot", 2, "Fire Ball", 3, player_, plugin_, defaultSlot_);
-        setNoHit(true);
+        super("End Staff", Material.STICK, 4, "Shulker Shot", 2, "Ender Pearl", 3, player_, plugin_, defaultSlot_);
     }
 
     @Override
@@ -61,37 +58,8 @@ public class WizStickEnd extends CTFDoubleCooldownItem {
             case RIGHT_CLICK_AIR:
                 if (getCooldown(1) == 0) {
                     startCooldown(1);
-                    int innerRadius = 7;
-                    int outerRadius = 7;
-                    Random rand = new Random();
-                    for (Entity e : p.getWorld().getNearbyEntities(p.getLocation(),innerRadius,innerRadius,innerRadius)) {
-                        if (e instanceof Player pe && Main.CTFPlayers.containsKey(pe)) {
-                            CTFPlayer cp = Main.CTFPlayers.get(pe);
-                            if (cp.getTeam() != player.getTeam()) {
-                                boolean teleported = false;
-                                int iteration = 0;
-                                while (!teleported && iteration <= 100) { //TODO bounding box in gamecontroller and align xyz
-                                    int x = rand.nextInt((outerRadius+innerRadius) * 2) - (outerRadius+innerRadius);
-                                    int z = rand.nextInt((outerRadius+innerRadius) * 2) - (outerRadius+innerRadius);
-                                    if ((x > innerRadius || x < -innerRadius) && (z > innerRadius || z < -innerRadius)) {
-                                        for (int y = 0; y < outerRadius * 2; y++) {
-                                            Location loc = new Location(p.getWorld(),x + p.getLocation().getBlockX(), y - outerRadius + p.getLocation().getBlockY(),z + p.getLocation().getBlockZ(),pe.getLocation().getYaw(),pe.getLocation().getPitch());
-                                            if (loc.getBlock().getType().isSolid() && loc.clone().add(new Vector(0.0,1.0,0.0)).getBlock().getType().isAir() && loc.clone().add(new Vector(0.0,2.0,0.0)).getBlock().getType().isAir()) {
-                                                pe.getWorld().spawnParticle(Particle.PORTAL,pe.getLocation().add(new Vector(0.0,1.0,0.0)),50,0.1,0.5,0.1);
-                                                pe.teleport(loc.clone().add(new Vector(0.0,1.0,0.0)));
-                                                pe.getWorld().playSound(pe, Sound.ENTITY_ENDERMAN_TELEPORT,1F,1F);
-                                                teleported = true;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    iteration ++;
-                                }
-                            }
-                        }
-                    }
+                    p.launchProjectile(EnderPearl.class);
                 }
-
                 break;
         }
     }

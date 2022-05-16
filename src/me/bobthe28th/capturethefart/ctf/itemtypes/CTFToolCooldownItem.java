@@ -4,10 +4,14 @@ import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public abstract class CTFToolCooldownItem extends CTFItem {
@@ -15,15 +19,37 @@ public abstract class CTFToolCooldownItem extends CTFItem {
     double cooldown = 0;
     double cooldownMax;
     String cooldownName;
+    Material actionItem;
 
-    public CTFToolCooldownItem(String itemName_, Material item_, Integer customModel_, String cooldownName_, double cooldownMax_, CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
+    public CTFToolCooldownItem(String itemName_, Material item_, Integer customModel_, String cooldownName_, double cooldownMax_, Material actionItem_, CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
         super(itemName_,item_,customModel_,player_,plugin_,defaultSlot_);
         cooldownName = cooldownName_;
         cooldownMax = cooldownMax_;
+        actionItem = actionItem_;
+    }
+
+    public void startAction() {
+        cooldown = -1;
+        ItemStack cItem = new ItemStack(actionItem);
+        cItem.setAmount(1);
+        if (cItem.hasItemMeta()) {
+            ItemMeta cMeta = cItem.getItemMeta();
+            if (cMeta != null) {
+                cMeta.setDisplayName(ChatColor.RESET + itemName);
+                cMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE, (byte) 1);
+                cItem.setItemMeta(cMeta);
+            }
+        }
+        if (player.getItemSlot(this) != -1) {
+            player.getPlayer().getInventory().setItem(player.getItemSlot(this),cItem);
+        }
+
+        displayCooldowns();
     }
 
     public void startCooldown() {
         cooldown = cooldownMax;
+        player.getPlayer().getInventory().setItem(player.getItemSlot(this),getItem());
         ItemStack item = player.getItemStack(this);
         Damageable meta = (Damageable) item.getItemMeta();
         if (meta != null) {

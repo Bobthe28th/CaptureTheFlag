@@ -9,6 +9,7 @@ public enum CTFDamageCause {
     WIZARD_SOLAR_BLAST,
     WIZARD_FIREBALL,
     WIZARD_SHULKER,
+    WIZARD_PEARL,
     //Paladin
     PALADIN_HAMMER,
     PALADIN_HAMMER_THROW,

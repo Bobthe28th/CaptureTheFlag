@@ -42,9 +42,9 @@ public class Assassin extends CTFClass implements Listener {
         player.removeItems();
         knife = new AssKnife(player,plugin,0);
         player.giveItem(knife);
-        potion = new AssPotion(knife,player,plugin,1);
+        potion = new AssPotion(knife,player,plugin,2);
         player.giveItem(potion);
-        player.giveItem(new AssSmoke(player,plugin,2));
+        player.giveItem(new AssSmoke(player,plugin,1));
     }
 
     @Override
@@ -74,7 +74,7 @@ public class Assassin extends CTFClass implements Listener {
                 if (eEvent.getDamager() instanceof Player pA) {
                     if (pA == player.getPlayer() && player.getPlayer().hasPotionEffect(PotionEffectType.INVISIBILITY)) {
                         Main.customDamageCause.put(pf,new CTFDamage(player, CTFDamageCause.ASSASSIN_KNIFE_STRONG));
-                        event.setDamage(event.getDamage() * 2);
+                        event.setDamage(event.getDamage() * 2.5);
                         player.getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
                     }
                 }

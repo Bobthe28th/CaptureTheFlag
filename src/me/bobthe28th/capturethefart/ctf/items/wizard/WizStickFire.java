@@ -23,8 +23,7 @@ import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 public class WizStickFire extends CTFDoubleCooldownItem {
 
     public WizStickFire(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("Fire Staff", Material.STICK, 3, "Solar Blast", 1.5, "Fire Ball", 3, player_, plugin_, defaultSlot_);
-        setNoHit(true);
+        super("Fire Staff", Material.STICK, 3, "Solar Blast", 1.5, "Fire Ball", 12, player_, plugin_, defaultSlot_);
     }
 
     @Override
@@ -43,19 +42,21 @@ public class WizStickFire extends CTFDoubleCooldownItem {
                     for (Entity entity : p.getNearbyEntities(10,10,10)) {
                         if (entity instanceof Player pN) {
                             if (pN.hasLineOfSight(p)) {
-                                //https://stackoverflow.com/questions/12826117/how-can-i-detect-if-a-point-is-inside-a-cone-or-not-in-3d-space/12826333
 
-                                Vector hitP = pN.getLocation().toVector().add(new Vector(0.0,1.0,0.0));
-                                double cDist = (hitP.clone().subtract(shotP)).clone().dot(dir);
-                                double cRad = (cDist / coneHeight) * coneRadius;
-                                double orthDist = (hitP.clone().subtract(shotP)).clone().subtract((dir.clone().multiply(cDist))).clone().length();
+                                if (Main.CTFPlayers.containsKey(pN) && Main.CTFPlayers.get(pN).getTeam() != player.getTeam()) {
+                                    //https://stackoverflow.com/questions/12826117/how-can-i-detect-if-a-point-is-inside-a-cone-or-not-in-3d-space/12826333
 
-                                if (orthDist < cRad && cDist >= 0 && cDist <= coneHeight) {
-                                    pN.setFireTicks(70);
-                                    Main.customDamageCause.put(pN,new CTFDamage(player, CTFDamageCause.WIZARD_SOLAR_BLAST));
-                                    pN.damage(2,p);
+                                    Vector hitP = pN.getLocation().toVector().add(new Vector(0.0,1.0,0.0));
+                                    double cDist = (hitP.clone().subtract(shotP)).clone().dot(dir);
+                                    double cRad = (cDist / coneHeight) * coneRadius;
+                                    double orthDist = (hitP.clone().subtract(shotP)).clone().subtract((dir.clone().multiply(cDist))).clone().length();
+
+                                    if (orthDist < cRad && cDist >= 0 && cDist <= coneHeight) {
+                                        pN.setFireTicks(70);
+                                        Main.customDamageCause.put(pN,new CTFDamage(player, CTFDamageCause.WIZARD_SOLAR_BLAST));
+                                        pN.damage(2,p);
+                                    }
                                 }
-
                             }
                         }
                     }

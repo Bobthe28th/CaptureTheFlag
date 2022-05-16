@@ -21,7 +21,7 @@ public class ArcPoisonArrow extends CTFStackCooldownItem {
     public ArcPoisonArrow(ArcBow bow_, CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
         super("Poison Arrow", Material.TIPPED_ARROW, 0, "Poison Arrow", 5, Material.STICK, player_, plugin_, defaultSlot_);
         setPotionColor(PotionEffectType.POISON.getColor());
-        addPotionEffect(new PotionEffect(PotionEffectType.POISON,300,1));
+        addPotionEffect(new PotionEffect(PotionEffectType.POISON,80,0));
         bow = bow_;
     }
 

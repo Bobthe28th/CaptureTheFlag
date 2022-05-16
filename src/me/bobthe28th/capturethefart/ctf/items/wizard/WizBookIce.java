@@ -64,12 +64,11 @@ public class WizBookIce extends CTFDoubleCooldownItem {
                         final double y = p.getLocation().getY() - 1.0;
                         public void run() {
                             t++;
-                            if (t > 60) {
+                            if (t > 60 || p.getGameMode() == GameMode.SPECTATOR) {
                                 startCooldown(1);
-                                this.cancel();
-                            }
-
-                            if (p.getGameMode() == GameMode.SPECTATOR) {
+                                if (p.getGameMode() != GameMode.SPECTATOR) {
+                                    Main.disableFall.add(p);
+                                }
                                 this.cancel();
                             }
 

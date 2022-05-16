@@ -22,7 +22,6 @@ public class WizStickWind extends CTFDoubleCooldownItem {
 
     public WizStickWind(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
         super("Lightning Staff",Material.STICK,1,"Zap",0.5,"Lightning Strike",20,player_,plugin_, defaultSlot_);
-        setNoHit(true);
     }
 
     @Override

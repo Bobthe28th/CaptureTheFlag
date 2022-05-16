@@ -48,3 +48,9 @@ commands:
   ctfhelp:
     description: Gets a description of a class
     usage: /<command> class
+  ctfsetmap:
+    description: Sets the map
+    usage: /<command> map
+  removeblocks:
+    description: Removes all blocks placed by builder
+    usage: /<command>

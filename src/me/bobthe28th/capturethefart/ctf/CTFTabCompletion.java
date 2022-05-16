@@ -82,6 +82,13 @@ public class CTFTabCompletion implements TabCompleter {
                     Collections.addAll(arguments, Main.CTFClassNames);
                     return arguments;
                 }
+            case "ctfsetmap":
+                if (args.length == 1) {
+                    List<String> arguments = new ArrayList<>();
+                    String[] mapNames = Main.getMapNames();
+                    Collections.addAll(arguments, mapNames);
+                    return arguments;
+                }
             case "music":
                 switch (args.length) {
                     case 1:

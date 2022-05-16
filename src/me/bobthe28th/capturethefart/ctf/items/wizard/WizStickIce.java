@@ -23,8 +23,7 @@ import java.util.Objects;
 public class WizStickIce extends CTFDoubleCooldownItem {
 
     public WizStickIce(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("Snow Staff",Material.STICK, 2,"Snowball", 0.5,"Snow Chunk", 20, player_,plugin_, defaultSlot_);
-        setNoHit(true);
+        super("Snow Staff",Material.STICK, 2,"Snowball", 0.5,"Snow Chunk", 18, player_,plugin_, defaultSlot_);
     }
 
     @Override

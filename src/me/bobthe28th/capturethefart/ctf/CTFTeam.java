@@ -18,13 +18,12 @@ public class CTFTeam {
     Material banner;
     Location spawnLocation;
 
-    public CTFTeam(Integer id_, String name_, ChatColor chatColor_, Color color_, Material banner_, Location spawnLocation_) {
+    public CTFTeam(Integer id_, String name_, ChatColor chatColor_, Color color_, Material banner_) {
         id = id_;
         name = name_;
         chatColor = chatColor_;
         color = color_;
         banner = banner_;
-        spawnLocation = spawnLocation_;
 
         Scoreboard s = Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard();
         Team t = s.registerNewTeam("ctf" + id);
@@ -71,6 +70,10 @@ public class CTFTeam {
             }
         }
         return alive + "/" + total;
+    }
+
+    public void setSpawnLocation(Location loc) {
+        spawnLocation = loc.clone();
     }
 
     public Location getSpawnLocation() {

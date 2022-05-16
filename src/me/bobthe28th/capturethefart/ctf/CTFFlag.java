@@ -21,17 +21,14 @@ public class CTFFlag implements Listener {
     int nearby;
 
     HashMap<CTFPlayer, Double> pickUpTimer = new HashMap<>();
-    double pickUpTime = 3.0;
-    double returnTime = 5.0;
+    double pickUpTime = 2.0;
+    double returnTime = 3.0;
 
-    public CTFFlag(CTFTeam team_, Main plugin_, Location home_) {
+    public CTFFlag(CTFTeam team_, Main plugin_) {
         team = team_;
         plugin = plugin_;
-        home = home_;
 
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-
-        setPos(home);
 
         nearby = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
             ArrayList<CTFPlayer> nearCPlayers = new ArrayList<>();
@@ -149,6 +146,11 @@ public class CTFFlag implements Listener {
         } else {
             return ChatColor.RED + "Taken";
         }
+    }
+
+    public void setHome(Location loc) {
+        home = loc.clone();
+        setPos(home);
     }
 
     public void setPos(Location loc) {

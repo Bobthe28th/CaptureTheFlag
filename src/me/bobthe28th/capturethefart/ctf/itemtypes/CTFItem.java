@@ -37,7 +37,6 @@ public abstract class CTFItem {
     public int amount = 1;
     public int defaultSlot;
     public int slot;
-    boolean noHit = false;
 
     CTFDamageCause meleeDeathMessage;
     Color potionColor;
@@ -65,10 +64,6 @@ public abstract class CTFItem {
 
     public void displayCooldowns() {
         player.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
-    }
-
-    public void setNoHit(boolean noHit) {
-        this.noHit = noHit;
     }
 
     public void setPotionColor(Color pColor) {
@@ -112,7 +107,6 @@ public abstract class CTFItem {
             meta.setCustomModelData(customModel);
             meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE, (byte) 1);
             meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfname"), PersistentDataType.STRING, itemName);
-            meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "nohit"), PersistentDataType.BYTE, (byte)(noHit ? 1 : 0));
             if (meleeDeathMessage != null) {
                 meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfmeleedamagecause"), PersistentDataType.STRING, meleeDeathMessage.toString());
             }

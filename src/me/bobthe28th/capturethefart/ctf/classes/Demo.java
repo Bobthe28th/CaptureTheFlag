@@ -64,6 +64,7 @@ public class Demo extends CTFClass implements Listener {
             event.getBlock().setType(Material.AIR);
             TNTPrimed tnt = player.getPlayer().getWorld().spawn(event.getBlock().getLocation().add(new Vector(0.5,0.0,0.5)), TNTPrimed.class);
             tnt.setMetadata("playerSent", new FixedMetadataValue(plugin, Objects.requireNonNull(player.getPlayer()).getName()));
+            tnt.setMetadata("tntType", new FixedMetadataValue(plugin, "demotnt"));
             tnt.setFuseTicks(10);
         }
     }
@@ -80,8 +81,6 @@ public class Demo extends CTFClass implements Listener {
             ((Arrow) event.getProjectile()).setCritical(false);
             event.getProjectile().setMetadata("ctfProjectile",new FixedMetadataValue(plugin,true));
             event.getProjectile().setMetadata("ctfProjectileType",new FixedMetadataValue(plugin,"bombarrow"));
-//            event.getProjectile().setMetadata("bombArrow", new FixedMetadataValue(plugin, true));
-//            event.getProjectile().setMetadata("playerSent", new FixedMetadataValue(plugin, Objects.requireNonNull(player.getPlayer()).getName()));
 
             new BukkitRunnable() {
                 final Arrow a = (Arrow) event.getProjectile();

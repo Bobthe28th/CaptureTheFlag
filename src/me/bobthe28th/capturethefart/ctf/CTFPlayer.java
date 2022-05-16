@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.comphenix.net.bytebuddy.build.BuildLogger;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
@@ -127,6 +128,7 @@ public class CTFPlayer implements Listener {
     public void setTeam(CTFTeam t) {
         team = t;
         t.getTeam().addEntry(player.getName());
+        Main.gameController.updateTeams();
         giveArmor();
     }
 
@@ -224,7 +226,7 @@ public class CTFPlayer implements Listener {
 
     public void captureFlag() {
         carriedFlag.capture(this);
-        removeGlow("flag");
+        removeGlow("flag"); //TODO announce in chat
         carriedFlag = null;
         flagOnHead.remove();
     }
@@ -245,7 +247,9 @@ public class CTFPlayer implements Listener {
 
     public void death(boolean byEntity) {
         isAlive = false;
-        Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,team);
+        if (team != null) {
+            Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE, team);
+        }
         deaths ++;
         Main.gameController.updateScoreboard(this,ScoreboardRow.DEATHS);
         if (carriedFlag != null) {
@@ -255,19 +259,25 @@ public class CTFPlayer implements Listener {
     }
 
     public void respawn() {
-        player.teleport(team.getSpawnLocation());
-        player.setGameMode(GameMode.SURVIVAL);
-        player.setHealth(20.0);
-        player.setFreezeTicks(0);
-        for (PotionEffect pEffect : player.getActivePotionEffects()) {
-            player.removePotionEffect(pEffect.getType());
-        }
-        if (pClass != null) {
-            pClass.givePassives();
-        }
-        isAlive = true;
-        Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,team);
-        player.sendTitle(" "," ",0,0,0);
+        player.teleport(team.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN); //TODO not teleporting? make player stop spectating other player
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                player.setGameMode(GameMode.SURVIVAL);
+                player.teleport(team.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                player.setHealth(20.0);
+                player.setFreezeTicks(0);
+                for (PotionEffect pEffect : player.getActivePotionEffects()) {
+                    player.removePotionEffect(pEffect.getType());
+                }
+                if (pClass != null) {
+                    pClass.givePassives();
+                }
+                isAlive = true;
+                Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,team);
+                player.sendTitle(" "," ",0,0,0);
+            }
+        }.runTaskLater(plugin,1L);
     }
 
     public void startRespawnCooldown() {
@@ -275,7 +285,7 @@ public class CTFPlayer implements Listener {
             respawnTimer.cancel();
         }
         respawnTimer = new BukkitRunnable() {
-            int t = 5;
+            int t = 10;
             @Override
             public void run() {
                 if (this.isCancelled()) {
@@ -471,7 +481,7 @@ public class CTFPlayer implements Listener {
     }
 
     public void regen() {
-        long rate = 16L;
+        long rate = 16L; //TODO faster
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -755,6 +765,16 @@ public class CTFPlayer implements Listener {
         if (event.getDismounted() instanceof Player p) {
             if (p != player) return;
             if (event.getEntity() == flagOnHead) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEntityToggleGlide(EntityToggleGlideEvent event) {
+        if (event.getEntity() instanceof Player pf) {
+            if (pf != player) return;
+            if (pf.getLocation().add(new Vector(0.0,-0.5,0.0)).getBlock().getType().isAir() || pf.getVelocity().getY() > 0.1) {
                 event.setCancelled(true);
             }
         }

@@ -33,6 +33,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
@@ -41,6 +42,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 
@@ -51,9 +53,11 @@ public class Main extends JavaPlugin implements Listener {
     public static ArrayList<Player> disableFall = new ArrayList<>();
     public static HashMap<Block,CTFTeam> breakableBlocks = new HashMap<>();
     public static HashMap<Player, CTFDamage> customDamageCause = new HashMap<>();
+    public static HashMap<Class<?>,List<String>> tutorialBooks = new HashMap<>();
 
     public static CTFTeam[] CTFTeams;
     public static CTFFlag[] CTFFlags;
+    public static CTFMap[] CTFMaps;
     public static Class<?>[] CTFClasses = new Class<?>[]{Paladin.class, Demo.class, Builder.class, Archer.class, Assassin.class, Alchemist.class, WizardFire.class, WizardIce.class, WizardWind.class, WizardEnd.class};
     public static String[] CTFClassNames = new String[]{"Paladin","Demo","Builder","Archer","Assassin","Alchemist","WizardFire","WizardIce","WizardWind","WizardEnd"};
     public static HashMap<Player,CTFPlayer> CTFPlayers;
@@ -77,13 +81,21 @@ public class Main extends JavaPlugin implements Listener {
         return teamNames;
     }
 
+    public static String[] getMapNames() {
+        String[] mapNames = new String[CTFMaps.length];
+        for (int i = 0; i < CTFMaps.length; i ++) {
+            mapNames[i] = CTFMaps[i].getName();
+        }
+        return mapNames;
+    }
+
     @Override
     public void onEnable() {
         CTFCommands commands = new CTFCommands(this);
         CTFTabCompletion tabCompleter = new CTFTabCompletion();
         getServer().getPluginManager().registerEvents(this, this);
 
-        String[] commandNames = new String[]{"ctfstart","ctfjoin","ctfleave","ctffulljoin","ctfteamjoin","ctfteamleave","ctfteams","ctfsetclass","ctfleaveclass","ctfhelp","fly","heal","test","music"};
+        String[] commandNames = new String[]{"ctfstart","ctfjoin","ctfleave","ctffulljoin","ctfteamjoin","ctfteamleave","ctfteams","ctfsetclass","ctfleaveclass","ctfhelp","ctfsetmap","removeblocks","fly","heal","test","music"};
 
         for (String commandName : commandNames) {
             Objects.requireNonNull(getCommand(commandName)).setExecutor(commands);
@@ -99,9 +111,18 @@ public class Main extends JavaPlugin implements Listener {
         }
 
         World w = Bukkit.getServer().getWorld("world");
-        CTFTeams = new CTFTeam[]{new CTFTeam(0,"Blue Team",ChatColor.BLUE,Color.BLUE,Material.BLUE_BANNER, new Location(w,-411.0,95.0,361.0,-90.0F,0.0F)), new CTFTeam(1,"Red Team",ChatColor.RED,Color.RED,Material.RED_BANNER,new Location(w,-280, 95, 233,90.0F,0.0F))};
-        CTFFlags = new CTFFlag[]{new CTFFlag(CTFTeams[0],this, new Location(w,-396, 94, 366)), new CTFFlag(CTFTeams[1],this, new Location(w, -296, 94, 228))};
+        CTFTeams = new CTFTeam[]{new CTFTeam(0,"Blue Team",ChatColor.BLUE,Color.BLUE,Material.BLUE_BANNER), new CTFTeam(1,"Red Team",ChatColor.RED,Color.RED,Material.RED_BANNER)};
+        CTFFlags = new CTFFlag[]{new CTFFlag(CTFTeams[0],this), new CTFFlag(CTFTeams[1],this)};
         CTFPlayers = new HashMap<>();
+
+        HashMap<CTFTeam,Location> spawnLocations = new HashMap<>();
+        spawnLocations.put(CTFTeams[0],new Location(w,-411.5,95.0,361.5,-90.0F,0.0F));
+        spawnLocations.put(CTFTeams[1],new Location(w,-280.5, 95.0, 233.5,90.0F,0.0F));
+
+        HashMap<CTFTeam,Location> flagLocations = new HashMap<>();
+        flagLocations.put(CTFTeams[0],new Location(w,-396, 94, 366));
+        flagLocations.put(CTFTeams[1],new Location(w, -296, 94, 228));
+        CTFMaps = new CTFMap[]{new CTFMap("Valley",spawnLocations,flagLocations,new BoundingBox(-272, 147, 223,-420, 64, 371))};
 
         gameController = new CTFGameController(this,w);
 
@@ -126,6 +147,11 @@ public class Main extends JavaPlugin implements Listener {
         }
 
         Bukkit.broadcastMessage("farted (vine boom sound effect)");
+
+        //TODO Move to json
+        tutorialBooks.put(Alchemist.class,new ArrayList<>(Arrays.asList(ChatColor.RED + "test","test2\ntest3")));
+        tutorialBooks.put(Paladin.class,new ArrayList<>(List.of("§7§l       Paladin\n\n§f\ue240§4§oPaladin's Hammer:§r The paladin's hammer is a strong weapon that can destroy any foe!\n§f\ue240§4§oThrow:§r Throw the hammer to deal damage and a stun to all enemies in a small radius.")));
+
     }
 
     @EventHandler
@@ -244,6 +270,7 @@ public class Main extends JavaPlugin implements Listener {
         if (projectile.hasMetadata("ctfProjectile")) {
             if (projectile.hasMetadata("ctfProjectileType")) {
                 Location loc;
+                TNTPrimed tnt;
                 switch (projectile.getMetadata("ctfProjectileType").get(0).asString()) {
                     case "hammer":
                         Material particleM = (event.getHitBlock() != null) ? event.getHitBlock().getType() : Material.REDSTONE_BLOCK;
@@ -253,6 +280,9 @@ public class Main extends JavaPlugin implements Listener {
                         }
 
                         if (CTFshooter != null) {
+                            if (CTFshooter.getpClass() instanceof Paladin paladin) {
+                                paladin.returnHammer();
+                            }
                             for (Entity e : projectile.getWorld().getNearbyEntities(projectile.getLocation(), 4, 4, 4)) {
                                 if (e instanceof Player pl && projectile.getLocation().distance(pl.getLocation()) <= 4 && CTFPlayers.containsKey(pl)) {
                                     if (CTFPlayers.get(pl).getTeam() != CTFshooter.getTeam()) {
@@ -291,25 +321,34 @@ public class Main extends JavaPlugin implements Listener {
                     case "bombarrow":
                         if (hitPlayer != null) {
                             loc = hitPlayer.getLocation();
+                        } else if (event.getHitBlock() != null && event.getHitBlockFace() != null) {
+                            loc = event.getHitBlock().getRelative(event.getHitBlockFace()).getLocation().add(new Vector(0.5,0.0,0.5));
                         } else {
-                            if (event.getHitBlock() != null && event.getHitBlockFace() != null) {
-                                loc = event.getHitBlock().getRelative(event.getHitBlockFace()).getLocation();
-                            } else {
-                                loc = projectile.getLocation();
-                            }
+                            loc = projectile.getLocation();
                         }
-                        //TODO knockback (rocket jump!)
-                        projectile.getWorld().createExplosion(loc, 4F, false, false, shooter);
+                        tnt = projectile.getWorld().spawn(loc, TNTPrimed.class);
+                        if (shooter != null) {
+                            tnt.setMetadata("playerSent", new FixedMetadataValue(this, shooter.getName()));
+                        }
+                        tnt.setMetadata("tntType", new FixedMetadataValue(this, "demoarrow"));
+                        tnt.setFuseTicks(0);
                         projectile.remove();
                         break;
                     case "fireball":
-                        loc = projectile.getLocation();
                         if (event.getHitEntity() != null) {
                             loc = event.getHitEntity().getLocation();
+                        } else if (event.getHitBlock() != null && event.getHitBlockFace() != null) {
+                            loc = event.getHitBlock().getRelative(event.getHitBlockFace()).getLocation().add(new Vector(0.5,0.0,0.5));
+                        } else {
+                            loc = projectile.getLocation();
                         }
                         if (shooter != null) {
-                            projectile.getWorld().createExplosion(loc, 4F, false, false, shooter);
+                            tnt = projectile.getWorld().spawn(loc, TNTPrimed.class);
+                            tnt.setMetadata("playerSent", new FixedMetadataValue(this, shooter.getName()));
+                            tnt.setMetadata("tntType", new FixedMetadataValue(this, "wizfireball"));
+                            tnt.setFuseTicks(0);
                         }
+                        projectile.remove();
                         break;
                     case "archerarrow":
                         if (hitPlayer != null && CTFshooter != null && projectile.hasMetadata("ArcherArrowType")) {
@@ -325,13 +364,18 @@ public class Main extends JavaPlugin implements Listener {
                         break;
                     case "smokebomb":
                         if (CTFshooter != null) {
-                            double blindRadius = 3;
+                            double blindRadius = 4;
                             for (Player p : Bukkit.getOnlinePlayers()) {
                                 p.spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, projectile.getLocation(), 2000, 1.5, 1.5, 1.5, 0);
                                 p.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, projectile.getLocation(), 1000, 0.5, 0.5, 0.5, 0.1);
-                                if (CTFPlayers.containsKey(p) && CTFPlayers.get(p).getTeam() != CTFshooter.getTeam()) {
+                                if (CTFPlayers.containsKey(p)) {
                                     if (p.getLocation().distance(projectile.getLocation()) <= blindRadius) {
-                                        p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 60, 0,false,false,true));
+                                        if (CTFPlayers.get(p).getTeam() != CTFshooter.getTeam()) {
+                                            p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 60, 0, false, false, true));
+                                            p.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 60, 0, false, false, true));
+                                        } else {
+                                            p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 120, 1, false, false, true));
+                                        }
                                     }
                                 }
                             }
@@ -360,7 +404,10 @@ public class Main extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
-        //TODO melee custom damage
+        if (gameController.getSelectingTeam()) {
+            event.setCancelled(true);
+        }
+
         //Disable fall
         if (event.getEntity() instanceof Player && disableFall.contains((Player)event.getEntity())) {
             if (event.getCause() == DamageCause.FALL) {
@@ -375,58 +422,62 @@ public class Main extends JavaPlugin implements Listener {
                 damageByEntityEvent = (EntityDamageByEntityEvent) event;
             }
 
+            if (damageByEntityEvent != null && event.getEntity() instanceof ShulkerBullet bullet) {
+                if (damageByEntityEvent.getDamager() == bullet.getShooter()) {
+                    event.setCancelled(true);
+                }
+            }
+
             if (event.getEntity() instanceof Player recipient) {
 
                 if (damageByEntityEvent != null) {
 
                     if (damageByEntityEvent.getDamager().getType() == EntityType.PRIMED_TNT && event.getCause() == DamageCause.ENTITY_EXPLOSION) {
                         TNTPrimed tnt = (TNTPrimed) damageByEntityEvent.getDamager();
-                        if (tnt.hasMetadata("playerSent")) {
+                        if (tnt.hasMetadata("playerSent") && tnt.hasMetadata("tntType")) {
                             Player damager = Bukkit.getPlayer(tnt.getMetadata("playerSent").get(0).asString());
                             if (damager != null) {
+                                String tntType = tnt.getMetadata("tntType").get(0).asString();
+                                CTFDamageCause dCause = switch (tntType) {
+                                    case "demotnt" -> CTFDamageCause.DEMO_TNT;
+                                    case "demoarrow" -> CTFDamageCause.DEMO_ARROW;
+                                    case "wizfireball" -> CTFDamageCause.WIZARD_FIREBALL;
+                                    default -> null;
+                                };
                                 if (CTFPlayers.containsKey(damager) && CTFPlayers.containsKey(recipient)) {
                                     if (CTFPlayers.get(damager).getTeam() == CTFPlayers.get(recipient).getTeam()) {
                                         if (recipient == damager) {
-                                            double xPos = recipient.getLocation().getBlockX() - tnt.getLocation().getBlockX();
-                                            double yPos = recipient.getLocation().getBlockY() + 1.0 - tnt.getLocation().getBlockY();
-                                            double zPos = recipient.getLocation().getBlockZ() - tnt.getLocation().getBlockZ();
-                                            double div = 1.5;
-                                            recipient.setVelocity(recipient.getVelocity().add(new Vector(xPos / div, yPos / div, zPos / div)));
-                                            customDamageCause.put(recipient, new CTFDamage(CTFPlayers.get(damager), CTFDamageCause.DEMO_TNT));
+                                            double selfKnockBackRange = 6;
+                                            double div = tntType.equals("demotnt") ? 7 : 15;
+                                            double max = tntType.equals("demotnt") ? 4 : 3;
+                                            Vector knockBackVector = recipient.getLocation().toVector().add(new Vector(0.0,1.0,0.0)).subtract(tnt.getLocation().toVector()).normalize().multiply(Math.min(max,selfKnockBackRange - recipient.getLocation().distance(tnt.getLocation()))).divide(new Vector(div,div,div));
+                                            recipient.setVelocity(recipient.getVelocity().add(knockBackVector));
+                                            if (dCause != null) {
+                                                customDamageCause.put(recipient, new CTFDamage(CTFPlayers.get(damager), dCause));
+                                            }
                                             event.setDamage(event.getDamage() / 5.0);
                                         } else {
                                             event.setCancelled(true);
                                             return;
                                         }
                                     } else {
-                                        customDamageCause.put(recipient, new CTFDamage(CTFPlayers.get(damager), CTFDamageCause.DEMO_TNT));
+                                        if (dCause != null) {
+                                            customDamageCause.put(recipient, new CTFDamage(CTFPlayers.get(damager), dCause));
+                                        }
                                         event.setDamage(event.getDamage() / 2.0);
                                     }
                                 } else if (CTFPlayers.containsKey(damager)) {
-                                    customDamageCause.put(recipient, new CTFDamage(CTFPlayers.get(damager), CTFDamageCause.DEMO_TNT));
+                                    if (dCause != null) {
+                                        customDamageCause.put(recipient, new CTFDamage(CTFPlayers.get(damager), dCause));
+                                    }
                                     event.setDamage(event.getDamage() / 2.0);
                                 }
                             }
                         }
                     }
 
-                    //I hate this
-                    if (damageByEntityEvent.getDamager() instanceof Player damager && event.getCause() == DamageCause.ENTITY_EXPLOSION && CTFPlayers.containsKey(damager)) {
-                        switch (CTFPlayers.get(damager).getpClass().getName()) {
-                            case "Demolitionist" -> customDamageCause.put(recipient, new CTFDamage(CTFPlayers.get(damager), CTFDamageCause.DEMO_ARROW));
-                            case "Fire Wizard" -> customDamageCause.put(recipient, new CTFDamage(CTFPlayers.get(damager), CTFDamageCause.WIZARD_FIREBALL));
-                            default -> {
-                            }
-                        }
-                    }
-
-                    if (damageByEntityEvent.getDamager() instanceof Player damager && event.getCause() == DamageCause.ENTITY_ATTACK && !customDamageCause.containsKey(recipient)) {
-                        if (damager.getInventory().getItemInMainHand().hasItemMeta() && damager.getInventory().getItemInMainHand().getItemMeta() != null && damager.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(this, "nohit"), PersistentDataType.BYTE)) {
-                            Byte noHit = damager.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(this, "nohit"), PersistentDataType.BYTE);
-                            if (noHit != null && noHit == (byte) 1) {
-                                event.setCancelled(true);
-                            }
-                        }
+                    if (event.getCause() == DamageCause.FALL && damageByEntityEvent.getDamager() instanceof EnderPearl) {
+                        event.setDamage(2);
                     }
 
                     //Update damager enemy
@@ -488,7 +539,7 @@ public class Main extends JavaPlugin implements Listener {
                     } else {
                         Bukkit.broadcastMessage(deathMessages.getMessage(false, damageType).replace("$1", (CTFrecipient != null ? CTFrecipient.getTeam().getChatColor() : ChatColor.RED) + recipient.getName() + ChatColor.RESET));
                     }
-                    Bukkit.broadcastMessage(damageType);
+//                    Bukkit.broadcastMessage(damageType);
                 }
                 customDamageCause.remove(recipient);
             }
@@ -706,7 +757,7 @@ public class Main extends JavaPlugin implements Listener {
             }
 
             if (musicRunnable != null) musicRunnable.cancel();
-            musicRunnable = new BukkitRunnable() {
+            musicRunnable = new BukkitRunnable() { //TODO error
                 @Override
                 public void run() {
                     musicQueue.remove(0);
@@ -791,5 +842,4 @@ public class Main extends JavaPlugin implements Listener {
         }
         musicQueue.clear();
     }
-
 }

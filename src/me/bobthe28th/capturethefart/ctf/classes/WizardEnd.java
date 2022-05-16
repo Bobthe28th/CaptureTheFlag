@@ -3,12 +3,25 @@ package me.bobthe28th.capturethefart.ctf.classes;
 import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFClass;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
+import me.bobthe28th.capturethefart.ctf.damage.CTFDamage;
+import me.bobthe28th.capturethefart.ctf.damage.CTFDamageCause;
+import me.bobthe28th.capturethefart.ctf.items.wizard.WizBookEnd;
 import me.bobthe28th.capturethefart.ctf.items.wizard.WizStickEnd;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Endermite;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerTeleportEvent;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class WizardEnd extends CTFClass implements Listener {
 
@@ -27,6 +40,7 @@ public class WizardEnd extends CTFClass implements Listener {
     public void giveItems() {
         player.removeItems();
         player.giveItem(new WizStickEnd(player,plugin,0));
+//        player.giveItem(new WizBookEnd(player,plugin,1));
     }
 
     @Override
@@ -37,5 +51,34 @@ public class WizardEnd extends CTFClass implements Listener {
     @Override
     public String getFormattedName() {
         return ChatColor.DARK_PURPLE + name + ChatColor.RESET;
+    }
+
+    @EventHandler
+    public void onPlayerTeleport(PlayerTeleportEvent event) {
+        if (event.getCause() != PlayerTeleportEvent.TeleportCause.ENDER_PEARL) return;
+        if (event.getTo() != null) {
+
+            double radius = 2.0;
+            for (Entity e : player.getPlayer().getWorld().getNearbyEntities(event.getTo(), radius, radius, radius)) {
+                if (e instanceof Player pe && Main.CTFPlayers.containsKey(pe) && Main.CTFPlayers.get(pe).getTeam() != player.getTeam()) {
+                    Main.customDamageCause.put(pe,new CTFDamage(player, CTFDamageCause.WIZARD_PEARL));
+                    pe.damage(4.0,player.getPlayer());
+                }
+            }
+
+//            for (int i = 0; i < 3; i++) {
+//                Endermite endermite = player.getPlayer().getWorld().spawn(event.getTo(), Endermite.class);
+//                List<CTFPlayer> ctfPlayerList = new ArrayList<>(Main.CTFPlayers.values());
+//                Collections.shuffle(ctfPlayerList);
+//                for (CTFPlayer p : ctfPlayerList) {
+//                    if (p.getTeam() != player.getTeam() && event.getTo().distance(p.getPlayer().getLocation()) <= 10.0) {
+//                        Bukkit.broadcastMessage(p.getPlayer().getName());
+//                        endermite.setTarget(p.getPlayer());
+//
+//                        break;
+//                    }
+//                }
+//            }
+        }
     }
 }
