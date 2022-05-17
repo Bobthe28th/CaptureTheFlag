@@ -75,12 +75,13 @@ public class WizBookFire extends CTFDoubleCooldownItem {
             case RIGHT_CLICK_BLOCK:
                 if (getCooldown(1) == 0) {
                     startCooldown(1);
+                    p.getWorld().playSound(p.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 1.0F, 1.0F);
                     double radius = 8.0;
                     for (Entity e : p.getWorld().getNearbyEntities(p.getLocation(), radius, radius, radius)) {
                         if (e instanceof Player a) {
                             if (a.getLocation().distance(p.getLocation()) <= radius) {
                                 if (Main.CTFPlayers.containsKey(a)) {
-                                    if (Main.CTFPlayers.get(a).getTeam() == player.getTeam()) {
+                                    if (Main.CTFPlayers.get(a).getTeam() == player.getTeam() && !Main.CTFPlayers.get(a).isCarringFlag()) {
                                         attackBoost(Main.CTFPlayers.get(a));
                                     }
                                 }

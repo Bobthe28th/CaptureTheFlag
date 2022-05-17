@@ -52,7 +52,7 @@ public class WizStickWind extends CTFDoubleCooldownItem {
                                     if (pd != p && Main.CTFPlayers.get(pd).getTeam() != player.getTeam()) {
                                         ArrayList<Player> playersChained = new ArrayList<>();
                                         Main.customDamageCause.put(pd, new CTFDamage(player,CTFDamageCause.WIZARD_ZAP));
-                                        pd.damage(1.0, p);
+                                        pd.damage(2.0, p);
                                         pd.getWorld().playSound(pd.getLocation(), Sound.ENTITY_BEE_DEATH, 1.0F, 2.0F);
                                         playersChained.add(p);
                                         playersChained.add(pd);
@@ -77,7 +77,7 @@ public class WizStickWind extends CTFDoubleCooldownItem {
             case RIGHT_CLICK_AIR:
                 if (getCooldown(1) == 0) {
 
-                    int range = 500;
+                    int range = 50;
 
                     Entity target = Main.getLookedAtPlayer(p,3);
 

@@ -11,10 +11,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.LingeringPotionSplashEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -53,13 +55,17 @@ public class Alchemist extends CTFClass implements Listener {
     @Override
     public void giveItems() {
         player.removeItems();
-        potions.put("Damage Potion", new AlcPotion(player,plugin,0,"Damage Potion",Material.SPLASH_POTION,3,PotionEffectType.HARM.getColor(),new PotionEffect[]{new PotionEffect(PotionEffectType.HARM,20,0,false,true,true)},false,true));
-        potions.put("Debuff Potion", new AlcPotion(player,plugin,1,"Debuff Potion",Material.SPLASH_POTION,5,PotionEffectType.POISON.getColor(),new PotionEffect[]{new PotionEffect(PotionEffectType.SLOW,40,0,false,true,true),new PotionEffect(PotionEffectType.POISON,40,1,false,true,true),new PotionEffect(PotionEffectType.WEAKNESS,140,0,false,true,true)},false,true));
-        potions.put("Heal Potion", new AlcPotion(player,plugin,2,"Heal Potion",Material.SPLASH_POTION,5,PotionEffectType.HEAL.getColor(),new PotionEffect[]{new PotionEffect(PotionEffectType.HEAL,20,0,false,true,true)},true,false));
-        potions.put("Attack Potion", new AlcPotion(player,plugin,3,"Attack Potion",Material.SPLASH_POTION,5,PotionEffectType.INCREASE_DAMAGE.getColor(),new PotionEffect[]{new PotionEffect(PotionEffectType.INCREASE_DAMAGE,160,0,false,true,true),new PotionEffect(PotionEffectType.ABSORPTION,160,0,false,true,true)},true,false));
-        potions.put("Movement Potion", new AlcPotion(player,plugin,4,"Movement Potion",Material.LINGERING_POTION,5,PotionEffectType.JUMP.getColor(),new PotionEffect[]{new PotionEffect(PotionEffectType.JUMP,20,6,false,true,true),new PotionEffect(PotionEffectType.SPEED,140,1,false,true,true),new PotionEffect(PotionEffectType.LUCK,20,0,true,false,false)},true,false));
+
+        //TODO spoon
+        potions.put("Heal/Damage Potion", new AlcPotion(player,plugin,0,"Heal/Damage Potion",Material.SPLASH_POTION,3,PotionEffectType.HARM.getColor(),new PotionEffect[]{new PotionEffect(PotionEffectType.HARM,1,0,false,true,true),new PotionEffect(PotionEffectType.HEAL,1,0,false,true,true)}));
+        potions.put("Buff/Debuff Potion", new AlcPotion(player,plugin,1,"Buff/Debuff Potion",Material.SPLASH_POTION,7,PotionEffectType.POISON.getColor(),new PotionEffect[]{new PotionEffect(PotionEffectType.SLOW,40,0,false,true,true),new PotionEffect(PotionEffectType.POISON,40,1,false,true,true),new PotionEffect(PotionEffectType.WEAKNESS,140,0,false,true,true),new PotionEffect(PotionEffectType.INCREASE_DAMAGE,160,0,false,true,true),new PotionEffect(PotionEffectType.ABSORPTION,160,0,false,true,true)}));
+        potions.put("Movement Potion", new AlcPotion(player,plugin,2,"Movement Potion",Material.LINGERING_POTION,15,PotionEffectType.JUMP.getColor(),new PotionEffect[]{new PotionEffect(PotionEffectType.JUMP,20,6,false,true,true),new PotionEffect(PotionEffectType.SPEED,140,1,false,true,true),new PotionEffect(PotionEffectType.SLOW,20,2,false,true,true),new PotionEffect(PotionEffectType.LUCK,20,0,true,false,false)}));
 
         potions.forEach((k,v) -> player.giveItem(v));
+    }
+
+    public enum NegativeEffects{
+        CONFUSION, HARM, HUNGER,POISON, SLOW_DIGGING, SLOW, WEAKNESS, WITHER
     }
 
     @EventHandler
@@ -70,35 +76,96 @@ public class Alchemist extends CTFClass implements Listener {
             String potionName = event.getPotion().getMetadata("potionName").get(0).asString();
             if (potions.containsKey(potionName)) {
 
-                boolean doesDamage = false;
-                for (PotionEffect potionEffect : event.getPotion().getEffects()) {
-                    if (potionEffect.getType().equals(PotionEffectType.HARM)) {
-                        doesDamage = true;
-                    }
-                }
+                event.setCancelled(true);
 
                 for (LivingEntity e : event.getAffectedEntities()) {
                     if (e instanceof Player p) {
                         if (Main.CTFPlayers.containsKey(p)) {
-                            if (Main.CTFPlayers.get(p).getTeam() == player.getTeam()) {
-                                if (!potions.get(potionName).applyToTeammates()) {
-                                    event.setIntensity(p,0.0);
-                                } else if (doesDamage) {
-                                    Main.customDamageCause.put(p,new CTFDamage(player, CTFDamageCause.ALCHEMIST_DAMAGE_POT));
+                            for (PotionEffect potionEffect : event.getPotion().getEffects()) {
+                                boolean isBad = false;
+                                boolean doesDamage = false;
+                                for(NegativeEffects bad: NegativeEffects.values()){
+                                    if (potionEffect.getType().getName().equalsIgnoreCase(bad.name())) {
+                                        isBad = true;
+                                        if (bad.name().equals("HARM")) {
+                                            doesDamage = true;
+                                        }
+                                    }
                                 }
-                            } else {
-                                if (!potions.get(potionName).applyToEnemies()) {
-                                    event.setIntensity(p,0.0);
-                                } else if (doesDamage) {
-                                    Main.customDamageCause.put(p,new CTFDamage(player, CTFDamageCause.ALCHEMIST_DAMAGE_POT));
+                                if (isBad) {
+                                    if (Main.CTFPlayers.get(p).getTeam() != player.getTeam()) {
+                                        if (doesDamage) {
+                                            Main.customDamageCause.put(p,new CTFDamage(player,CTFDamageCause.ALCHEMIST_DAMAGE_POT));
+                                        }
+                                        p.addPotionEffect(potionEffect);
+                                    }
+                                } else {
+                                    if (Main.CTFPlayers.get(p).getTeam() == player.getTeam()) {
+                                        p.addPotionEffect(potionEffect);
+                                    }
                                 }
                             }
                         }
                     }
                 }
-
-
             }
+        }
+    }
+
+    @EventHandler
+    public void onAreaEffectCloudApply(AreaEffectCloudApplyEvent event) {
+        if (event.getEntity().hasMetadata("playerSent") && event.getEntity().getMetadata("playerSent").get(0).asString().equals(player.getPlayer().getName())) {
+            if (event.getEntity().hasMetadata("potionName")) {
+                String potionName = event.getEntity().getMetadata("potionName").get(0).asString();
+                if (potions.containsKey(potionName)) {
+
+                    event.setCancelled(true);
+
+                    for (LivingEntity e : event.getAffectedEntities()) {
+                        if (e instanceof Player p) {
+                            if (Main.CTFPlayers.containsKey(p)) {
+                                for (PotionEffect potionEffect : event.getEntity().getCustomEffects()) {
+                                    boolean isBad = false;
+                                    boolean doesDamage = false;
+                                    for(NegativeEffects bad: NegativeEffects.values()){
+                                        if (potionEffect.getType().getName().equalsIgnoreCase(bad.name())) {
+                                            isBad = true;
+                                            if (bad.name().equals("HARM")) {
+                                                doesDamage = true;
+                                            }
+                                        }
+                                    }
+                                    if (isBad) {
+                                        if (Main.CTFPlayers.get(p).getTeam() != player.getTeam()) {
+                                            if (doesDamage) {
+                                                Main.customDamageCause.put(p,new CTFDamage(player,CTFDamageCause.ALCHEMIST_DAMAGE_POT));
+                                            }
+                                            p.addPotionEffect(potionEffect);
+                                        }
+                                    } else {
+                                        if (Main.CTFPlayers.get(p).getTeam() == player.getTeam() && !Main.CTFPlayers.get(p).isCarringFlag()) {
+                                            p.addPotionEffect(potionEffect);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onLingeringPotionSplash(LingeringPotionSplashEvent event) {
+        if (event.getEntity().getShooter() != player.getPlayer()) return;
+
+        if (event.getEntity().hasMetadata("potionName")) {
+            AreaEffectCloud effectCloud = event.getAreaEffectCloud();
+            effectCloud.setMetadata("playerSent", new FixedMetadataValue(plugin,player.getPlayer().getName()));
+            effectCloud.setMetadata("potionName", new FixedMetadataValue(plugin,event.getEntity().getMetadata("potionName").get(0).asString()));
+//            effectCloud.setMetadata("ctfTeam", new FixedMetadataValue(plugin,player.getTeam().getId()));
         }
     }
 
@@ -106,6 +173,8 @@ public class Alchemist extends CTFClass implements Listener {
     public void onProjectileLaunch(ProjectileLaunchEvent event) {
         if (event.getEntity().getShooter() != player.getPlayer()) return;
         if (event.getEntity() instanceof ThrownPotion thrownPotion) {
+            thrownPotion.setVelocity(thrownPotion.getVelocity().subtract(player.getPlayer().getVelocity()));
+            thrownPotion.setVelocity(thrownPotion.getVelocity().multiply(1.5));
             ItemMeta meta = thrownPotion.getItem().getItemMeta();
             if (meta != null && potions.containsKey(meta.getPersistentDataContainer().get(new NamespacedKey(plugin,"ctfname"),  PersistentDataType.STRING))) {
                 event.setCancelled(true);

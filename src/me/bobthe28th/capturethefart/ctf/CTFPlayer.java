@@ -104,7 +104,7 @@ public class CTFPlayer implements Listener {
 
         cooldownTask = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
             int slot = player.getInventory().getHeldItemSlot();
-            if (getItem(slot) != null) {
+            if (getItem(slot) != null && player.getGameMode() != GameMode.SPECTATOR) {
                 getItem(slot).displayCooldowns();
             } else {
                 Objects.requireNonNull(player.getPlayer()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
@@ -226,7 +226,7 @@ public class CTFPlayer implements Listener {
 
     public void captureFlag() {
         carriedFlag.capture(this);
-        removeGlow("flag"); //TODO announce in chat
+        removeGlow("flag");
         carriedFlag = null;
         flagOnHead.remove();
     }
@@ -259,25 +259,27 @@ public class CTFPlayer implements Listener {
     }
 
     public void respawn() {
-        player.teleport(team.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN); //TODO not teleporting? make player stop spectating other player
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                player.setGameMode(GameMode.SURVIVAL);
-                player.teleport(team.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
-                player.setHealth(20.0);
-                player.setFreezeTicks(0);
-                for (PotionEffect pEffect : player.getActivePotionEffects()) {
-                    player.removePotionEffect(pEffect.getType());
-                }
-                if (pClass != null) {
-                    pClass.givePassives();
-                }
-                isAlive = true;
-                Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,team);
-                player.sendTitle(" "," ",0,0,0);
-            }
-        }.runTaskLater(plugin,1L);
+        isAlive = true;
+        player.setGameMode(GameMode.SURVIVAL);
+        player.setFireTicks(0);
+        player.setHealth(20.0);
+        player.setFreezeTicks(0);
+        player.setArrowsInBody(0);
+        if (team != null) {
+            player.teleport(team.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+            Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,team);
+        }
+        for (PotionEffect pEffect : player.getActivePotionEffects()) {
+            player.removePotionEffect(pEffect.getType());
+        }
+        if (pClass != null) {
+            pClass.givePassives();
+        }
+
+        player.sendTitle(" "," ",0,0,0);
+
+        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,80,255,true,false,true));
+
     }
 
     public void startRespawnCooldown() {
@@ -702,31 +704,35 @@ public class CTFPlayer implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onEntityDamage(EntityDamageEvent event) {
-        if (event.getEntity() instanceof Player pf) {
-            if (pf == player) {
-                healCooldown = 7.0;
-                if (!onHealCooldown) {
-                    startHealCooldown();
+        if (!event.isCancelled()) {
+            if (event.getEntity() instanceof Player pf) {
+                if (pf == player) {
+                    healCooldown = 7.0;
+                    if (!onHealCooldown) {
+                        startHealCooldown();
+                    }
                 }
             }
-        }
-        if (event.getEntity() instanceof LivingEntity lEntity) {
-            if (lEntity != enemy) return;
-            updateEnemyHealth(Math.max(0.0,(lEntity.getHealth() - event.getFinalDamage()) / Objects.requireNonNull(lEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
+            if (event.getEntity() instanceof LivingEntity lEntity) {
+                if (lEntity != enemy) return;
+                updateEnemyHealth(Math.min(1.0,Math.max(0.0, (lEntity.getHealth() - event.getFinalDamage()) / Objects.requireNonNull(lEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue())));
+            }
         }
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        if (event.getDamager() instanceof Player pDamager && event.getEntity() instanceof LivingEntity lEntity) {
-            if (pDamager != player) return;
+        if (!event.isCancelled()) {
+            if (event.getDamager() instanceof Player pDamager && event.getEntity() instanceof LivingEntity lEntity) {
+                if (pDamager != player) return;
 
-            if (lEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH) != null) {
-                enemy = lEntity;
-                setEnemyHealthCooldown();
-                updateEnemyHealth(Math.max(0.0,(lEntity.getHealth() - event.getFinalDamage()) / Objects.requireNonNull(lEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
+                if (lEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH) != null) {
+                    enemy = lEntity;
+                    setEnemyHealthCooldown();
+                    updateEnemyHealth(Math.min(1.0,Math.max(0.0, (lEntity.getHealth() - event.getFinalDamage()) / Objects.requireNonNull(lEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue())));
+                }
             }
         }
     }
@@ -770,15 +776,15 @@ public class CTFPlayer implements Listener {
         }
     }
 
-    @EventHandler
-    public void onEntityToggleGlide(EntityToggleGlideEvent event) {
-        if (event.getEntity() instanceof Player pf) {
-            if (pf != player) return;
-            if (pf.getLocation().add(new Vector(0.0,-0.5,0.0)).getBlock().getType().isAir() || pf.getVelocity().getY() > 0.1) {
-                event.setCancelled(true);
-            }
-        }
-    }
+//    @EventHandler
+//    public void onEntityToggleGlide(EntityToggleGlideEvent event) {
+//        if (event.getEntity() instanceof Player pf) {
+//            if (pf != player) return;
+//            if (pf.getLocation().add(new Vector(0.0,-0.5,0.0)).getBlock().getType().isAir() || pf.getVelocity().getY() > 0.1) {
+//                event.setCancelled(true);
+//            }
+//        }
+//    }
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {

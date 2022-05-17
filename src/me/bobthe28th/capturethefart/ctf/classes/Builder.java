@@ -3,16 +3,18 @@ package me.bobthe28th.capturethefart.ctf.classes;
 import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFClass;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
-import me.bobthe28th.capturethefart.ctf.items.builder.BuiAxe;
-import me.bobthe28th.capturethefart.ctf.items.builder.BuiRod;
-import me.bobthe28th.capturethefart.ctf.items.builder.BuiShears;
-import me.bobthe28th.capturethefart.ctf.items.builder.BuiWool;
+import me.bobthe28th.capturethefart.ctf.items.builder.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.FishHook;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.player.PlayerFishEvent;
 
 public class Builder extends CTFClass implements Listener {
 
@@ -42,10 +44,11 @@ public class Builder extends CTFClass implements Listener {
     public void giveItems() {
         player.removeItems();
         player.giveItem(new BuiAxe(player,plugin,0));
-        player.giveItem(new BuiRod(player,plugin,2));
-        player.giveItem(new BuiShears(player,plugin,3));
+        player.giveItem(new BuiRod(player,plugin,3));
+        player.giveItem(new BuiShears(player,plugin,4));
         wool = new BuiWool(player,plugin,1);
         player.giveItem(wool);
+        player.giveItem(new BuiPlan(player,plugin,2,wool));
     }
 
     @Override
@@ -55,4 +58,27 @@ public class Builder extends CTFClass implements Listener {
             wool.add(1);
         }
     }
+
+    @EventHandler
+    public void onPlayerFish(PlayerFishEvent event) {
+        if (event.getPlayer() != player.getPlayer()) return;
+        event.setExpToDrop(0);
+        if (event.getState() == PlayerFishEvent.State.CAUGHT_ENTITY && event.getCaught() != null) {
+            if (event.getCaught() instanceof Player p && Main.CTFPlayers.containsKey(p) && Main.CTFPlayers.get(p).getTeam() != player.getTeam()) {
+                event.getCaught().setVelocity(player.getPlayer().getLocation().toVector().subtract(event.getCaught().getLocation().toVector()).multiply(0.2));
+                event.getHook().remove();
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onProjectileLaunch(ProjectileLaunchEvent event) {
+        if (event.getEntity().getShooter() != player.getPlayer()) return;
+
+        if (event.getEntity() instanceof FishHook) {
+            event.getEntity().setVelocity(event.getEntity().getVelocity().multiply(2));
+        }
+    }
+
 }

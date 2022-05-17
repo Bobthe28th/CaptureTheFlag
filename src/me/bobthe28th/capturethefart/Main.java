@@ -154,6 +154,12 @@ public class Main extends JavaPlugin implements Listener {
 
     }
 
+    @Override
+    public void onDisable() {
+        gameController.removeBreakableBlocks();
+        gameController.resetFlags();
+    }
+
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
@@ -166,7 +172,7 @@ public class Main extends JavaPlugin implements Listener {
     public void onEntityChangeBlock(EntityChangeBlockEvent event) {
         Location loc = event.getEntity().getLocation();
         if (event.getEntityType() == EntityType.FALLING_BLOCK && event.getTo() == Material.SNOW_BLOCK) {
-            for (Entity entity : Objects.requireNonNull(loc.getWorld()).getNearbyEntities(loc,1,1,1)) {
+            for (Entity entity : Objects.requireNonNull(loc.getWorld()).getNearbyEntities(loc,2,2,2)) {
                 if (entity.getType() == EntityType.PLAYER) {
                     Player pd = (Player)entity;
                     FallingBlock f = (FallingBlock)event.getEntity();
@@ -221,6 +227,13 @@ public class Main extends JavaPlugin implements Listener {
     @EventHandler
     public void onBlockFadeEvent(BlockFadeEvent event) {
         if (event.getBlock().getType() == Material.FROSTED_ICE) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onEntityCombust(EntityCombustEvent event){
+        if(event.getEntity() instanceof Phantom){
             event.setCancelled(true);
         }
     }
@@ -284,7 +297,7 @@ public class Main extends JavaPlugin implements Listener {
                                 paladin.returnHammer();
                             }
                             for (Entity e : projectile.getWorld().getNearbyEntities(projectile.getLocation(), 4, 4, 4)) {
-                                if (e instanceof Player pl && projectile.getLocation().distance(pl.getLocation()) <= 4 && CTFPlayers.containsKey(pl)) {
+                                if (e instanceof Player pl && projectile.getLocation().distance(pl.getLocation()) <= 4 && CTFPlayers.containsKey(pl) && pl.hasLineOfSight(projectile)) {
                                     if (CTFPlayers.get(pl).getTeam() != CTFshooter.getTeam()) {
                                         customDamageCause.put(pl, new CTFDamage(CTFshooter, CTFDamageCause.PALADIN_HAMMER_THROW));
                                         pl.damage(3.0, shooter);
@@ -320,6 +333,7 @@ public class Main extends JavaPlugin implements Listener {
                         break;
                     case "bombarrow":
                         if (hitPlayer != null) {
+                            customDamageCause.put(hitPlayer, new CTFDamage(CTFshooter, CTFDamageCause.DEMO_ARROW));
                             loc = hitPlayer.getLocation();
                         } else if (event.getHitBlock() != null && event.getHitBlockFace() != null) {
                             loc = event.getHitBlock().getRelative(event.getHitBlockFace()).getLocation().add(new Vector(0.5,0.0,0.5));
@@ -333,6 +347,7 @@ public class Main extends JavaPlugin implements Listener {
                         tnt.setMetadata("tntType", new FixedMetadataValue(this, "demoarrow"));
                         tnt.setFuseTicks(0);
                         projectile.remove();
+                        event.setCancelled(true);
                         break;
                     case "fireball":
                         if (event.getHitEntity() != null) {
@@ -389,7 +404,7 @@ public class Main extends JavaPlugin implements Listener {
                             if (CTFshooter != null) {
                                 customDamageCause.put(hitPlayer,new CTFDamage(CTFshooter,CTFDamageCause.WIZARD_SHULKER));
                             }
-                            hitPlayer.damage(3.0,shooter);
+                            hitPlayer.damage(5.0,shooter);
                         }
                         projectile.remove();
                         break;
@@ -407,6 +422,8 @@ public class Main extends JavaPlugin implements Listener {
         if (gameController.getSelectingTeam()) {
             event.setCancelled(true);
         }
+
+        //TODO double kill
 
         //Disable fall
         if (event.getEntity() instanceof Player && disableFall.contains((Player)event.getEntity())) {
@@ -455,7 +472,7 @@ public class Main extends JavaPlugin implements Listener {
                                             if (dCause != null) {
                                                 customDamageCause.put(recipient, new CTFDamage(CTFPlayers.get(damager), dCause));
                                             }
-                                            event.setDamage(event.getDamage() / 5.0);
+                                            event.setDamage(event.getDamage() / 8.0);
                                         } else {
                                             event.setCancelled(true);
                                             return;
@@ -464,13 +481,13 @@ public class Main extends JavaPlugin implements Listener {
                                         if (dCause != null) {
                                             customDamageCause.put(recipient, new CTFDamage(CTFPlayers.get(damager), dCause));
                                         }
-                                        event.setDamage(event.getDamage() / 2.0);
+                                        event.setDamage(event.getDamage() / (tntType.equals("demoarrow") ? 10.0 : 7.0));
                                     }
                                 } else if (CTFPlayers.containsKey(damager)) {
                                     if (dCause != null) {
                                         customDamageCause.put(recipient, new CTFDamage(CTFPlayers.get(damager), dCause));
                                     }
-                                    event.setDamage(event.getDamage() / 2.0);
+                                    event.setDamage(event.getDamage() / (tntType.equals("demoarrow") ? 10.0 : 7.0));
                                 }
                             }
                         }
@@ -479,14 +496,24 @@ public class Main extends JavaPlugin implements Listener {
                     if (event.getCause() == DamageCause.FALL && damageByEntityEvent.getDamager() instanceof EnderPearl) {
                         event.setDamage(2);
                     }
+                }
 
-                    //Update damager enemy
-                    if (!event.isCancelled() && customDamageCause.containsKey(recipient) && customDamageCause.get(recipient).getDamager().getPlayer() != recipient) {
-                        CTFPlayer customDamager = customDamageCause.get(recipient).getDamager();
-                        customDamager.setEnemy(recipient);
-                        customDamager.updateEnemyHealth(Math.max(0.0, (recipient.getHealth() - event.getFinalDamage()) / Objects.requireNonNull(recipient.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
-                        customDamager.setEnemyHealthCooldown();
+                //Update damager enemy
+                if (!event.isCancelled() && customDamageCause.containsKey(recipient) && customDamageCause.get(recipient).getDamager().getPlayer() != recipient) {
+                    CTFPlayer customDamager = customDamageCause.get(recipient).getDamager();
+                    customDamager.setEnemy(recipient);
+                    customDamager.updateEnemyHealth(Math.max(0.0, (recipient.getHealth() - event.getFinalDamage()) / Objects.requireNonNull(recipient.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
+                    customDamager.setEnemyHealthCooldown();
+                }
+
+                if (customDamageCause.containsKey(recipient) && !customDamageCause.get(recipient).getCause().doesKnockback()) {
+                    event.setCancelled(true);
+                    if (recipient.getAbsorptionAmount() > 0) {
+                        recipient.setAbsorptionAmount(Math.max(0.0, recipient.getAbsorptionAmount() - event.getDamage()));
+                    } else {
+                        recipient.setHealth(Math.max(0.0, recipient.getHealth() - event.getFinalDamage()));
                     }
+                    recipient.playEffect(EntityEffect.HURT);
                 }
 
                 //If died
@@ -498,7 +525,8 @@ public class Main extends JavaPlugin implements Listener {
                         CTFrecipient.death(byEntity);
                     }
                     event.setCancelled(true); // dont dieee
-                    recipient.setHealth(0.1);
+                    recipient.setFireTicks(0);
+                    recipient.setHealth(20.0);
                     recipient.setGameMode(GameMode.SPECTATOR);
                     recipient.setFreezeTicks(0);
                     for (PotionEffect pEffect : recipient.getActivePotionEffects()) {
@@ -509,9 +537,13 @@ public class Main extends JavaPlugin implements Listener {
                     Entity damager = null;
                     CTFPlayer CTFdamager = null;
 
+
                     if (customDamageCause.containsKey(recipient)) {
                         damageType = customDamageCause.get(recipient).getCause().toString();
                         CTFdamager = customDamageCause.get(recipient).getDamager();
+                        CTFdamager.setEnemy(recipient);
+                        CTFdamager.updateEnemyHealth(0.0);
+                        CTFdamager.startEnemyHealthCooldown();
                         if (CTFrecipient != null) {
                             CTFdamager.kill(CTFrecipient);
                         }
@@ -519,7 +551,7 @@ public class Main extends JavaPlugin implements Listener {
                         damageType = event.getCause().toString();
                     }
 
-                    if (byEntity) {
+                    if (byEntity || CTFdamager != null) {
                         if (CTFdamager == null) {
                             damager = damageByEntityEvent.getDamager();
                             if (damager instanceof Player pdamager && CTFPlayers.containsKey(pdamager)) {
@@ -528,8 +560,11 @@ public class Main extends JavaPlugin implements Listener {
                                     if (pdamager.getInventory().getItemInMainHand().hasItemMeta() && pdamager.getInventory().getItemInMainHand().getItemMeta() != null && pdamager.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(this, "ctfmeleedamagecause"), PersistentDataType.STRING)) {
                                         String ctfmeleedamagecause = pdamager.getInventory().getItemInMainHand().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(this, "ctfmeleedamagecause"), PersistentDataType.STRING);
                                         if (ctfmeleedamagecause != null) {
-                                            CTFDamageCause.valueOf(ctfmeleedamagecause);
+//                                            CTFDamageCause.valueOf(ctfmeleedamagecause);
                                             damageType = ctfmeleedamagecause;
+                                            if (CTFrecipient != null) {
+                                                CTFdamager.kill(CTFrecipient);
+                                            }
                                         }
                                     }
                                 }
@@ -757,7 +792,7 @@ public class Main extends JavaPlugin implements Listener {
             }
 
             if (musicRunnable != null) musicRunnable.cancel();
-            musicRunnable = new BukkitRunnable() { //TODO error
+            musicRunnable = new BukkitRunnable() {
                 @Override
                 public void run() {
                     musicQueue.remove(0);

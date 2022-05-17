@@ -55,7 +55,7 @@ public class WizardWind extends CTFClass implements Listener {
 
         Player pE = event.getPlayer();
 
-        if(!pE.isSneaking()) {
+        if(!pE.isSneaking() && player.getPlayer().getGameMode() != GameMode.SPECTATOR) {
             if (pE.getVelocity().getY() <= 0) {
                 pE.setVelocity(pE.getVelocity().setY(0.0));
             }

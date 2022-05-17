@@ -4,7 +4,6 @@ import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -50,13 +49,14 @@ public abstract class CTFToolCooldownItem extends CTFItem {
     public void startCooldown() {
         cooldown = cooldownMax;
         player.getPlayer().getInventory().setItem(player.getItemSlot(this),getItem());
-        ItemStack item = player.getItemStack(this);
-        Damageable meta = (Damageable) item.getItemMeta();
+        ItemStack itemM = player.getItemStack(this);
+        Damageable meta = (Damageable) itemM.getItemMeta();
         if (meta != null) {
-            meta.setDamage(item.getType().getMaxDurability());
-            item.setItemMeta(meta);
+            meta.setDamage(itemM.getType().getMaxDurability());
+            itemM.setItemMeta(meta);
         }
         new BukkitRunnable() {
+            final ItemStack item = itemM;
             @Override
             public void run() {
                 cooldown -= 0.1;

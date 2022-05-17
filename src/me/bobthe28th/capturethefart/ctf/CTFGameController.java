@@ -4,10 +4,7 @@ import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.classes.TeamPreview;
 import me.bobthe28th.capturethefart.ctf.classes.WizardPreview;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -101,9 +98,21 @@ public class CTFGameController implements Listener {
 
     public void removeBreakableBlocks() {
         for (Block b : Main.breakableBlocks.keySet()) {
-            b.setType(Material.AIR);
-            Main.breakableBlocks.remove(b);
+            if (b != null) {
+                b.setType(Material.AIR);
+            }
         }
+        Main.breakableBlocks.clear();
+    }
+
+    public void resetFlags() {
+        for (CTFFlag flag : Main.CTFFlags) {
+            flag.setPos(flag.getHome());
+        }
+    }
+
+    public void gameEnd(CTFTeam winner) {
+        //TODO game end
     }
 
     public void updateScoreboard(CTFPlayer p, ScoreboardRow r) {
@@ -223,6 +232,7 @@ public class CTFGameController implements Listener {
                 addScoreboard(p);
             }
             p.getPlayer().setScoreboard(pScoreboard.get(p));
+            p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN,1,1);
         }
     }
 

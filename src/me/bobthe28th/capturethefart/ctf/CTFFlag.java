@@ -52,6 +52,14 @@ public class CTFFlag implements Listener {
                                             for (Player player : Bukkit.getOnlinePlayers()) {
                                                 player.sendTitle(" ", cp.getFormattedName() + " picked up the " + team.getFormattedName() + team.getChatColor() + "'s " + "Flag" + ChatColor.RESET, 10, 20, 5);
                                             }
+                                            Bukkit.broadcastMessage(cp.getFormattedName() + " picked up the " + team.getFormattedName() + team.getChatColor() + "'s " + "Flag" + ChatColor.RESET);
+                                            for (CTFPlayer takeFlagPlayers : Main.CTFPlayers.values()) {
+                                                if (takeFlagPlayers.getTeam() == team) {
+                                                    takeFlagPlayers.getPlayer().playSound(takeFlagPlayers.getPlayer(),Sound.ENTITY_WITHER_DEATH,1,1);
+                                                } else {
+                                                    takeFlagPlayers.getPlayer().playSound(takeFlagPlayers.getPlayer(),Sound.ENTITY_RAVAGER_CELEBRATE,1,1);
+                                                }
+                                            }
                                             p.setLevel(0);
                                             p.setExp(0.0F);
                                             pickUpTimer.remove(cp);
@@ -80,6 +88,14 @@ public class CTFFlag implements Listener {
 
                                                 for (Player player : Bukkit.getOnlinePlayers()) {
                                                     player.sendTitle(" ", cp.getFormattedName() + " returned the " + team.getFormattedName() + team.getChatColor() + "'s " + "Flag" + ChatColor.RESET, 10, 20, 5);
+                                                }
+                                                Bukkit.broadcastMessage(cp.getFormattedName() + " returned the " + team.getFormattedName() + team.getChatColor() + "'s " + "Flag" + ChatColor.RESET);
+                                                for (CTFPlayer returnFlagPlayers : Main.CTFPlayers.values()) {
+                                                    if (returnFlagPlayers.getTeam() == team) {
+                                                        returnFlagPlayers.getPlayer().playSound(returnFlagPlayers.getPlayer(),Sound.BLOCK_BEACON_POWER_SELECT,1,1);
+                                                    } else {
+                                                        returnFlagPlayers.getPlayer().playSound(returnFlagPlayers.getPlayer(),Sound.ENTITY_ELDER_GUARDIAN_CURSE,1,1);
+                                                    }
                                                 }
                                                 p.setLevel(0);
                                                 p.setExp(0.0F);
@@ -134,6 +150,10 @@ public class CTFFlag implements Listener {
         }, 0, 2);
     }
 
+    public Location getHome() {
+        return home;
+    }
+
     public CTFTeam getTeam() {
         return team;
     }
@@ -172,6 +192,10 @@ public class CTFFlag implements Listener {
         Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.FLAG,team);
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.sendTitle(" ", cp.getFormattedName() + " captured the " + team.getFormattedName() + team.getChatColor() + "'s " + "Flag" + ChatColor.RESET, 10, 20, 5);
+        }
+        Bukkit.broadcastMessage(cp.getFormattedName() + " captured the " + team.getFormattedName() + team.getChatColor() + "'s " + "Flag" + ChatColor.RESET);
+        for (CTFPlayer captureFlagPlayers : Main.CTFPlayers.values()) {
+            captureFlagPlayers.getPlayer().playSound(captureFlagPlayers.getPlayer(),Sound.ENTITY_ENDER_DRAGON_GROWL,1,1);
         }
     }
 

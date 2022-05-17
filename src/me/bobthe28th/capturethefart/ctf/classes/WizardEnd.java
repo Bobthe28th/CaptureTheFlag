@@ -40,7 +40,7 @@ public class WizardEnd extends CTFClass implements Listener {
     public void giveItems() {
         player.removeItems();
         player.giveItem(new WizStickEnd(player,plugin,0));
-//        player.giveItem(new WizBookEnd(player,plugin,1));
+        player.giveItem(new WizBookEnd(player,plugin,1));
     }
 
     @Override
@@ -58,27 +58,17 @@ public class WizardEnd extends CTFClass implements Listener {
         if (event.getCause() != PlayerTeleportEvent.TeleportCause.ENDER_PEARL) return;
         if (event.getTo() != null) {
 
-            double radius = 2.0;
-            for (Entity e : player.getPlayer().getWorld().getNearbyEntities(event.getTo(), radius, radius, radius)) {
-                if (e instanceof Player pe && Main.CTFPlayers.containsKey(pe) && Main.CTFPlayers.get(pe).getTeam() != player.getTeam()) {
-                    Main.customDamageCause.put(pe,new CTFDamage(player, CTFDamageCause.WIZARD_PEARL));
-                    pe.damage(4.0,player.getPlayer());
+            if (!player.isCarringFlag()) {
+                double radius = 2.0;
+                for (Entity e : player.getPlayer().getWorld().getNearbyEntities(event.getTo(), radius, radius, radius)) {
+                    if (e instanceof Player pe && Main.CTFPlayers.containsKey(pe) && Main.CTFPlayers.get(pe).getTeam() != player.getTeam()) {
+                        Main.customDamageCause.put(pe, new CTFDamage(player, CTFDamageCause.WIZARD_PEARL));
+                        pe.damage(6.0, player.getPlayer());
+                    }
                 }
+            } else {
+                event.setCancelled(true);
             }
-
-//            for (int i = 0; i < 3; i++) {
-//                Endermite endermite = player.getPlayer().getWorld().spawn(event.getTo(), Endermite.class);
-//                List<CTFPlayer> ctfPlayerList = new ArrayList<>(Main.CTFPlayers.values());
-//                Collections.shuffle(ctfPlayerList);
-//                for (CTFPlayer p : ctfPlayerList) {
-//                    if (p.getTeam() != player.getTeam() && event.getTo().distance(p.getPlayer().getLocation()) <= 10.0) {
-//                        Bukkit.broadcastMessage(p.getPlayer().getName());
-//                        endermite.setTarget(p.getPlayer());
-//
-//                        break;
-//                    }
-//                }
-//            }
         }
     }
 }

@@ -19,8 +19,8 @@ public class AssPotion extends CTFStackCooldownItem {
     public AssPotion(AssKnife knife_, CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
         super("Invisibility Potion", Material.POTION,0,"Invisibility Potion",20,Material.GLASS_BOTTLE,player_,plugin_,defaultSlot_);
         setPotionColor(PotionEffectType.INVISIBILITY.getColor());
-        addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,1200,0));
-        addPotionEffect(new PotionEffect(PotionEffectType.SPEED,1200,1));
+        addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,1200,0,false,true,true));
+        addPotionEffect(new PotionEffect(PotionEffectType.SPEED,1200,1,false,false,true));
         knife = knife_;
     }
 
@@ -30,7 +30,8 @@ public class AssPotion extends CTFStackCooldownItem {
             startAction();
             player.removeArmor();
             event.setCancelled(true);
-            player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,1200,0,true,true,true));
+            player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,1200,0,false,true,true));
+            player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED,1200,1,false,false,true));
             knife.setAttackState(true);
         }
     }

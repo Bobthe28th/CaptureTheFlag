@@ -9,6 +9,7 @@ import me.bobthe28th.capturethefart.ctf.itemtypes.CTFDoubleCooldownItem;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
@@ -23,7 +24,7 @@ import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 public class WizStickFire extends CTFDoubleCooldownItem {
 
     public WizStickFire(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("Fire Staff", Material.STICK, 3, "Solar Blast", 1.5, "Fire Ball", 12, player_, plugin_, defaultSlot_);
+        super("Fire Staff", Material.STICK, 3, "Solar Blast", 1.5, "Fire Ball", 10, player_, plugin_, defaultSlot_);
     }
 
     @Override
@@ -35,6 +36,7 @@ public class WizStickFire extends CTFDoubleCooldownItem {
             case LEFT_CLICK_BLOCK:
             case LEFT_CLICK_AIR:
                 if (getCooldown(0) == 0) {
+                    p.getWorld().playSound(p.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1.0F, 1.0F);
                     double coneHeight = 5.0;
                     double coneRadius = 3.0;
                     Vector shotP = p.getLocation().toVector().add(new Vector(0.0,1.0,0.0));
@@ -81,6 +83,7 @@ public class WizStickFire extends CTFDoubleCooldownItem {
             case RIGHT_CLICK_AIR:
                 if (getCooldown(1) == 0) {
                     startCooldown(1);
+                    p.getWorld().playSound(p.getLocation(), Sound.ENTITY_GHAST_SHOOT, 1.0F, 1.0F);
                     Fireball f = p.getWorld().spawn(p.getLocation().add(p.getLocation().getDirection().normalize().multiply(1.5)).add(new Vector(0.0, 1.0, 0.0)), Fireball.class);
                     f.setDirection(p.getLocation().getDirection().normalize());
                     f.setVelocity(p.getEyeLocation().getDirection().multiply(1.7));

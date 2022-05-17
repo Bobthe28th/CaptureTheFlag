@@ -33,6 +33,7 @@ public class AssKnife extends CTFItem {
         Action action = event.getAction();
         if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
             player.getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
+            player.getPlayer().removePotionEffect(PotionEffectType.SPEED);
         }
     }
 

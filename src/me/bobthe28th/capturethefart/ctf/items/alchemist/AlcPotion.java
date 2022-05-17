@@ -6,32 +6,25 @@ import me.bobthe28th.capturethefart.ctf.itemtypes.CTFStackCooldownItem;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
 
 public class AlcPotion extends CTFStackCooldownItem {
 
     Material type;
     Color potionColor;
     PotionEffect[] potionEffects;
-    boolean teammates;
-    boolean enemies;
 
-    public AlcPotion(CTFPlayer player_, Main plugin_, Integer defaultSlot_, String name_, Material type_, int cooldown_, Color potionColor_, PotionEffect[] potionEffects_, boolean teammates_, boolean enemies_) {
+    public AlcPotion(CTFPlayer player_, Main plugin_, Integer defaultSlot_, String name_, Material type_, int cooldown_, Color potionColor_, PotionEffect[] potionEffects_) {
         super(name_, type_,0,name_,cooldown_,Material.GLASS_BOTTLE,player_,plugin_,defaultSlot_);
         type = type_;
         potionColor = potionColor_;
         potionEffects = potionEffects_.clone();
-        teammates = teammates_;
-        enemies = enemies_;
 
         setPotionColor(potionColor);
         for (PotionEffect pE : potionEffects) {
@@ -39,12 +32,9 @@ public class AlcPotion extends CTFStackCooldownItem {
         }
     }
 
-    public boolean applyToTeammates() {
-        return teammates;
-    }
-
-    public boolean applyToEnemies() {
-        return enemies;
+    @Override
+    public void endCooldown() {
+        player.getPlayer().playSound(player.getPlayer(), Sound.BLOCK_BREWING_STAND_BREW,1,1);
     }
 
     @Override

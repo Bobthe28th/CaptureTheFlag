@@ -32,6 +32,7 @@ public class CTFTeam {
         t.setAllowFriendlyFire(false);
         t.setCanSeeFriendlyInvisibles(true);
         t.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.FOR_OTHER_TEAMS);
+        t.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.FOR_OWN_TEAM);
         team = t;
     }
 

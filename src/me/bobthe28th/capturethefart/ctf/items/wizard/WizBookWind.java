@@ -39,7 +39,7 @@ public class WizBookWind extends CTFDoubleCooldownItem {
                 break;
             case LEFT_CLICK_BLOCK:
             case LEFT_CLICK_AIR:
-                if (getCooldown(0) == 0) {
+                if (getCooldown(0) == 0 && !player.isCarringFlag()) {
                     Location l = p.getEyeLocation().add(p.getEyeLocation().clone().getDirection().normalize().multiply(2));
                     for (Entity entity : p.getWorld().getNearbyEntities(l,2.0,2.0,2.0)) {
                         if (entity.getType() == EntityType.PLAYER && entity != p) {

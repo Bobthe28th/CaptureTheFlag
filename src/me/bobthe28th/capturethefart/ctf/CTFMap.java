@@ -30,10 +30,10 @@ public class CTFMap {
 
     public void set() {
         for (CTFFlag f : Main.CTFFlags) {
-            f.setHome(flagLocations.get(f.getTeam()));
+            f.setHome(flagLocations.get(f.getTeam()).clone());
         }
         for (CTFTeam t : Main.CTFTeams) {
-            t.setSpawnLocation(spawnLocations.get(t));
+            t.setSpawnLocation(spawnLocations.get(t).clone());
         }
     }
 

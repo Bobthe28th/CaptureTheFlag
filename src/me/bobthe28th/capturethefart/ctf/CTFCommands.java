@@ -293,7 +293,6 @@ public class CTFCommands implements CommandExecutor {
                     }
 
                     if (cClass != null) {
-                        //TODO book
                         ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
                         BookMeta bookMeta = (BookMeta) book.getItemMeta();
                         if (bookMeta != null) {
@@ -334,9 +333,8 @@ public class CTFCommands implements CommandExecutor {
                 player.sendMessage(player.getAllowFlight() ? ChatColor.GREEN + "Flight Enabled" : ChatColor.RED + "Flight Disabled");
                 return true;
             case "heal":
-                player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue());
-                player.setFoodLevel(20);
-//                player.setSaturation(20.0F);
+//                player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue());
+//                player.setFoodLevel(20);
                 return true;
             case "music":
                 if (args.length > 0) {
