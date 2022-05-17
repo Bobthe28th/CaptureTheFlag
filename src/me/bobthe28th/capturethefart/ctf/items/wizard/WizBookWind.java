@@ -42,8 +42,7 @@ public class WizBookWind extends CTFDoubleCooldownItem {
                 if (getCooldown(0) == 0 && !player.isCarringFlag()) {
                     Location l = p.getEyeLocation().add(p.getEyeLocation().clone().getDirection().normalize().multiply(2));
                     for (Entity entity : p.getWorld().getNearbyEntities(l,2.0,2.0,2.0)) {
-                        if (entity.getType() == EntityType.PLAYER && entity != p) {
-                            Player pd = (Player)entity;
+                        if (entity instanceof Player pd && p != pd && Main.CTFPlayers.containsKey(pd) && Main.CTFPlayers.get(pd).getTeam() != player.getTeam()) {
                             pd.setVelocity(pd.getVelocity().add(p.getEyeLocation().getDirection().normalize().multiply(2)));
                         }
                     }

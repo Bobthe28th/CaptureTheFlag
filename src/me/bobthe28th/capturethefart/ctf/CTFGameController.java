@@ -181,6 +181,7 @@ public class CTFGameController implements Listener {
                 t.setAllowFriendlyFire(false);
                 t.setCanSeeFriendlyInvisibles(true);
                 t.setOption(Team.Option.NAME_TAG_VISIBILITY, team.getTeam().getOption(Team.Option.NAME_TAG_VISIBILITY));
+                t.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.FOR_OWN_TEAM);
                 for (String e : team.getTeam().getEntries()) {
                     t.addEntry(e);
                 }
@@ -236,6 +237,10 @@ public class CTFGameController implements Listener {
         }
     }
 
+    public Scoreboard getScoreboard(CTFPlayer p) {
+        return pScoreboard.get(p);
+    }
+
     public void start() {
         selectTeam();
     }
@@ -251,6 +256,9 @@ public class CTFGameController implements Listener {
             }
             p.teleport(teamStart);
             Main.CTFPlayers.put(p, new CTFPlayer(plugin, p));
+            if (Bukkit.getScoreboardManager() != null) {
+                p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+            }
             Main.fakeClass(p, new UUID(0,0),70, teamSelect[0].clone().add(0.0,3.0,0.0), 0F, 90F, TeamPreview.class,Main.CTFTeams[0],plugin);
             Main.fakeClass(p, new UUID(0,1),71, teamSelect[1].clone().add(0.0,3.0,0.0), 0F, 90F, TeamPreview.class,Main.CTFTeams[1],plugin);
         }

@@ -80,9 +80,7 @@ public class CTFPlayer implements Listener {
 
         isAlive = true;
         Main.gameController.addScoreboard(this);
-        if (Bukkit.getScoreboardManager() != null) {
-            player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
-        }
+        player.setScoreboard(Main.gameController.getScoreboard(this));
         player.setLevel(0);
         player.setExp(0.0F);
         player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getDefaultValue());
@@ -200,7 +198,7 @@ public class CTFPlayer implements Listener {
         }
 
         flag.getTeam().getTeam().addEntry(flagOnHead.getUniqueId().toString());
-        flagOnHead.setGlowing(true); //set to false to make flag not glow
+        flagOnHead.setGlowing(true);
 
         player.addPassenger(flagOnHead);
 
@@ -262,11 +260,11 @@ public class CTFPlayer implements Listener {
         isAlive = true;
         player.setGameMode(GameMode.SURVIVAL);
         player.setFireTicks(0);
-        player.setHealth(20.0);
+        player.setHealth(0.0);
         player.setFreezeTicks(0);
         player.setArrowsInBody(0);
         if (team != null) {
-            player.teleport(team.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+//            player.teleport(team.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
             Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,team);
         }
         for (PotionEffect pEffect : player.getActivePotionEffects()) {
@@ -562,6 +560,32 @@ public class CTFPlayer implements Listener {
     }
 
     @EventHandler
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
+        if (event.getPlayer() != player) return;
+        isAlive = true;
+        player.setGameMode(GameMode.SURVIVAL);
+        player.setFireTicks(0);
+        player.setHealth(0.0);
+        player.setFreezeTicks(0);
+        player.setArrowsInBody(0);
+        if (team != null) {
+            Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,team);
+        }
+        for (PotionEffect pEffect : player.getActivePotionEffects()) {
+            player.removePotionEffect(pEffect.getType());
+        }
+        if (pClass != null) {
+            pClass.givePassives();
+        }
+        player.sendTitle(" "," ",0,0,0);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,80,255,true,false,true));
+        if (team != null) {
+            event.setRespawnLocation(team.getSpawnLocation());
+            Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,team);
+        }
+    }
+
+    @EventHandler
     public void onPlayerClick(PlayerInteractEvent event) {
         if (event.getPlayer() != player) return;
 
@@ -737,7 +761,7 @@ public class CTFPlayer implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onEntityRegainHealth(EntityRegainHealthEvent event) {
         if (event.getEntity() instanceof Player pf) {
             if (pf != player) return;

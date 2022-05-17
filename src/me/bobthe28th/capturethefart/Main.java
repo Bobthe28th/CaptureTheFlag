@@ -172,7 +172,7 @@ public class Main extends JavaPlugin implements Listener {
     public void onEntityChangeBlock(EntityChangeBlockEvent event) {
         Location loc = event.getEntity().getLocation();
         if (event.getEntityType() == EntityType.FALLING_BLOCK && event.getTo() == Material.SNOW_BLOCK) {
-            for (Entity entity : Objects.requireNonNull(loc.getWorld()).getNearbyEntities(loc,2,2,2)) {
+            for (Entity entity : Objects.requireNonNull(loc.getWorld()).getNearbyEntities(loc,1,2,1)) {
                 if (entity.getType() == EntityType.PLAYER) {
                     Player pd = (Player)entity;
                     FallingBlock f = (FallingBlock)event.getEntity();
@@ -186,7 +186,7 @@ public class Main extends JavaPlugin implements Listener {
                                     pd.damage(1.0,pS);
                                     pd.setNoDamageTicks(0);
                                 }
-                                pd.setFreezeTicks(pd.getFreezeTicks() + 80);
+                                pd.setFreezeTicks(Math.min(pd.getFreezeTicks() + 80,pd.getMaxFreezeTicks() + 100));
                             }
                         }
                     }
@@ -502,7 +502,7 @@ public class Main extends JavaPlugin implements Listener {
                 if (!event.isCancelled() && customDamageCause.containsKey(recipient) && customDamageCause.get(recipient).getDamager().getPlayer() != recipient) {
                     CTFPlayer customDamager = customDamageCause.get(recipient).getDamager();
                     customDamager.setEnemy(recipient);
-                    customDamager.updateEnemyHealth(Math.max(0.0, (recipient.getHealth() - event.getFinalDamage()) / Objects.requireNonNull(recipient.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
+                    customDamager.updateEnemyHealth(Math.min(1.0,Math.max(0.0, (recipient.getHealth() - event.getFinalDamage()) / Objects.requireNonNull(recipient.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue())));
                     customDamager.setEnemyHealthCooldown();
                 }
 
@@ -511,7 +511,7 @@ public class Main extends JavaPlugin implements Listener {
                     if (recipient.getAbsorptionAmount() > 0) {
                         recipient.setAbsorptionAmount(Math.max(0.0, recipient.getAbsorptionAmount() - event.getDamage()));
                     } else {
-                        recipient.setHealth(Math.max(0.0, recipient.getHealth() - event.getFinalDamage()));
+                        recipient.setHealth(Math.min(Math.max(0.0, recipient.getHealth() - event.getFinalDamage()),Objects.requireNonNull(recipient.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
                     }
                     recipient.playEffect(EntityEffect.HURT);
                 }

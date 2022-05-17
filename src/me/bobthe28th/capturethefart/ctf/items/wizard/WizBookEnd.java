@@ -9,7 +9,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.Random;
@@ -44,7 +43,7 @@ public class WizBookEnd extends CTFDoubleCooldownItem {
                         if (e instanceof Player pe && Main.CTFPlayers.containsKey(pe)) {
                             CTFPlayer cp = Main.CTFPlayers.get(pe);
                             if (cp.getTeam() != player.getTeam()) {
-                                boolean teleported = false;
+                                boolean teleported = false; //TODO only teleports one
                                 int iteration = 0;
                                 while (!teleported && iteration <= 100) {
                                     int x = rand.nextInt((outerRadius + innerRadius) * 2) - (outerRadius + innerRadius);

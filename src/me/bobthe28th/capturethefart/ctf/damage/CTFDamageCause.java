@@ -4,7 +4,7 @@ public enum CTFDamageCause {
     //Wizard
     WIZARD_ZAP(false),
     WIZARD_LIGHTNING(false),
-    WIZARD_SNOWBALL(false),
+    WIZARD_SNOWBALL(true),
     WIZARD_SNOW_CHUNK(false),
     WIZARD_SOLAR_BLAST(true),
     WIZARD_FIREBALL(true),

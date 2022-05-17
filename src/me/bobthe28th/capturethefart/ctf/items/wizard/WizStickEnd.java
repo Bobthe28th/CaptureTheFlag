@@ -33,7 +33,7 @@ public class WizStickEnd extends CTFDoubleCooldownItem {
                 if (getCooldown(0) == 0) {
                     Player target = (Player) Main.getLookedAtPlayer(p,5);
                     if (target != null) {
-                        if (Main.CTFPlayers.containsKey(target) && Main.CTFPlayers.get(target).getTeam() != player.getTeam()) {
+                        if (Main.CTFPlayers.containsKey(target) && Main.CTFPlayers.get(target).getTeam() != player.getTeam() && p.hasLineOfSight(target)) {
                             startCooldown(0);
                             ShulkerBullet Sbullet = p.launchProjectile(ShulkerBullet.class);
                             Sbullet.setGravity(false);
@@ -93,7 +93,7 @@ public class WizStickEnd extends CTFDoubleCooldownItem {
                                         if (!hitPlayers.contains(pHit)) {
                                             hitPlayers.add(pHit);
                                             Main.customDamageCause.put(pHit,new CTFDamage(player, CTFDamageCause.WIZARD_PHANTOM));
-                                            pHit.damage(10.0,player.getPlayer());
+                                            pHit.damage(8.0,player.getPlayer());
                                         }
                                     }
                                 }

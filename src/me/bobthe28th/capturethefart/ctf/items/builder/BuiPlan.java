@@ -16,7 +16,7 @@ public class BuiPlan extends CTFDoubleCooldownItem {
     BuiWool wool;
 
     public BuiPlan(CTFPlayer player_, Main plugin_, Integer defaultSlot_, BuiWool wool) {
-        super("Builder's Plans", Material.BOOK, 5, "Wall", 2, "Floor", 2, player_, plugin_, defaultSlot_);
+        super("Builder's Plans", Material.BOOK, 7, "Wall", 5, "Floor", 2, player_, plugin_, defaultSlot_);
         this.wool = wool;
     }
 
