@@ -10,18 +10,12 @@ import me.bobthe28th.capturethefart.ctf.items.wizard.WizStickEnd;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.entity.Endermite;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerTeleportEvent;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 public class WizardEnd extends CTFClass implements Listener {
 
@@ -32,7 +26,7 @@ public class WizardEnd extends CTFClass implements Listener {
         if (player_ != null) {
             Bukkit.getPluginManager().registerEvents(this, plugin);
         }
-        setArmor(new Material[]{Material.LEATHER,null,null});
+        setArmor(new Material[]{Material.LEATHER,Material.GOLDEN_LEGGINGS,Material.GOLDEN_BOOTS});
         setHelmetCustomModel(4);
     }
 
@@ -55,11 +49,10 @@ public class WizardEnd extends CTFClass implements Listener {
 
     @EventHandler
     public void onPlayerTeleport(PlayerTeleportEvent event) {
-        if (event.getCause() != PlayerTeleportEvent.TeleportCause.ENDER_PEARL) return;
-        if (event.getTo() != null) {
-
+        if (event.getPlayer() != player.getPlayer()) return;
+        if (event.getCause() == PlayerTeleportEvent.TeleportCause.ENDER_PEARL && event.getTo() != null) {
             if (!player.isCarringFlag()) {
-                double radius = 2.0;
+                double radius = 3.0;
                 for (Entity e : player.getPlayer().getWorld().getNearbyEntities(event.getTo(), radius, radius, radius)) {
                     if (e instanceof Player pe && Main.CTFPlayers.containsKey(pe) && Main.CTFPlayers.get(pe).getTeam() != player.getTeam()) {
                         Main.customDamageCause.put(pe, new CTFDamage(player, CTFDamageCause.WIZARD_PEARL));

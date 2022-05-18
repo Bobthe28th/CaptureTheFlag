@@ -2,17 +2,14 @@ package me.bobthe28th.capturethefart.ctf.items.archer;
 
 import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
-import me.bobthe28th.capturethefart.ctf.itemtypes.CTFBuildUpItem;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFStackCooldownItem;
 import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
 
 public class ArcPoisonArrow extends CTFStackCooldownItem {
 

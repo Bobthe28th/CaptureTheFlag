@@ -10,9 +10,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.scoreboard.*;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
@@ -251,10 +255,11 @@ public class CTFGameController implements Listener {
             team.setNameTagVisiblity(true);
         }
         for (Player p : Bukkit.getOnlinePlayers()) {
+            p.getInventory().clear();
             if (Main.CTFPlayers.containsKey(p)) {
                 Main.CTFPlayers.get(p).remove();
             }
-            p.teleport(teamStart);
+            p.teleport(teamStart, PlayerTeleportEvent.TeleportCause.PLUGIN);
             Main.CTFPlayers.put(p, new CTFPlayer(plugin, p));
             if (Bukkit.getScoreboardManager() != null) {
                 p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
@@ -435,7 +440,7 @@ public class CTFGameController implements Listener {
                 }
                 int index = Main.CTFClasses.length - 4;
                 Main.fakeClass(p.getPlayer(), new UUID(0, index), 70 + index, classSelect[p.getTeam().getId()][index], 0F, 90F,WizardPreview.class, p.getTeam(), plugin);
-                p.getPlayer().teleport(classStart[p.getTeam().getId()]);
+                p.getPlayer().teleport(classStart[p.getTeam().getId()], PlayerTeleportEvent.TeleportCause.PLUGIN);
             }
         }
     }

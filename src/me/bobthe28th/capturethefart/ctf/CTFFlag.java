@@ -234,7 +234,7 @@ public class CTFFlag implements Listener {
             }
         }
         if (blockToAdd != null) {
-            setPos(blockToAdd.add(new Vector(0.0,1.0,0.0)));
+            setPos(blockToAdd.add(new Vector(0.0,1.0,0.0))); //TODO glow or have some way to find
         }
     }
 }

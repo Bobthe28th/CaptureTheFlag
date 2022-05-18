@@ -9,6 +9,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.Vector;
 
 import java.util.Random;
@@ -16,7 +17,7 @@ import java.util.Random;
 public class WizBookEnd extends CTFDoubleCooldownItem {
 
     public WizBookEnd(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("End Tome", Material.BOOK, 4, "Ender Pearl", 15, "Scatter", 10, player_, plugin_, defaultSlot_);
+        super("End Tome", Material.BOOK, 4, "Ender Pearl", 20, "Scatter", 10, player_, plugin_, defaultSlot_);
     }
 
     @Override
@@ -40,10 +41,10 @@ public class WizBookEnd extends CTFDoubleCooldownItem {
                     int outerRadius = 7;
                     Random rand = new Random();
                     for (Entity e : p.getWorld().getNearbyEntities(p.getLocation(), innerRadius, innerRadius, innerRadius)) {
-                        if (e instanceof Player pe && Main.CTFPlayers.containsKey(pe)) {
+                        if (e instanceof Player pe && Main.CTFPlayers.containsKey(pe) && pe.getGameMode() != GameMode.SPECTATOR) {
                             CTFPlayer cp = Main.CTFPlayers.get(pe);
                             if (cp.getTeam() != player.getTeam()) {
-                                boolean teleported = false; //TODO only teleports one
+                                boolean teleported = false;
                                 int iteration = 0;
                                 while (!teleported && iteration <= 100) {
                                     int x = rand.nextInt((outerRadius + innerRadius) * 2) - (outerRadius + innerRadius);
@@ -53,13 +54,12 @@ public class WizBookEnd extends CTFDoubleCooldownItem {
                                             Location loc = new Location(p.getWorld(), x + p.getLocation().getBlockX(), y - outerRadius + p.getLocation().getBlockY(), z + p.getLocation().getBlockZ(), pe.getLocation().getYaw(), pe.getLocation().getPitch());
                                             if (!teleported && Main.gameController.getMap().getBoundingBox().contains(loc.toVector()) && loc.getBlock().getType().isSolid() && loc.clone().add(new Vector(0.0, 1.0, 0.0)).getBlock().getType().isAir() && loc.clone().add(new Vector(0.0, 2.0, 0.0)).getBlock().getType().isAir()) {
                                                 pe.getWorld().spawnParticle(Particle.PORTAL, pe.getLocation().add(new Vector(0.0, 1.0, 0.0)), 50, 0.1, 0.5, 0.1);
-                                                pe.teleport(loc.clone().add(new Vector(0.5, 1.0, 0.5)));
+                                                pe.teleport(loc.clone().add(new Vector(0.5, 1.0, 0.5)), PlayerTeleportEvent.TeleportCause.PLUGIN);
                                                 pe.getWorld().playSound(pe, Sound.ENTITY_ENDERMAN_TELEPORT, 1F, 1F);
                                                 teleported = true;
                                             }
                                         }
                                     }
-
                                     iteration++;
                                 }
                             }

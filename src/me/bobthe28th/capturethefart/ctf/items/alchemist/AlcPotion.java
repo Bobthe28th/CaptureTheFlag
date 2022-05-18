@@ -5,7 +5,6 @@ import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFStackCooldownItem;
 import org.bukkit.Color;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.inventory.ItemStack;

@@ -1,21 +1,19 @@
 package me.bobthe28th.capturethefart.ctf.items.wizard;
 
-import java.util.Objects;
-import java.util.Random;
-
+import me.bobthe28th.capturethefart.Main;
+import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFDoubleCooldownItem;
 import org.bukkit.*;
 import org.bukkit.Particle.DustTransition;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.Vector;
 
-import me.bobthe28th.capturethefart.Main;
-import me.bobthe28th.capturethefart.ctf.CTFPlayer;
+import java.util.Objects;
+import java.util.Random;
 
 public class WizBookWind extends CTFDoubleCooldownItem {
 

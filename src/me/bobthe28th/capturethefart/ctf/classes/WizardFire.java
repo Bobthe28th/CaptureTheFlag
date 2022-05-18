@@ -22,7 +22,7 @@ public class WizardFire extends CTFClass implements Listener {
         if (player_ != null) {
             Bukkit.getPluginManager().registerEvents(this, plugin);
         }
-        setArmor(new Material[]{Material.LEATHER,null,null});
+        setArmor(new Material[]{Material.LEATHER,Material.GOLDEN_LEGGINGS,Material.GOLDEN_BOOTS});
         setHelmetCustomModel(1);
     }
 

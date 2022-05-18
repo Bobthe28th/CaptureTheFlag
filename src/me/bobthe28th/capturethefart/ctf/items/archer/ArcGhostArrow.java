@@ -4,7 +4,6 @@ import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.damage.CTFDamage;
 import me.bobthe28th.capturethefart.ctf.damage.CTFDamageCause;
-import me.bobthe28th.capturethefart.ctf.itemtypes.CTFBuildUpItem;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFStackCooldownItem;
 import org.bukkit.*;
 import org.bukkit.entity.Arrow;
@@ -34,7 +33,7 @@ public class ArcGhostArrow extends CTFStackCooldownItem {
 
         new BukkitRunnable() {
             final Location loc = arrow.getLocation();
-            final Vector dir = player.getPlayer().getEyeLocation().getDirection().normalize().multiply(force);
+            final Vector dir = player.getPlayer().getEyeLocation().getDirection().normalize().multiply(force*2);
             int t = 0;
             public void run() {
                 if (t >= 200) {
@@ -46,7 +45,7 @@ public class ArcGhostArrow extends CTFStackCooldownItem {
                 }
 
                 if (loc.getWorld() != null) {
-                    double radius = 1.0;
+                    double radius = 2.0;
                     for (Entity e : loc.getWorld().getNearbyEntities(loc, radius, radius, radius)) {
                         if (e instanceof Player p) {
                             if (Main.CTFPlayers.containsKey(p)) {

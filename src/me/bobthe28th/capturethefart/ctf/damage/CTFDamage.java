@@ -1,7 +1,6 @@
 package me.bobthe28th.capturethefart.ctf.damage;
 
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
-import org.bukkit.entity.LivingEntity;
 
 public class CTFDamage {
 

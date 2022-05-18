@@ -1,8 +1,7 @@
 package me.bobthe28th.capturethefart.ctf.items.wizard;
 
-import java.util.Objects;
-import java.util.Random;
-
+import me.bobthe28th.capturethefart.Main;
+import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.damage.CTFDamage;
 import me.bobthe28th.capturethefart.ctf.damage.CTFDamageCause;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFDoubleCooldownItem;
@@ -18,8 +17,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
-import me.bobthe28th.capturethefart.Main;
-import me.bobthe28th.capturethefart.ctf.CTFPlayer;
+import java.util.Objects;
+import java.util.Random;
 
 public class WizStickFire extends CTFDoubleCooldownItem {
 
@@ -56,7 +55,8 @@ public class WizStickFire extends CTFDoubleCooldownItem {
                                     if (orthDist < cRad && cDist >= 0 && cDist <= coneHeight) {
                                         pN.setFireTicks(70);
                                         Main.customDamageCause.put(pN,new CTFDamage(player, CTFDamageCause.WIZARD_SOLAR_BLAST));
-                                        pN.damage(2,p);
+                                        pN.damage(4,p);
+                                        player.getPlayer().playSound(player.getPlayer(),Sound.ENTITY_EXPERIENCE_ORB_PICKUP,0.5F,0.5F);
                                     }
                                 }
                             }

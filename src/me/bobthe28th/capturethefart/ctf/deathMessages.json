@@ -23,8 +23,8 @@
     "ARCHER_POISON_ARROW": ["no death message"],
     "ARCHER_SONIC_ARROW": ["no death message"],
     "PALADIN_HAMMER": ["$1 got bonked by $2","$1 got smashed by $2","$1's head caved in by $2"],
-    "PALADIN_HAMMER_THROW": ["$1 got remote bonked by $2",""],
-    "ASSASSIN_KNIFE": ["$1 got stabbed by $2"],
+    "PALADIN_HAMMER_THROW": ["$1 got remote bonked by $2"],
+    "ASSASSIN_KNIFE": ["$1 got stabbed by $2","$1 got stabby wabbied by $2"],
     "ASSASSIN_KNIFE_STRONG": ["$1 got mega stabbed by $2","$1 got trick-stabbed by $2"]
   }
 }

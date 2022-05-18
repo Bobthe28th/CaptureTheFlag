@@ -120,10 +120,8 @@ public class WizBookFire extends CTFDoubleCooldownItem {
                     Location loc2 = p.getPlayer().getLocation().clone();
                     loc2.add(new Vector(Math.sin(angle) * ringSize,2 * ((double)(maxTime - t)/maxTime),Math.cos(angle) * ringSize));
 
-                    for (Player a : Bukkit.getOnlinePlayers()) {
-                        a.spawnParticle(Particle.FLAME,loc,0,0.0,0.0,0.0);
-                        a.spawnParticle(Particle.FLAME,loc2,0,0.0,0.0,0.0);
-                    }
+                    p.getPlayer().getWorld().spawnParticle(Particle.FLAME,loc,0,0.0,0.0,0.0);
+                    p.getPlayer().getWorld().spawnParticle(Particle.FLAME,loc2,0,0.0,0.0,0.0);
                     t++;
                 }
             }

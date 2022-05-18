@@ -19,6 +19,10 @@
     {
       "predicate": { "custom_model_data": 4 },
       "model": "wizard/endbook"
+    },
+    {
+      "predicate": { "custom_model_data": 5 },
+      "model": "builder/plans"
     }
   ]
 }

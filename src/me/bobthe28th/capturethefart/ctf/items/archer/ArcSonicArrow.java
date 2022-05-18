@@ -2,7 +2,6 @@ package me.bobthe28th.capturethefart.ctf.items.archer;
 
 import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
-import me.bobthe28th.capturethefart.ctf.itemtypes.CTFBuildUpItem;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFStackCooldownItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -60,10 +59,10 @@ public class ArcSonicArrow extends CTFStackCooldownItem {
         if (loc.getWorld() != null) {
             for (Entity e : loc.getWorld().getNearbyEntities(loc, radius, radius, radius)) {
                 if (e instanceof Player p) {
-                    if (p.getLocation().distance(loc) <= radius) {
+                    if (p.getLocation().distance(loc) <= radius) { //TODO found person sound
                         if (Main.CTFPlayers.containsKey(p)) {
                             if (Main.CTFPlayers.get(p).getTeam() != player.getTeam()) {
-                                Main.CTFPlayers.get(p).addGlow("sonic" + arrow.getUniqueId());
+                                Main.CTFPlayers.get(p).addGlow("sonic" + arrow.getUniqueId()); //TODO you are found sound
                             }
                             Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                                 final Player pg = p;

@@ -1,9 +1,5 @@
 package me.bobthe28th.capturethefart;
 
-import java.io.*;
-import java.lang.reflect.Constructor;
-import java.util.*;
-
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
@@ -14,7 +10,9 @@ import me.bobthe28th.capturethefart.ctf.*;
 import me.bobthe28th.capturethefart.ctf.classes.*;
 import me.bobthe28th.capturethefart.ctf.damage.CTFDamage;
 import me.bobthe28th.capturethefart.ctf.damage.CTFDamageCause;
-import net.md_5.bungee.api.chat.*;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -45,11 +43,15 @@ import org.bukkit.scoreboard.Team;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.util.*;
+
 
 public class Main extends JavaPlugin implements Listener {
 
     public static ArrayList<Integer> tornado = new ArrayList<>();
-    public static HashMap<Snowball, Integer> snowBallEffect = new HashMap<>();
     public static ArrayList<Player> disableFall = new ArrayList<>();
     public static HashMap<Block,CTFTeam> breakableBlocks = new HashMap<>();
     public static HashMap<Player, CTFDamage> customDamageCause = new HashMap<>();
@@ -172,7 +174,7 @@ public class Main extends JavaPlugin implements Listener {
     public void onEntityChangeBlock(EntityChangeBlockEvent event) {
         Location loc = event.getEntity().getLocation();
         if (event.getEntityType() == EntityType.FALLING_BLOCK && event.getTo() == Material.SNOW_BLOCK) {
-            for (Entity entity : Objects.requireNonNull(loc.getWorld()).getNearbyEntities(loc,1,2,1)) {
+            for (Entity entity : Objects.requireNonNull(loc.getWorld()).getNearbyEntities(loc,1.4,2,1.4)) {
                 if (entity.getType() == EntityType.PLAYER) {
                     Player pd = (Player)entity;
                     FallingBlock f = (FallingBlock)event.getEntity();
@@ -186,13 +188,13 @@ public class Main extends JavaPlugin implements Listener {
                                     pd.damage(1.0,pS);
                                     pd.setNoDamageTicks(0);
                                 }
-                                pd.setFreezeTicks(Math.min(pd.getFreezeTicks() + 80,pd.getMaxFreezeTicks() + 100));
+                                pd.setFreezeTicks(Math.min(pd.getFreezeTicks() + 80,pd.getMaxFreezeTicks() + 200));
                             }
                         }
                     }
                 }
             }
-            loc.getWorld().spawnParticle(Particle.SNOWFLAKE, loc, 50, 0.3, 0.3, 0.3, 0.2);
+            loc.getWorld().spawnParticle(Particle.SNOWFLAKE, loc, 20, 0.3, 0.3, 0.3, 0.2);
             event.setCancelled(true);
         }
     }
@@ -202,15 +204,12 @@ public class Main extends JavaPlugin implements Listener {
         Player player = event.getPlayer();
         if (((Entity) player).isOnGround()) {
             if (disableFall.contains(player)) {
-                Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
-                    if (player.getLastDamageCause() == null) {
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
                         disableFall.remove(player);
-                    } else {
-                        if (player.getLastDamageCause().getCause() != DamageCause.FALL) {
-                            disableFall.remove(player);
-                        }
                     }
-                }, 1L);
+                }.runTaskLater(this,1L);
             }
         }
     }
@@ -288,19 +287,19 @@ public class Main extends JavaPlugin implements Listener {
                     case "hammer":
                         Material particleM = (event.getHitBlock() != null) ? event.getHitBlock().getType() : Material.REDSTONE_BLOCK;
 
-                        for (Player particleP : Bukkit.getOnlinePlayers()) {
-                            particleP.spawnParticle(Particle.BLOCK_DUST, projectile.getLocation(), 40, 0.2, 0.2, 0.2, 1.0, particleM.createBlockData());
-                        }
+                        projectile.getWorld().spawnParticle(Particle.BLOCK_DUST, projectile.getLocation(), 40, 0.2, 0.2, 0.2, 1.0, particleM.createBlockData());
 
                         if (CTFshooter != null) {
                             if (CTFshooter.getpClass() instanceof Paladin paladin) {
                                 paladin.returnHammer();
                             }
-                            for (Entity e : projectile.getWorld().getNearbyEntities(projectile.getLocation(), 4, 4, 4)) {
+                            boolean didHitPlayer = false;
+                            for (Entity e : projectile.getWorld().getNearbyEntities(projectile.getLocation(), 3, 3, 3)) {
                                 if (e instanceof Player pl && projectile.getLocation().distance(pl.getLocation()) <= 4 && CTFPlayers.containsKey(pl) && pl.hasLineOfSight(projectile)) {
                                     if (CTFPlayers.get(pl).getTeam() != CTFshooter.getTeam()) {
                                         customDamageCause.put(pl, new CTFDamage(CTFshooter, CTFDamageCause.PALADIN_HAMMER_THROW));
                                         pl.damage(3.0, shooter);
+                                        didHitPlayer = true;
                                         pl.setVelocity(new Vector(0, pl.getVelocity().getY() + 0.05, 0));
                                         CTFPlayers.get(pl).setCanUse(false);
                                         pl.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 1, true, true, true));
@@ -316,6 +315,9 @@ public class Main extends JavaPlugin implements Listener {
                                     }
                                 }
                             }
+                            if (didHitPlayer) {
+                                shooter.playSound(shooter,Sound.ENTITY_EXPERIENCE_ORB_PICKUP,0.5F,0.5F);
+                            }
                         }
                         for (Entity e : projectile.getPassengers()) {
                             projectile.removePassenger(e);
@@ -328,6 +330,7 @@ public class Main extends JavaPlugin implements Listener {
                                 customDamageCause.put(hitPlayer, new CTFDamage(CTFshooter, CTFDamageCause.WIZARD_SNOWBALL));
                                 hitPlayer.damage(2.0, shooter);
                                 hitPlayer.setFreezeTicks(Math.min(hitPlayer.getFreezeTicks() + 50, hitPlayer.getMaxFreezeTicks() + 60));
+                                shooter.playSound(shooter,Sound.ENTITY_EXPERIENCE_ORB_PICKUP,0.5F,0.5F);
                             }
                         }
                         break;
@@ -380,14 +383,14 @@ public class Main extends JavaPlugin implements Listener {
                     case "smokebomb":
                         if (CTFshooter != null) {
                             double blindRadius = 4;
+                            shooter.getWorld().spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, projectile.getLocation(), 2000, 1.5, 1.5, 1.5, 0);
+                            shooter.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, projectile.getLocation(), 1000, 0.5, 0.5, 0.5, 0.1);
                             for (Player p : Bukkit.getOnlinePlayers()) {
-                                p.spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, projectile.getLocation(), 2000, 1.5, 1.5, 1.5, 0);
-                                p.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, projectile.getLocation(), 1000, 0.5, 0.5, 0.5, 0.1);
                                 if (CTFPlayers.containsKey(p)) {
                                     if (p.getLocation().distance(projectile.getLocation()) <= blindRadius) {
                                         if (CTFPlayers.get(p).getTeam() != CTFshooter.getTeam()) {
-                                            p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 60, 0, false, false, true));
-                                            p.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 60, 0, false, false, true));
+                                            p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 80, 0, false, false, true));
+                                            p.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 80, 0, false, false, true));
                                         } else {
                                             p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 120, 1, false, false, true));
                                         }
@@ -405,6 +408,7 @@ public class Main extends JavaPlugin implements Listener {
                                 customDamageCause.put(hitPlayer,new CTFDamage(CTFshooter,CTFDamageCause.WIZARD_SHULKER));
                             }
                             hitPlayer.damage(5.0,shooter);
+                            shooter.playSound(shooter,Sound.ENTITY_EXPERIENCE_ORB_PICKUP,0.5F,0.5F);
                         }
                         projectile.remove();
                         break;
@@ -514,6 +518,9 @@ public class Main extends JavaPlugin implements Listener {
                         recipient.setHealth(Math.min(Math.max(0.0, recipient.getHealth() - event.getFinalDamage()),Objects.requireNonNull(recipient.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
                     }
                     recipient.playEffect(EntityEffect.HURT);
+                    if (CTFPlayers.containsKey(recipient)) {
+                        CTFPlayers.get(recipient).startHealCooldown();
+                    }
                 }
 
                 //If died
@@ -541,9 +548,6 @@ public class Main extends JavaPlugin implements Listener {
                     if (customDamageCause.containsKey(recipient)) {
                         damageType = customDamageCause.get(recipient).getCause().toString();
                         CTFdamager = customDamageCause.get(recipient).getDamager();
-                        CTFdamager.setEnemy(recipient);
-                        CTFdamager.updateEnemyHealth(0.0);
-                        CTFdamager.startEnemyHealthCooldown();
                         if (CTFrecipient != null) {
                             CTFdamager.kill(CTFrecipient);
                         }
@@ -570,6 +574,13 @@ public class Main extends JavaPlugin implements Listener {
                                 }
                             }
                         }
+
+                        if (CTFdamager != null) {
+                            CTFdamager.setEnemy(recipient);
+                            CTFdamager.updateEnemyHealth(0.0);
+                            CTFdamager.startEnemyHealthCooldown();
+                        }
+
                         Bukkit.broadcastMessage(deathMessages.getMessage(true, damageType).replace("$1", (CTFrecipient != null ? CTFrecipient.getTeam().getChatColor() : ChatColor.RED) + recipient.getName() + ChatColor.RESET).replace("$2", (CTFdamager != null ? CTFdamager.getTeam().getChatColor() + CTFdamager.getPlayer().getName() : ChatColor.BLUE + damager.getName()) + ChatColor.RESET));
                     } else {
                         Bukkit.broadcastMessage(deathMessages.getMessage(false, damageType).replace("$1", (CTFrecipient != null ? CTFrecipient.getTeam().getChatColor() : ChatColor.RED) + recipient.getName() + ChatColor.RESET));
@@ -580,13 +591,31 @@ public class Main extends JavaPlugin implements Listener {
             }
         }
     }
-    public static Entity getLookedAtPlayer(Player player, double threshold) {
-        Entity target = null;
-        for (Entity other : Objects.requireNonNull(player.getPlayer()).getWorld().getPlayers()) {
-            final Vector n = other.getLocation().toVector().subtract(player.getPlayer().getLocation().toVector());
-            if (player.getPlayer().getLocation().getDirection().normalize().crossProduct(n).lengthSquared() < threshold && n.normalize().dot(player.getPlayer().getLocation().getDirection().normalize()) >= 0) {
-                if (target == null || target.getLocation().distanceSquared(player.getPlayer().getLocation()) > other.getLocation().distanceSquared(player.getPlayer().getLocation())) {
-                    target = other;
+
+//    public static Player getLookedAtPlayer(Player player, double threshold) {
+//        Player target = null;
+//        for (Player other : Objects.requireNonNull(player.getPlayer()).getWorld().getPlayers()) {
+//            if (other.getGameMode() != GameMode.SPECTATOR) {
+//                final Vector n = other.getLocation().toVector().subtract(player.getPlayer().getLocation().toVector());
+//                if (player.getPlayer().getLocation().getDirection().normalize().crossProduct(n).lengthSquared() < threshold && n.normalize().dot(player.getPlayer().getLocation().getDirection().normalize()) >= 0) {
+//                    if (target == null || target.getLocation().distanceSquared(player.getPlayer().getLocation()) > other.getLocation().distanceSquared(player.getPlayer().getLocation())) {
+//                        target = other;
+//                    }
+//                }
+//            }
+//        }
+//        return target;
+//    }
+
+    public static CTFPlayer getLookedAtCTFPlayer(CTFPlayer player, double threshold) {
+        CTFPlayer target = null;
+        for (Player other : Objects.requireNonNull(player.getPlayer()).getWorld().getPlayers()) {
+            if (other.getGameMode() != GameMode.SPECTATOR && CTFPlayers.containsKey(other) && CTFPlayers.get(other).getTeam() != player.getTeam()) {
+                final Vector n = other.getLocation().toVector().subtract(player.getPlayer().getLocation().toVector());
+                if (player.getPlayer().getLocation().getDirection().normalize().crossProduct(n).lengthSquared() < threshold && n.normalize().dot(player.getPlayer().getLocation().getDirection().normalize()) >= 0) {
+                    if (target == null || target.getPlayer().getLocation().distanceSquared(player.getPlayer().getLocation()) > other.getLocation().distanceSquared(player.getPlayer().getLocation())) {
+                        target = CTFPlayers.get(other);
+                    }
                 }
             }
         }

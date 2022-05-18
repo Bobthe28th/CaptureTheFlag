@@ -1,29 +1,28 @@
 package me.bobthe28th.capturethefart.ctf.items.wizard;
 
+import me.bobthe28th.capturethefart.Main;
+import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFDoubleCooldownItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import me.bobthe28th.capturethefart.Main;
-import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 
 import java.util.Objects;
 
 public class WizStickIce extends CTFDoubleCooldownItem {
 
     public WizStickIce(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("Snow Staff",Material.STICK, 2,"Snowball", 0.5,"Snow Chunk", 18, player_,plugin_, defaultSlot_);
+        super("Snow Staff",Material.STICK, 2,"Snowball", 0.5,"Snow Chunk", 8, player_,plugin_, defaultSlot_);
     }
 
     @Override
@@ -40,19 +39,19 @@ public class WizStickIce extends CTFDoubleCooldownItem {
                     ball.setVelocity(p.getLocation().getDirection().multiply(1.8));
                     ball.setMetadata("ctfProjectile",new FixedMetadataValue(plugin,true));
                     ball.setMetadata("ctfProjectileType",new FixedMetadataValue(plugin,"snowball"));
-                    if (Main.snowBallEffect.get(ball) == null) {
-                        Main.snowBallEffect.put(ball, Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-                            final Snowball s = ball;
-                            public void run() {
-                                if (!s.isDead()) {
-                                    Location l = s.getLocation();
-                                    Objects.requireNonNull(l.getWorld()).spawnParticle(Particle.SNOWFLAKE, l, 1, 0.0, 0.0, 0.0, 0.05);
-                                } else {
-                                    Bukkit.getScheduler().cancelTask(Main.snowBallEffect.get(s));
-                                }
+
+                    new BukkitRunnable() {
+                        final Snowball s = ball;
+                        @Override
+                        public void run() {
+                            if (!s.isDead()) {
+                                Location l = s.getLocation();
+                                Objects.requireNonNull(l.getWorld()).spawnParticle(Particle.SNOWFLAKE, l, 1, 0.0, 0.0, 0.0, 0.05);
+                            } else {
+                                this.cancel();
                             }
-                        }, 0, 1));
-                    }
+                        }
+                    }.runTaskTimer(plugin,0,1L);
                     startCooldown(0);
                 }
                 break;
@@ -62,10 +61,10 @@ public class WizStickIce extends CTFDoubleCooldownItem {
                     Block b = p.getTargetBlock(null, 20);
                     Location loc = b.getLocation().add(new Vector(0.5, 1.0, 0.5));
 
-                    Entity target = Main.getLookedAtPlayer(p,0.0001);
+                    CTFPlayer target = Main.getLookedAtCTFPlayer(player,1);
 
                     if (target != null) {
-                        loc = target.getLocation();
+                        loc = target.getPlayer().getLocation();
                     }
 
                     int sizeR = 5;

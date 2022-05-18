@@ -3,7 +3,6 @@ package me.bobthe28th.capturethefart.ctf.items.paladin;
 import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.damage.CTFDamageCause;
-import me.bobthe28th.capturethefart.ctf.itemtypes.CTFStackCooldownItem;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFToolCooldownItem;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;

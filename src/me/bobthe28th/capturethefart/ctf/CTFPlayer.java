@@ -1,15 +1,12 @@
 package me.bobthe28th.capturethefart.ctf;
 
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import com.comphenix.net.bytebuddy.build.BuildLogger;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
+import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFItem;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.data.type.Door;
@@ -20,12 +17,15 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.*;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
@@ -34,16 +34,17 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.persistence.PersistentDataType;
-
-import me.bobthe28th.capturethefart.Main;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 import org.spigotmc.event.entity.EntityDismountEvent;
+
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class CTFPlayer implements Listener {
 
@@ -56,6 +57,7 @@ public class CTFPlayer implements Listener {
     CTFFlag carriedFlag = null;
     ArmorStand flagOnHead = null;
     ArrayList<String> glowReason = new ArrayList<>();
+    double healCooldownMax = 6.0;
     double healCooldown = 0.0;
     boolean onHealCooldown = false;
     boolean canUse = true;
@@ -124,9 +126,14 @@ public class CTFPlayer implements Listener {
     }
 
     public void setTeam(CTFTeam t) {
+        CTFTeam oldTeam = team;
         team = t;
         t.getTeam().addEntry(player.getName());
         Main.gameController.updateTeams();
+        Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,team);
+        if (oldTeam != null) {
+            Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,oldTeam);
+        }
         giveArmor();
     }
 
@@ -238,7 +245,7 @@ public class CTFPlayer implements Listener {
 
     public void kill(CTFPlayer p) {
         player.playSound(player,Sound.ITEM_AXE_SCRAPE,1F,1F);
-        player.spawnParticle(Particle.TOTEM,p.getPlayer().getLocation().clone().add(new Vector(0.0,1.0,0.0)),20,0.2,0.5,0.2,0.2);
+        player.getWorld().spawnParticle(Particle.TOTEM,p.getPlayer().getLocation().clone().add(new Vector(0.0,1.0,0.0)),20,0.2,0.5,0.2,0.2);
         kills ++;
         Main.gameController.updateScoreboard(this,ScoreboardRow.KILLS);
     }
@@ -260,11 +267,16 @@ public class CTFPlayer implements Listener {
         isAlive = true;
         player.setGameMode(GameMode.SURVIVAL);
         player.setFireTicks(0);
-        player.setHealth(0.0);
+        player.setHealth(20.0);
         player.setFreezeTicks(0);
         player.setArrowsInBody(0);
+        if (player.getVehicle() != null) {
+            player.getVehicle().removePassenger(player);
+        }
         if (team != null) {
-//            player.teleport(team.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+            if(!player.teleport(team.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN)) {
+                player.setHealth(0.0);
+            }
             Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,team);
         }
         for (PotionEffect pEffect : player.getActivePotionEffects()) {
@@ -323,6 +335,8 @@ public class CTFPlayer implements Listener {
     }
 
     public void remove() {
+        Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,team);
+        Main.gameController.updateTeams();
         leaveClass();
         leaveTeam();
         enemyHealth.removeAll();
@@ -331,7 +345,9 @@ public class CTFPlayer implements Listener {
             respawnTimer.cancel();
         }
         HandlerList.unregisterAll(this);
-
+        if (Bukkit.getScoreboardManager() != null) {
+            player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+        }
         removeItems();
         Main.gameController.removeScoreboard(this);
         Main.CTFPlayers.remove(player);
@@ -481,7 +497,7 @@ public class CTFPlayer implements Listener {
     }
 
     public void regen() {
-        long rate = 16L; //TODO faster
+        long rate = 10L;
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -490,9 +506,9 @@ public class CTFPlayer implements Listener {
                 } else {
                     if (player.getHealth() < Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getDefaultValue()) {
                         PacketContainer packet = new PacketContainer(PacketType.Play.Server.UPDATE_HEALTH);
-                        double healAmout = Math.min(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getDefaultValue(),player.getHealth() + 1);
-                        packet.getFloat().write(0, (float)healAmout);
-                        packet.getIntegers().write(0,20);
+                        double healAmout = Math.min(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getDefaultValue(), player.getHealth() + 1);
+                        packet.getFloat().write(0, (float) healAmout);
+                        packet.getIntegers().write(0, 20);
                         try {
                             ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
                         } catch (Exception e) {
@@ -508,20 +524,23 @@ public class CTFPlayer implements Listener {
     }
 
     public void startHealCooldown() {
-        onHealCooldown = true;
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                healCooldown -= 0.1;
-                healCooldown = Math.round(healCooldown*10.0)/10.0;
-                if (healCooldown <= 0) {
-                    healCooldown = 0;
-                    onHealCooldown = false;
-                    regen();
-                    this.cancel();
+        healCooldown = healCooldownMax;
+        if (!onHealCooldown) {
+            onHealCooldown = true;
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    healCooldown -= 0.1;
+                    healCooldown = Math.round(healCooldown * 10.0) / 10.0;
+                    if (healCooldown <= 0) {
+                        healCooldown = 0;
+                        onHealCooldown = false;
+                        regen();
+                        this.cancel();
+                    }
                 }
-            }
-        }.runTaskTimer(plugin, 2L, 2L);
+            }.runTaskTimer(plugin, 2L, 2L);
+        }
     }
 
     public void startEnemyHealthCooldown() {
@@ -557,6 +576,12 @@ public class CTFPlayer implements Listener {
         enemyHealth.setProgress(healthProgress);
         enemyHealth.setTitle(enemy.getName());
         enemyHealth.setVisible(true);
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        if (event.getPlayer() != player.getPlayer()) return;
+        remove();
     }
 
     @EventHandler
@@ -733,10 +758,7 @@ public class CTFPlayer implements Listener {
         if (!event.isCancelled()) {
             if (event.getEntity() instanceof Player pf) {
                 if (pf == player) {
-                    healCooldown = 7.0;
-                    if (!onHealCooldown) {
-                        startHealCooldown();
-                    }
+                    startHealCooldown();
                 }
             }
             if (event.getEntity() instanceof LivingEntity lEntity) {
@@ -764,11 +786,13 @@ public class CTFPlayer implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onEntityRegainHealth(EntityRegainHealthEvent event) {
         if (event.getEntity() instanceof Player pf) {
-            if (pf != player) return;
-            if (event.getRegainReason() == EntityRegainHealthEvent.RegainReason.SATIATED) {
-                event.setCancelled(true);
+            if (pf == player) {
+                if (event.getRegainReason() == EntityRegainHealthEvent.RegainReason.SATIATED) {
+                    event.setCancelled(true);
+                }
             }
-        } else if (event.getEntity() instanceof LivingEntity lEntity) {
+        }
+        if (event.getEntity() instanceof LivingEntity lEntity) {
             if (lEntity != enemy) return;
             updateEnemyHealth(Math.min(1.0,(lEntity.getHealth() + event.getAmount()) / Objects.requireNonNull(lEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue()));
         }

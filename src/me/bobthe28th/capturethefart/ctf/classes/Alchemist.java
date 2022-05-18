@@ -5,14 +5,15 @@ import me.bobthe28th.capturethefart.ctf.CTFClass;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.damage.CTFDamage;
 import me.bobthe28th.capturethefart.ctf.damage.CTFDamageCause;
-import me.bobthe28th.capturethefart.ctf.items.alchemist.*;
-import me.bobthe28th.capturethefart.ctf.itemtypes.CTFItem;
+import me.bobthe28th.capturethefart.ctf.items.alchemist.AlcPotion;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.*;
+import org.bukkit.entity.AreaEffectCloud;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -27,7 +28,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashMap;
-import java.util.Objects;
 
 public class Alchemist extends CTFClass implements Listener {
 
@@ -39,7 +39,8 @@ public class Alchemist extends CTFClass implements Listener {
         if (player_ != null) {
             Bukkit.getPluginManager().registerEvents(this, plugin);
         }
-        setArmor(new Material[]{Material.LEATHER_HELMET,Material.LEATHER_LEGGINGS,Material.LEATHER_BOOTS});
+        setArmor(new Material[]{Material.LEATHER,Material.LEATHER_LEGGINGS,Material.LEATHER_BOOTS});
+        setHelmetCustomModel(7);
     }
 
     @Override

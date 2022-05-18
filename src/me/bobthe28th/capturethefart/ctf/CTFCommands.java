@@ -1,23 +1,22 @@
 package me.bobthe28th.capturethefart.ctf;
 
-import org.bukkit.*;
-import org.bukkit.attribute.Attribute;
+import me.bobthe28th.capturethefart.Main;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.*;
-
-import me.bobthe28th.capturethefart.Main;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
-import java.util.Objects;
 
 import static java.lang.Integer.parseInt;
-import static java.lang.Integer.remainderUnsigned;
 
 
 public class CTFCommands implements CommandExecutor {
@@ -379,7 +378,6 @@ public class CTFCommands implements CommandExecutor {
             case "removeblocks":
                 Main.gameController.removeBreakableBlocks();
                 return true;
-                //TODO show scoreboard command
             case "test":
 
 //                JsonObject object = new JsonObject();

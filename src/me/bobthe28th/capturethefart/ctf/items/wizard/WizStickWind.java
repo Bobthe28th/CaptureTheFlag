@@ -1,7 +1,7 @@
 package me.bobthe28th.capturethefart.ctf.items.wizard;
 
-import java.util.*;
-
+import me.bobthe28th.capturethefart.Main;
+import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.damage.CTFDamage;
 import me.bobthe28th.capturethefart.ctf.damage.CTFDamageCause;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFDoubleCooldownItem;
@@ -9,14 +9,14 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.Vector;
 
-import me.bobthe28th.capturethefart.Main;
-import me.bobthe28th.capturethefart.ctf.CTFPlayer;
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.Random;
 
 public class WizStickWind extends CTFDoubleCooldownItem {
 
@@ -79,13 +79,13 @@ public class WizStickWind extends CTFDoubleCooldownItem {
 
                     int range = 50;
 
-                    Entity target = Main.getLookedAtPlayer(p,3);
+                    CTFPlayer target = Main.getLookedAtCTFPlayer(player,3);
 
                     Block b = p.getTargetBlock(null, range);
                     Location loc = b.getLocation().add(new Vector(0.5, 1, 0.5));
 
                     if (target != null) {
-                        loc = target.getLocation();
+                        loc = target.getPlayer().getLocation();
                     }
 
                     p.getWorld().strikeLightningEffect(loc);
