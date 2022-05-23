@@ -21,7 +21,7 @@ public class WizBookFire extends CTFDoubleCooldownItem {
 
 
     public WizBookFire(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("Fire Tome", Material.BOOK, 3, "Fire Wall", 13, "Attack Boost", 23, player_, plugin_, defaultSlot_);
+        super("Fire Tome", Material.BOOK, 3, "Fire Wall", 13,false, "Attack Boost", 23,false, player_, plugin_, defaultSlot_);
     }
 
     @Override

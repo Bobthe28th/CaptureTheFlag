@@ -38,7 +38,7 @@ public class Demo extends CTFClass implements Listener {
         }
         setArmor(new Material[]{Material.IRON_INGOT,Material.LEATHER_LEGGINGS,Material.IRON_BOOTS});
         setHelmetCustomModel(2);
-        setEnchantments(new Enchantment[][]{null, null, new Enchantment[]{Enchantment.PROTECTION_FALL}}, new Integer[][]{null, null, new Integer[]{4}});
+        setEnchantments(new Enchantment[][]{null, null, new Enchantment[]{Enchantment.PROTECTION_FALL}}, new Integer[][]{null, null, new Integer[]{6}});
     }
 
     @Override

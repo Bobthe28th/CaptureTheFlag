@@ -4,7 +4,7 @@ public enum CTFDamageCause {
     //Wizard
     WIZARD_ZAP(false),
     WIZARD_LIGHTNING(false),
-    WIZARD_SNOWBALL(true),
+    WIZARD_SNOWBALL(false),
     WIZARD_SNOW_CHUNK(false),
     WIZARD_SOLAR_BLAST(true),
     WIZARD_FIREBALL(true),
@@ -15,7 +15,7 @@ public enum CTFDamageCause {
     PALADIN_HAMMER(true),
     PALADIN_HAMMER_THROW(true),
     //Demo
-    DEMO_TNT(true),
+    DEMO_TNT(false),
     DEMO_ARROW(true),
     //Builder
     BUILDER_AXE(true),

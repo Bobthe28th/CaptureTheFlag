@@ -2,6 +2,7 @@ package me.bobthe28th.capturethefart.ctf.items.wizard;
 
 import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
+import me.bobthe28th.capturethefart.ctf.CTFTeam;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFDoubleCooldownItem;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -20,7 +21,7 @@ import org.bukkit.util.Vector;
 public class WizBookIce extends CTFDoubleCooldownItem {
 
     public WizBookIce(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("Ice Tome",Material.BOOK, 2,"Ice Wall", 10,"Ice Skate", 20, player_,plugin_, defaultSlot_);
+        super("Ice Tome",Material.BOOK, 2,"Ice Wall", 10,false,"Ice Skate", 20,false, player_,plugin_, defaultSlot_);
         plugin = plugin_;
         player = player_;
     }
@@ -46,8 +47,13 @@ public class WizBookIce extends CTFDoubleCooldownItem {
                     for (int x = wallWidth * -1; x <= wallWidth; x++) {
                         for (int y = wallHeightBelow * -1 + 1; y <= wallHeight; y++) {
                             Location l = block.getLocation().clone().add(new Vector((xDir) ? x : 0, y, (xDir) ? 0 : x));
-
-                            if (l.getBlock().isEmpty()) {
+                            boolean inSpawn = false;
+                            for (CTFTeam sBoxTeam : Main.gameController.getMap().getSpawnPlaceBoxes().keySet()) {
+                                if (sBoxTeam != player.getTeam() && Main.gameController.getMap().getSpawnPlaceBoxes().get(sBoxTeam).contains(l.toVector())) {
+                                    inSpawn = true;
+                                }
+                            }
+                            if (l.getBlock().isEmpty() && !inSpawn) {
                                 Main.createFadingBlock(l, Material.FROSTED_ICE, Material.AIR, 3, (int)(Math.random() * 22 + 18), plugin);
                             }
                         }

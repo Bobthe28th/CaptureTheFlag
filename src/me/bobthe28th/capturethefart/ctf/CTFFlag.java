@@ -10,6 +10,7 @@ import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 public class CTFFlag implements Listener {
 
@@ -19,6 +20,7 @@ public class CTFFlag implements Listener {
     Location home;
     CTFPlayer carriedPlayer = null;
     int nearby;
+    Random rand = new Random();
 
     HashMap<CTFPlayer, Double> pickUpTimer = new HashMap<>();
     double pickUpTime = 2.0;
@@ -52,7 +54,7 @@ public class CTFFlag implements Listener {
                                             for (Player player : Bukkit.getOnlinePlayers()) {
                                                 player.sendTitle(" ", cp.getFormattedName() + " picked up the " + team.getFormattedName() + team.getChatColor() + "'s " + "Flag" + ChatColor.RESET, 10, 20, 5);
                                             }
-                                            Bukkit.broadcastMessage(cp.getFormattedName() + " picked up the " + team.getFormattedName() + team.getChatColor() + "'s " + "Flag" + ChatColor.RESET);
+                                            Bukkit.broadcastMessage(ChatColor.GRAY + "[" + team.getChatColor() + "⚑" + ChatColor.GRAY + "] " + ChatColor.RESET + cp.getFormattedName() + " picked up the " + team.getFormattedName() + team.getChatColor() + "'s " + "Flag" + ChatColor.RESET);
                                             for (CTFPlayer takeFlagPlayers : Main.CTFPlayers.values()) {
                                                 if (takeFlagPlayers.getTeam() == team) {
                                                     takeFlagPlayers.getPlayer().playSound(takeFlagPlayers.getPlayer(),Sound.ENTITY_WITHER_DEATH,1,1);
@@ -89,7 +91,7 @@ public class CTFFlag implements Listener {
                                                 for (Player player : Bukkit.getOnlinePlayers()) {
                                                     player.sendTitle(" ", cp.getFormattedName() + " returned the " + team.getFormattedName() + team.getChatColor() + "'s " + "Flag" + ChatColor.RESET, 10, 20, 5);
                                                 }
-                                                Bukkit.broadcastMessage(cp.getFormattedName() + " returned the " + team.getFormattedName() + team.getChatColor() + "'s " + "Flag" + ChatColor.RESET);
+                                                Bukkit.broadcastMessage(ChatColor.GRAY + "[" + team.getChatColor() + "⚑" + ChatColor.GRAY + "] " + ChatColor.RESET + cp.getFormattedName() + " returned the " + team.getFormattedName() + team.getChatColor() + "'s " + "Flag" + ChatColor.RESET);
                                                 for (CTFPlayer returnFlagPlayers : Main.CTFPlayers.values()) {
                                                     if (returnFlagPlayers.getTeam() == team) {
                                                         returnFlagPlayers.getPlayer().playSound(returnFlagPlayers.getPlayer(),Sound.BLOCK_BEACON_POWER_SELECT,1,1);
@@ -190,10 +192,13 @@ public class CTFFlag implements Listener {
         carriedPlayer = null;
         setPos(home);
         Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.FLAG,team);
+        if (cp.getPlayer().getName().equals("Schmoe_") && rand.nextBoolean()) {
+            cp.getPlayer().getWorld().playSound(cp.getPlayer().getLocation(), "minecraft:flag", 10000, 1);
+        }
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.sendTitle(" ", cp.getFormattedName() + " captured the " + team.getFormattedName() + team.getChatColor() + "'s " + "Flag" + ChatColor.RESET, 10, 20, 5);
         }
-        Bukkit.broadcastMessage(cp.getFormattedName() + " captured the " + team.getFormattedName() + team.getChatColor() + "'s " + "Flag" + ChatColor.RESET);
+        Bukkit.broadcastMessage(ChatColor.GRAY + "[" + team.getChatColor() + "⚑" + ChatColor.GRAY + "] " + ChatColor.RESET + cp.getFormattedName() + " captured the " + team.getFormattedName() + team.getChatColor() + "'s " + "Flag" + ChatColor.RESET);
         for (CTFPlayer captureFlagPlayers : Main.CTFPlayers.values()) {
             captureFlagPlayers.getPlayer().playSound(captureFlagPlayers.getPlayer(),Sound.ENTITY_ENDER_DRAGON_GROWL,1,1);
         }
@@ -222,6 +227,12 @@ public class CTFFlag implements Listener {
 
     public void fall(Location loc) {
         loc.setDirection(new Vector(0.0,-1.0,0.0));
+        if (carriedPlayer != null) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                player.sendTitle(" ", carriedPlayer.getFormattedName() + " dropped the " + team.getFormattedName() + team.getChatColor() + "'s " + "Flag" + ChatColor.RESET, 10, 20, 5);
+            }
+            Bukkit.broadcastMessage(ChatColor.GRAY + "[" + team.getChatColor() + "⚑" + ChatColor.GRAY + "] " + ChatColor.RESET + carriedPlayer.getFormattedName() + " dropped the " + team.getFormattedName() + team.getChatColor() + "'s " + "Flag" + ChatColor.RESET);
+        }
         carriedPlayer = null;
         BlockIterator blocksToAdd = new BlockIterator(loc,0,200);
         Location blockToAdd = null;

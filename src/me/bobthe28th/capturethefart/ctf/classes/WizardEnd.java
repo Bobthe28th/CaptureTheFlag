@@ -3,6 +3,7 @@ package me.bobthe28th.capturethefart.ctf.classes;
 import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFClass;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
+import me.bobthe28th.capturethefart.ctf.CTFTeam;
 import me.bobthe28th.capturethefart.ctf.damage.CTFDamage;
 import me.bobthe28th.capturethefart.ctf.damage.CTFDamageCause;
 import me.bobthe28th.capturethefart.ctf.items.wizard.WizBookEnd;
@@ -52,11 +53,18 @@ public class WizardEnd extends CTFClass implements Listener {
         if (event.getPlayer() != player.getPlayer()) return;
         if (event.getCause() == PlayerTeleportEvent.TeleportCause.ENDER_PEARL && event.getTo() != null) {
             if (!player.isCarringFlag()) {
-                double radius = 3.0;
-                for (Entity e : player.getPlayer().getWorld().getNearbyEntities(event.getTo(), radius, radius, radius)) {
-                    if (e instanceof Player pe && Main.CTFPlayers.containsKey(pe) && Main.CTFPlayers.get(pe).getTeam() != player.getTeam()) {
-                        Main.customDamageCause.put(pe, new CTFDamage(player, CTFDamageCause.WIZARD_PEARL));
-                        pe.damage(6.0, player.getPlayer());
+                for (CTFTeam sBoxTeam : Main.gameController.getMap().getSpawnMoveBoxes().keySet()) {
+                    if (sBoxTeam != player.getTeam() && Main.gameController.getMap().getSpawnMoveBoxes().get(sBoxTeam).contains(event.getTo().toVector())) {
+                        event.setCancelled(true);
+                    }
+                }
+                if (!event.isCancelled()) {
+                    double radius = 3.0;
+                    for (Entity e : player.getPlayer().getWorld().getNearbyEntities(event.getTo(), radius, radius, radius)) {
+                        if (e instanceof Player pe && Main.CTFPlayers.containsKey(pe) && Main.CTFPlayers.get(pe).getTeam() != player.getTeam()) {
+                            Main.customDamageCause.put(pe, new CTFDamage(player, CTFDamageCause.WIZARD_PEARL));
+                            pe.damage(6.0, player.getPlayer());
+                        }
                     }
                 }
             } else {

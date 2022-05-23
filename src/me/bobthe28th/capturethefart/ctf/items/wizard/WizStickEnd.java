@@ -25,7 +25,7 @@ import java.util.ArrayList;
 public class WizStickEnd extends CTFDoubleCooldownItem {
 
     public WizStickEnd(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("End Staff", Material.STICK, 4, "Shulker Shot", 2, "Phantom", 14, player_, plugin_, defaultSlot_);
+        super("End Staff", Material.STICK, 4, "Shulker Shot", 1,false, "Phantom", 14,false, player_, plugin_, defaultSlot_);
     }
 
     @Override
@@ -85,29 +85,43 @@ public class WizStickEnd extends CTFDoubleCooldownItem {
                         @Override
                         public void run() {
                             if (phantom.getVelocity().length() < 0.3) {
+                                double radius = 7.0;
+                                for (Entity e : phantom.getWorld().getNearbyEntities(phantom.getLocation(), radius, radius, radius)) {
+                                    if (e instanceof Player pHit && phantom.getLocation().distance(pHit.getLocation().add(new Vector(0, 1, 0))) <= radius && phantom.hasLineOfSight(pHit)) {
+                                        if (Main.CTFPlayers.containsKey(pHit) && Main.CTFPlayers.get(pHit).getTeam() != player.getTeam()) {
+                                            if (!hitPlayers.contains(pHit)) {
+                                                hitPlayers.add(pHit);
+                                                Main.customDamageCause.put(pHit, new CTFDamage(player, CTFDamageCause.WIZARD_PHANTOM));
+                                                pHit.damage(8.0, player.getPlayer());
+                                                player.getPlayer().playSound(player.getPlayer(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.5F, 0.5F);
+                                            }
+                                        }
+                                    }
+                                }
+                                phantom.getWorld().spawnParticle(Particle.DRAGON_BREATH,phantom.getLocation().add(new Vector(0, 0.2, 0)), 20, 0.7, 0.2, 0.7, 0.1);
                                 phantom.remove();
                             }
                             if (phantom.isDead() || t >= 400) {
                                 phantom.remove();
                                 this.cancel();
-                            }
-
-                            double radius = 3.0;
-                            for (Entity e : phantom.getWorld().getNearbyEntities(phantom.getLocation(),radius,radius,radius)) {
-                                if (e instanceof Player pHit && phantom.getLocation().distance(pHit.getLocation().add(new Vector(0,1,0))) <= radius) {
-                                    if (Main.CTFPlayers.containsKey(pHit) && Main.CTFPlayers.get(pHit).getTeam() != player.getTeam()) {
-                                        if (!hitPlayers.contains(pHit)) {
-                                            hitPlayers.add(pHit);
-                                            Main.customDamageCause.put(pHit,new CTFDamage(player, CTFDamageCause.WIZARD_PHANTOM));
-                                            pHit.damage(8.0,player.getPlayer());
-                                            player.getPlayer().playSound(player.getPlayer(),Sound.ENTITY_EXPERIENCE_ORB_PICKUP,0.5F,0.5F);
+                            } else {
+                                double radius = 3.0;
+                                for (Entity e : phantom.getWorld().getNearbyEntities(phantom.getLocation(), radius, radius, radius)) {
+                                    if (e instanceof Player pHit && phantom.getLocation().distance(pHit.getLocation().add(new Vector(0, 1, 0))) <= radius && phantom.hasLineOfSight(pHit)) {
+                                        if (Main.CTFPlayers.containsKey(pHit) && Main.CTFPlayers.get(pHit).getTeam() != player.getTeam()) {
+                                            if (!hitPlayers.contains(pHit)) {
+                                                hitPlayers.add(pHit);
+                                                Main.customDamageCause.put(pHit, new CTFDamage(player, CTFDamageCause.WIZARD_PHANTOM));
+                                                pHit.damage(8.0, player.getPlayer());
+                                                player.getPlayer().playSound(player.getPlayer(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.5F, 0.5F);
+                                            }
                                         }
                                     }
                                 }
+                                phantom.getWorld().spawnParticle(Particle.SPELL_WITCH, phantom.getLocation().add(new Vector(0, 0.2, 0)), 5, 0.7, 0.2, 0.7, 0.0);
+                                phantom.setVelocity(direction);
+                                t++;
                             }
-                            phantom.getWorld().spawnParticle(Particle.SPELL_WITCH,phantom.getLocation().add(new Vector(0,0.2,0)),5,0.7,0.2,0.7,0.0);
-                            phantom.setVelocity(direction);
-                            t++;
                         }
                     }.runTaskTimer(plugin,0,1L);
 

@@ -116,6 +116,36 @@ public class CTFGameController implements Listener {
     }
 
     public void gameEnd(CTFTeam winner) {
+        Main.pvp = false;
+        Main.breakBlocks = false;
+        removeBreakableBlocks();
+        resetFlags();
+        for (CTFPlayer p : Main.CTFPlayers.values()) {
+            if (p.getTeam() == winner) {
+                p.getPlayer().teleport(new Location(p.getPlayer().getWorld(),650, 114, 93));
+            } else {
+                p.getPlayer().teleport(new Location(p.getPlayer().getWorld(),607, 114, 89));
+            }
+            p.setCanUse(false);
+        }
+
+        for (CTFTeam team : Main.CTFTeams) {
+            team.setNameTagVisiblity(true);
+        }
+
+//        World w = Bukkit.getServer().getWorld("world");
+//        if (w != null) {
+//            new BukkitRunnable() {
+//                @Override
+//                public void run() {
+//                    Firework fWork = w.spawn(new Location(w, 0, 0, 0), Firework.class); //TODO loc
+//                    FireworkMeta fMeta = fWork.getFireworkMeta();
+//                    FireworkEffect effect = FireworkEffect.builder().withColor(winner.getColor()).with(FireworkEffect.Type.BURST).trail(true).withFade(Color.WHITE).build();
+//                    fMeta.addEffect(effect);
+//                    fWork.setFireworkMeta(fMeta);
+//                }
+//            }.runTaskTimer(plugin, 20L, 20L);
+//        }
         //TODO game end
     }
 
@@ -239,6 +269,8 @@ public class CTFGameController implements Listener {
             p.getPlayer().setScoreboard(pScoreboard.get(p));
             p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN,1,1);
         }
+        Main.pvp = true;
+        Main.breakBlocks = true;
     }
 
     public Scoreboard getScoreboard(CTFPlayer p) {

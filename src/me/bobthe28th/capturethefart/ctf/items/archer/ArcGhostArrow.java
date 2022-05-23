@@ -51,7 +51,8 @@ public class ArcGhostArrow extends CTFStackCooldownItem {
                             if (Main.CTFPlayers.containsKey(p)) {
                                 if (Main.CTFPlayers.get(p).getTeam() != player.getTeam()) {
                                     Main.customDamageCause.put(p,new CTFDamage(player, CTFDamageCause.ARCHER_GHOST_ARROW));
-                                    p.damage(3.0,player.getPlayer()); //TODO sound
+                                    p.damage(3.0,player.getPlayer());
+                                    player.getPlayer().playSound(player.getPlayer(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.5F, 0.5F);
                                     Main.CTFPlayers.get(p).addGlow("ghost");
                                     Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                                         final Player pg = p;

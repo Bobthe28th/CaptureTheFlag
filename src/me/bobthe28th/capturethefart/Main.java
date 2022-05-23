@@ -23,11 +23,14 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -64,14 +67,17 @@ public class Main extends JavaPlugin implements Listener {
     public static String[] CTFClassNames = new String[]{"Paladin","Demo","Builder","Archer","Assassin","Alchemist","WizardFire","WizardIce","WizardWind","WizardEnd"};
     public static HashMap<Player,CTFPlayer> CTFPlayers;
 
-    public static String[] musicTitle = new String[]{"Halland / Dalarna - Smash Ultimate OST","Glide - Smash Ultimate OST","Mick Gordon - 11. BFG Division","Chris Christodoulou - You're Gonna Need a Bigger Ukulele | Risk of Rain 2 (2020)","Plants vs. Zombies: Garden Warfare [OST] #13: Loon Skirmish","Klaus Veen - Ordinary Days V2"};
-    public static String[] musicLink = new String[]{"https://youtu.be/qa0LLO8xz9g","https://youtu.be/TFAfyMc-W3w","https://youtu.be/QHRuTYtSbJQ","https://youtu.be/r2JeL1ibBI0","https://youtu.be/372g0DPPUHY","https://youtu.be/rpGIXmaQ2Ak"};
-    public static String[] music = new String[]{"halland_dalarna","glide","bfg_division","bigger_ukulele","loon_skirmish","ordinary_days"};
-    public static Long[] musicLength = new Long[]{3440L,3360L,10120L,6040L,3500L,7120L};
+    public static String[] musicTitle = new String[]{"Halland / Dalarna - Smash Ultimate OST","Glide - Smash Ultimate OST","Mick Gordon - 11. BFG Division","Chris Christodoulou - You're Gonna Need a Bigger Ukulele | Risk of Rain 2 (2020)","Plants vs. Zombies: Garden Warfare [OST] #13: Loon Skirmish","Klaus Veen - Ordinary Days V2","Will's Menu Music","LISA: The Lustful OST - All That Glitters","Cast List - Super Mario World","Escape From the City (City Escape) - Sonic Adventure 2","Live and Learn - Sonic Adventure 2"};
+    public static String[] musicLink = new String[]{"https://youtu.be/qa0LLO8xz9g","https://youtu.be/TFAfyMc-W3w","https://youtu.be/QHRuTYtSbJQ","https://youtu.be/r2JeL1ibBI0","https://youtu.be/372g0DPPUHY","https://youtu.be/rpGIXmaQ2Ak","https://www.twitch.tv/accidentallymental","https://youtu.be/F-RKIJiiNC4","https://youtu.be/BtjcKTxi2Vc","https://youtu.be/5WcyVvWZJU4","https://youtu.be/z1BRZg0GG0A"};
+    public static String[] music = new String[]{"halland_dalarna","glide","bfg_division","bigger_ukulele","loon_skirmish","ordinary_days","willsmenumusic","all_that_glitters","cast_list","city_escape","live_and_learn"};
+    public static Long[] musicLength = new Long[]{3440L,3360L,10120L,6040L,3500L,7120L,1420L,4300L,2820L,1160L,5380L};
     public static ArrayList<String> musicQueue = new ArrayList<>();
     static boolean musicPlaying = false;
     static BukkitTask musicRunnable;
     public static CTFGameController gameController;
+
+    public static boolean pvp = false;
+    public static boolean breakBlocks = false;
 
     CTFDeathMessages deathMessages;
 
@@ -97,7 +103,7 @@ public class Main extends JavaPlugin implements Listener {
         CTFTabCompletion tabCompleter = new CTFTabCompletion();
         getServer().getPluginManager().registerEvents(this, this);
 
-        String[] commandNames = new String[]{"ctfstart","ctfjoin","ctfleave","ctffulljoin","ctfteamjoin","ctfteamleave","ctfteams","ctfsetclass","ctfleaveclass","ctfhelp","ctfsetmap","removeblocks","fly","heal","test","music"};
+        String[] commandNames = new String[]{"ctfstart","ctfjoin","ctfleave","ctffulljoin","ctfteamjoin","ctfteamleave","ctfteams","ctfsetclass","ctfleaveclass","ctfhelp","ctfsetmap","removeblocks","fly","heal","test","music","adminpm","pvp","breakblocks"};
 
         for (String commandName : commandNames) {
             Objects.requireNonNull(getCommand(commandName)).setExecutor(commands);
@@ -117,14 +123,39 @@ public class Main extends JavaPlugin implements Listener {
         CTFFlags = new CTFFlag[]{new CTFFlag(CTFTeams[0],this), new CTFFlag(CTFTeams[1],this)};
         CTFPlayers = new HashMap<>();
 
-        HashMap<CTFTeam,Location> spawnLocations = new HashMap<>();
-        spawnLocations.put(CTFTeams[0],new Location(w,-411.5,95.0,361.5,-90.0F,0.0F));
-        spawnLocations.put(CTFTeams[1],new Location(w,-280.5, 95.0, 233.5,90.0F,0.0F));
+        HashMap<CTFTeam,Location> ValleyspawnLocations = new HashMap<>();
+        ValleyspawnLocations.put(CTFTeams[0],new Location(w,-411.5,95.0,361.5,-90.0F,0.0F));
+        ValleyspawnLocations.put(CTFTeams[1],new Location(w,-280.5, 95.0, 233.5,90.0F,0.0F));
 
-        HashMap<CTFTeam,Location> flagLocations = new HashMap<>();
-        flagLocations.put(CTFTeams[0],new Location(w,-396, 94, 366));
-        flagLocations.put(CTFTeams[1],new Location(w, -296, 94, 228));
-        CTFMaps = new CTFMap[]{new CTFMap("Valley",spawnLocations,flagLocations,new BoundingBox(-272, 147, 223,-420, 64, 371))};
+        HashMap<CTFTeam,Location> ValleyflagLocations = new HashMap<>();
+        ValleyflagLocations.put(CTFTeams[0],new Location(w,-396, 94, 366));
+        ValleyflagLocations.put(CTFTeams[1],new Location(w, -296, 94, 228));
+
+        HashMap<CTFTeam,BoundingBox> ValleyspawnPlaceBoxes = new HashMap<>();
+        ValleyspawnPlaceBoxes.put(CTFTeams[0],new BoundingBox(-416, 107, 368,-402, 94, 355));
+        ValleyspawnPlaceBoxes.put(CTFTeams[1],new BoundingBox(-276, 107, 226,-290, 94, 239));
+
+        HashMap<CTFTeam,BoundingBox> ValleyspawnMoveBoxes = new HashMap<>();
+        ValleyspawnMoveBoxes.put(CTFTeams[0],new BoundingBox(-406, 98, 366,-415, 94, 356));
+        ValleyspawnMoveBoxes.put(CTFTeams[1],new BoundingBox(-286, 98, 228,-277, 94, 238));
+
+        HashMap<CTFTeam,Location> CastlespawnLocations = new HashMap<>();
+        CastlespawnLocations.put(CTFTeams[0],new Location(w,120, 140, 208,-90.0F,0.0F));
+        CastlespawnLocations.put(CTFTeams[1],new Location(w,231, 140, 209,90.0F,0.0F));
+
+        HashMap<CTFTeam,Location> CastleflagLocations = new HashMap<>();
+        CastleflagLocations.put(CTFTeams[0],new Location(w,118, 136, 213));
+        CastleflagLocations.put(CTFTeams[1],new Location(w, 233, 136, 213));
+
+        HashMap<CTFTeam,BoundingBox> CastlespawnPlaceBoxes = new HashMap<>();
+        CastlespawnPlaceBoxes.put(CTFTeams[0],new BoundingBox(126, 143, 216,115, 140, 201));
+        CastlespawnPlaceBoxes.put(CTFTeams[1],new BoundingBox(225, 143, 201,236, 140, 216));
+
+        HashMap<CTFTeam,BoundingBox> CastlespawnMoveBoxes = new HashMap<>();
+        CastlespawnMoveBoxes.put(CTFTeams[0],new BoundingBox(124, 143, 213,118, 140, 204));
+        CastlespawnMoveBoxes.put(CTFTeams[1],new BoundingBox(227, 143, 204,233, 140, 213));
+
+        CTFMaps = new CTFMap[]{new CTFMap("Valley",ValleyspawnLocations,ValleyflagLocations, ValleyspawnPlaceBoxes, ValleyspawnMoveBoxes,new BoundingBox(-272, 147, 223,-420, 64, 371)),new CTFMap("Castle",CastlespawnLocations,CastleflagLocations, CastlespawnPlaceBoxes, CastlespawnMoveBoxes,new BoundingBox(110, 166, 238,241, 121, 179))};
 
         gameController = new CTFGameController(this,w);
 
@@ -158,8 +189,17 @@ public class Main extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        gameController.removeBreakableBlocks();
-        gameController.resetFlags();
+        if (gameController != null) {
+            gameController.removeBreakableBlocks();
+            gameController.resetFlags();
+        }
+        if (CTFPlayers != null) {
+            Iterator<CTFPlayer> it = CTFPlayers.values().iterator();
+            while (it.hasNext()) {
+                it.next().removeNotList();
+            }
+            CTFPlayers.clear();
+        }
     }
 
     @EventHandler
@@ -167,7 +207,24 @@ public class Main extends JavaPlugin implements Listener {
         Player player = event.getPlayer();
 
         player.setPlayerListHeader("capture the FART!\n\uE238");
+        event.setJoinMessage(ChatColor.YELLOW + event.getPlayer().getName() + " joined the fart");
+        player.setGameMode(GameMode.SURVIVAL);
+        player.teleport(new Location(player.getWorld(),626.5, 65, 95.5));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION,Integer.MAX_VALUE,10,true,false,false));
+        ItemStack partyhat = new ItemStack(Material.PAPER);
+        ItemMeta pMeta = partyhat.getItemMeta();
+        if (pMeta != null) {
+            pMeta.setCustomModelData(player.getName().equals("Bobthe29th") ? 2 : 1);
+            partyhat.setItemMeta(pMeta);
+        }
+        player.getInventory().setItem(EquipmentSlot.HEAD, partyhat);
+    }
 
+    @EventHandler
+    public void onPlayerBreakBlock(BlockBreakEvent event) {
+        if (!breakBlocks && event.getPlayer().getGameMode() != GameMode.CREATIVE) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler
@@ -180,7 +237,7 @@ public class Main extends JavaPlugin implements Listener {
                     FallingBlock f = (FallingBlock)event.getEntity();
                     String pSent = f.getMetadata("playerSent").get(0).asString();
                     Player pS = Bukkit.getPlayer(pSent);
-                    if (pS != null) {
+                    if (pS != null && pd.hasLineOfSight(event.getEntity())) {
                         if (CTFPlayers.containsKey(pS) && CTFPlayers.containsKey(pd)) {
                             if (CTFPlayers.get(pS).getTeam() != CTFPlayers.get(pd).getTeam()) {
                                 if (pd.getGameMode() != GameMode.SPECTATOR && pd.getGameMode() != GameMode.CREATIVE) {
@@ -234,6 +291,14 @@ public class Main extends JavaPlugin implements Listener {
     public void onEntityCombust(EntityCombustEvent event){
         if(event.getEntity() instanceof Phantom){
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerChat(AsyncPlayerChatEvent event) {
+        event.setMessage(event.getMessage().replace("boowomp","\ue239"));
+        if (Main.CTFPlayers.containsKey(event.getPlayer())) {
+            event.setFormat(Main.CTFPlayers.get(event.getPlayer()).getFormattedName() + ": " + event.getMessage());
         }
     }
 
@@ -423,11 +488,9 @@ public class Main extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
-        if (gameController.getSelectingTeam()) {
+        if (gameController.getSelectingTeam() || (!pvp && event.getCause() != DamageCause.VOID)) {
             event.setCancelled(true);
         }
-
-        //TODO double kill
 
         //Disable fall
         if (event.getEntity() instanceof Player && disableFall.contains((Player)event.getEntity())) {
@@ -467,16 +530,21 @@ public class Main extends JavaPlugin implements Listener {
                                 };
                                 if (CTFPlayers.containsKey(damager) && CTFPlayers.containsKey(recipient)) {
                                     if (CTFPlayers.get(damager).getTeam() == CTFPlayers.get(recipient).getTeam()) {
-                                        if (recipient == damager) {
+                                        if (recipient == damager && !CTFPlayers.get(recipient).isCarringFlag()) {
                                             double selfKnockBackRange = 6;
-                                            double div = tntType.equals("demotnt") ? 7 : 15;
-                                            double max = tntType.equals("demotnt") ? 4 : 3;
+                                            double div = tntType.equals("demotnt") ? 2 : 15;
+//                                            double max = tntType.equals("demotnt") ? 3 : 3;
+                                            double max = 3;
                                             Vector knockBackVector = recipient.getLocation().toVector().add(new Vector(0.0,1.0,0.0)).subtract(tnt.getLocation().toVector()).normalize().multiply(Math.min(max,selfKnockBackRange - recipient.getLocation().distance(tnt.getLocation()))).divide(new Vector(div,div,div));
                                             recipient.setVelocity(recipient.getVelocity().add(knockBackVector));
-                                            if (dCause != null) {
+                                            if (dCause != null && !tntType.equals("demotnt")) {
                                                 customDamageCause.put(recipient, new CTFDamage(CTFPlayers.get(damager), dCause));
                                             }
                                             event.setDamage(event.getDamage() / 8.0);
+                                            if (tntType.equals("demotnt")) {
+                                                event.setCancelled(true);
+                                                return;
+                                            }
                                         } else {
                                             event.setCancelled(true);
                                             return;
@@ -485,13 +553,13 @@ public class Main extends JavaPlugin implements Listener {
                                         if (dCause != null) {
                                             customDamageCause.put(recipient, new CTFDamage(CTFPlayers.get(damager), dCause));
                                         }
-                                        event.setDamage(event.getDamage() / (tntType.equals("demoarrow") ? 10.0 : 7.0));
+                                        event.setDamage(event.getDamage() / (tntType.equals("demoarrow") ? 13.0 : 4.0));
                                     }
                                 } else if (CTFPlayers.containsKey(damager)) {
                                     if (dCause != null) {
                                         customDamageCause.put(recipient, new CTFDamage(CTFPlayers.get(damager), dCause));
                                     }
-                                    event.setDamage(event.getDamage() / (tntType.equals("demoarrow") ? 10.0 : 7.0));
+                                    event.setDamage(event.getDamage() / (tntType.equals("demoarrow") ? 13.0 : 4.0));
                                 }
                             }
                         }
@@ -581,9 +649,9 @@ public class Main extends JavaPlugin implements Listener {
                             CTFdamager.startEnemyHealthCooldown();
                         }
 
-                        Bukkit.broadcastMessage(deathMessages.getMessage(true, damageType).replace("$1", (CTFrecipient != null ? CTFrecipient.getTeam().getChatColor() : ChatColor.RED) + recipient.getName() + ChatColor.RESET).replace("$2", (CTFdamager != null ? CTFdamager.getTeam().getChatColor() + CTFdamager.getPlayer().getName() : ChatColor.BLUE + damager.getName()) + ChatColor.RESET));
+                        Bukkit.broadcastMessage(ChatColor.GRAY + "[" + (CTFrecipient != null ? CTFrecipient.getTeam().getChatColor() : ChatColor.RED) + "☠" + ChatColor.GRAY + "] " + deathMessages.getMessage(true, damageType).replace("$1", (CTFrecipient != null ? CTFrecipient.getTeam().getChatColor() : ChatColor.RED) + recipient.getName() + ChatColor.GRAY).replace("$2", (CTFdamager != null ? CTFdamager.getTeam().getChatColor() + CTFdamager.getPlayer().getName() : ChatColor.BLUE + damager.getName()) + ChatColor.GRAY));
                     } else {
-                        Bukkit.broadcastMessage(deathMessages.getMessage(false, damageType).replace("$1", (CTFrecipient != null ? CTFrecipient.getTeam().getChatColor() : ChatColor.RED) + recipient.getName() + ChatColor.RESET));
+                        Bukkit.broadcastMessage(ChatColor.GRAY + "[" + (CTFrecipient != null ? CTFrecipient.getTeam().getChatColor() : ChatColor.RED) + "☠" + ChatColor.GRAY + "] " + deathMessages.getMessage(false, damageType).replace("$1", (CTFrecipient != null ? CTFrecipient.getTeam().getChatColor() : ChatColor.RED) + recipient.getName() + ChatColor.GRAY));
                     }
 //                    Bukkit.broadcastMessage(damageType);
                 }

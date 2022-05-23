@@ -21,7 +21,7 @@ import java.util.Random;
 public class WizStickWind extends CTFDoubleCooldownItem {
 
     public WizStickWind(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("Lightning Staff",Material.STICK,1,"Zap",0.5,"Lightning Strike",20,player_,plugin_, defaultSlot_);
+        super("Lightning Staff",Material.STICK,1,"Zap",0.5,false,"Lightning Strike",20,false,player_,plugin_, defaultSlot_);
     }
 
     @Override
@@ -111,7 +111,7 @@ public class WizStickWind extends CTFDoubleCooldownItem {
         double lastDistance = Double.MAX_VALUE;
         Player result = null;
         for(Entity entity : Objects.requireNonNull(loc.getWorld()).getNearbyEntities(loc,6.0,6.0,6.0)) {
-            if(entity instanceof Player pd) {
+            if(entity instanceof Player pd && pChained.get(pChained.size()-1).hasLineOfSight(pd)) {
                 if (Main.CTFPlayers.containsKey(pd)) {
                     if (Main.CTFPlayers.get(pd).getTeam() != player.getTeam()) {
                         double distance = loc.distance(pd.getLocation());

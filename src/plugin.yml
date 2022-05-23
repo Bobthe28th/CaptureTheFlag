@@ -1,5 +1,5 @@
 name: CaptureTheFart
-version: 0.8
+version: 1.0
 author: Bobthe28th
 main: me.bobthe28th.capturethefart.Main
 description: Capture the flag but funnie
@@ -53,4 +53,13 @@ commands:
     usage: /<command> map
   removeblocks:
     description: Removes all blocks placed by builder
+    usage: /<command>
+  adminpm:
+    description: Sends an admin pm to a user
+    usage: /<command> target message
+  pvp:
+    description: Toggles pvp
+    usage: /<command>
+  breakblocks:
+    description: Toggles break blocks
     usage: /<command>

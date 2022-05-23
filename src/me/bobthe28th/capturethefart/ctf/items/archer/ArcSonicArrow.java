@@ -56,13 +56,16 @@ public class ArcSonicArrow extends CTFStackCooldownItem {
 
         double radius = 10.0;
         long time = 80L;
+        boolean foundPerson = false;
         if (loc.getWorld() != null) {
             for (Entity e : loc.getWorld().getNearbyEntities(loc, radius, radius, radius)) {
                 if (e instanceof Player p) {
-                    if (p.getLocation().distance(loc) <= radius) { //TODO found person sound
+                    if (p.getLocation().distance(loc) <= radius) {
+                        foundPerson = true;
                         if (Main.CTFPlayers.containsKey(p)) {
                             if (Main.CTFPlayers.get(p).getTeam() != player.getTeam()) {
-                                Main.CTFPlayers.get(p).addGlow("sonic" + arrow.getUniqueId()); //TODO you are found sound
+                                Main.CTFPlayers.get(p).addGlow("sonic" + arrow.getUniqueId());
+                                p.playSound(p.getLocation(),"minecraft:blueshield",1,1);
                             }
                             Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                                 final Player pg = p;
@@ -78,6 +81,9 @@ public class ArcSonicArrow extends CTFStackCooldownItem {
                 }
             }
             Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, arrow::remove, time);
+            if (foundPerson) {
+                player.getPlayer().playSound(player.getPlayer().getLocation(), "minecraft:sonic", 1, 1);
+            }
         }
     }
 

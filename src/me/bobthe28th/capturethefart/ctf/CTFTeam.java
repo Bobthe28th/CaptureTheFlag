@@ -83,6 +83,9 @@ public class CTFTeam {
 
     public void scorePoint() {
         points ++;
+        if (points >= 3) {
+            Main.gameController.gameEnd(this);
+        }
         Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.POINTS,this);
     }
 

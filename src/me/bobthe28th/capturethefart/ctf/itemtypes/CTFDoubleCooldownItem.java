@@ -15,20 +15,28 @@ public abstract class CTFDoubleCooldownItem extends CTFItem {
     double rightCooldown;
     String leftActionName;
     String rightActionName;
+    boolean leftBlockedWithFlag;
+    boolean rightBlockedWithFlag;
 
-    public CTFDoubleCooldownItem(String itemName_, Material item_, Integer customModel_, String leftActionName_, double leftCooldown_, String rightActionName_, double rightCooldown_, CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
+    public CTFDoubleCooldownItem(String itemName_, Material item_, Integer customModel_, String leftActionName_, double leftCooldown_, boolean leftBlockedWithFlag_, String rightActionName_, double rightCooldown_, boolean rightBlockedWithFlag_, CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
         super(itemName_,item_,customModel_,player_,plugin_,defaultSlot_);
         leftActionName = leftActionName_;
         rightActionName = rightActionName_;
         leftCooldown = leftCooldown_;
         rightCooldown = rightCooldown_;
+        leftBlockedWithFlag = leftBlockedWithFlag_;
+        rightBlockedWithFlag = rightBlockedWithFlag_;
     }
 
     @Override
     public void displayCooldowns() {
         String cooldown0;
         if (cooldown[0] == 0) {
-            cooldown0 = "READY";
+            if (leftBlockedWithFlag && player.isCarringFlag()) {
+                cooldown0 = "BLOCKED";
+            } else {
+                cooldown0 = "READY";
+            }
         } else {
             if (cooldown[0] == -1) {
                 cooldown0 = "WORKING";
@@ -38,7 +46,11 @@ public abstract class CTFDoubleCooldownItem extends CTFItem {
         }
         String cooldown1;
         if (cooldown[1] == 0) {
-            cooldown1 = "READY";
+            if (rightBlockedWithFlag && player.isCarringFlag()) {
+                cooldown1 = "BLOCKED";
+            } else {
+                cooldown1 = "READY";
+            }
         } else {
             if (cooldown[1] == -1) {
                 cooldown1 = "WORKING";
@@ -46,7 +58,7 @@ public abstract class CTFDoubleCooldownItem extends CTFItem {
                 cooldown1 = cooldown[1] + "s";
             }
         }
-        String text = ((cooldown[0] == 0) ? ChatColor.GREEN : ChatColor.RED) + leftActionName + ": " + cooldown0 + ChatColor.RESET + " | " + ((cooldown[1] == 0) ? ChatColor.GREEN : ChatColor.RED) + rightActionName + ": " + cooldown1 + ChatColor.RESET;
+        String text = ((cooldown[0] == 0) ? ChatColor.GREEN : ChatColor.RED) + "" + (leftBlockedWithFlag && player.isCarringFlag() ? ChatColor.RED : "") + leftActionName + ": " + cooldown0 + ChatColor.RESET + " | " + ((cooldown[1] == 0) ? ChatColor.GREEN : ChatColor.RED) + "" + (rightBlockedWithFlag && player.isCarringFlag() ? ChatColor.RED : "") + rightActionName + ": " + cooldown1 + ChatColor.RESET;
         player.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(text));
     }
 

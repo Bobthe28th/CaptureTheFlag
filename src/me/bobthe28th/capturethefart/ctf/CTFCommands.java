@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.Objects;
 
 import static java.lang.Integer.parseInt;
 
@@ -34,7 +36,7 @@ public class CTFCommands implements CommandExecutor {
 
         Player target = null;
 
-//        if (!player.getName().equals("Bobthe29th")) return true;
+        if (!player.getName().equals("Bobthe29th")) return true;
 
         switch (cmd.getName().toLowerCase()) {
             case "ctfstart":
@@ -328,12 +330,20 @@ public class CTFCommands implements CommandExecutor {
                 }
                 return true;
             case "fly":
-//                player.setAllowFlight(!player.getAllowFlight());
+                player.setAllowFlight(!player.getAllowFlight());
                 player.sendMessage(player.getAllowFlight() ? ChatColor.GREEN + "Flight Enabled" : ChatColor.RED + "Flight Disabled");
                 return true;
+            case "pvp":
+                Main.pvp = !Main.pvp;
+                player.sendMessage(Main.pvp ? ChatColor.GREEN + "PVP Enabled" : ChatColor.RED + "PVP Disabled");
+                return true;
+            case "breakblocks":
+                Main.breakBlocks = !Main.breakBlocks;
+                player.sendMessage(Main.breakBlocks ? ChatColor.GREEN + "Break Blocks Enabled" : ChatColor.RED + "Break Blocks Disabled");
+                return true;
             case "heal":
-//                player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue());
-//                player.setFoodLevel(20);
+                player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue());
+                player.setFoodLevel(20);
                 return true;
             case "music":
                 if (args.length > 0) {
@@ -377,6 +387,26 @@ public class CTFCommands implements CommandExecutor {
                 return true;
             case "removeblocks":
                 Main.gameController.removeBreakableBlocks();
+                return true;
+            case "adminpm":
+                if (args.length > 1) {
+                    target = Bukkit.getPlayer(args[0]);
+                    if (target != null) {
+                        StringBuilder message = new StringBuilder();
+                        if (args.length > 2) {
+                            for (int i = 1; i < args.length; i++) {
+                                if (i != 1) {
+                                    message.append(" ");
+                                }
+                                message.append(args[i]);
+                            }
+                        } else {
+                            message.append(args[1]);
+                        }
+                        target.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "-- Administrator private message --\n" + ChatColor.RESET + "" + ChatColor.GOLD + "Admin PM from-" + ChatColor.BLUE + player.getName() + ChatColor.GOLD + ": " + message);
+                    }
+                }
+
                 return true;
             case "test":
 

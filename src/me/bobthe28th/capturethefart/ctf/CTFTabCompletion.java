@@ -33,6 +33,7 @@ public class CTFTabCompletion implements TabCompleter {
             case "ctfleave":
             case "ctfteamleave":
             case "ctfleaveclass":
+            case "adminpm":
                 if (args.length == 1) {
                     return playerList();
                 }

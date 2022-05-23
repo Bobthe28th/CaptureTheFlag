@@ -71,6 +71,7 @@ public class CTFPlayer implements Listener {
 
     int kills = 0;
     int deaths = 0;
+    int fishCaught = 0;
 
     boolean isAlive;
 
@@ -256,6 +257,7 @@ public class CTFPlayer implements Listener {
             Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE, team);
         }
         deaths ++;
+        fishCaught = 0;
         Main.gameController.updateScoreboard(this,ScoreboardRow.DEATHS);
         if (carriedFlag != null) {
             dropFlag();
@@ -275,6 +277,7 @@ public class CTFPlayer implements Listener {
         }
         if (team != null) {
             if(!player.teleport(team.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN)) {
+                plugin.getLogger().info("Bad respawn");
                 player.setHealth(0.0);
             }
             Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,team);
@@ -335,10 +338,17 @@ public class CTFPlayer implements Listener {
     }
 
     public void remove() {
-        Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,team);
-        Main.gameController.updateTeams();
+        removeNotList();
+        Main.CTFPlayers.remove(player);
+    }
+
+    public void removeNotList() {
+        if (team != null) {
+            Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE, team);
+        }
         leaveClass();
         leaveTeam();
+        Main.gameController.updateTeams();
         enemyHealth.removeAll();
         Bukkit.getServer().getScheduler().cancelTask(cooldownTask);
         if (respawnTimer != null) {
@@ -350,7 +360,6 @@ public class CTFPlayer implements Listener {
         }
         removeItems();
         Main.gameController.removeScoreboard(this);
-        Main.CTFPlayers.remove(player);
     }
 
     public void giveArmor() {
@@ -433,6 +442,14 @@ public class CTFPlayer implements Listener {
         }
 
         player.updateInventory();
+    }
+
+    public int getFishCaught() {
+        return fishCaught;
+    }
+
+    public void setFishCaught(int fc) {
+        fishCaught = fc;
     }
 
     public Player getPlayer() {
@@ -579,6 +596,18 @@ public class CTFPlayer implements Listener {
     }
 
     @EventHandler
+    public void onPlayerMove(PlayerMoveEvent event) {
+        if (event.getPlayer() != player) return;
+        if (event.getTo() != null) {
+            for (CTFTeam sBoxTeam : Main.gameController.getMap().getSpawnMoveBoxes().keySet()) {
+                if (team != null && sBoxTeam != team && Main.gameController.getMap().getSpawnMoveBoxes().get(sBoxTeam).contains(event.getTo().toVector())) {
+                    event.setCancelled(true);
+                }
+            }
+        }
+    }
+
+    @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         if (event.getPlayer() != player.getPlayer()) return;
         remove();
@@ -651,7 +680,6 @@ public class CTFPlayer implements Listener {
                 getItem(slot).onclickAction(event);
             }
         }
-
     }
 
     @EventHandler
@@ -686,7 +714,15 @@ public class CTFPlayer implements Listener {
     @EventHandler
     public void onPlayerPlaceBlock(BlockPlaceEvent event) {
         if (event.getPlayer() != player) return;
-        if (!canUse) {
+
+        boolean inspawn = false;
+        for (CTFTeam sBoxTeam : Main.gameController.getMap().getSpawnPlaceBoxes().keySet()) {
+            if (team != null && sBoxTeam != team && Main.gameController.getMap().getSpawnPlaceBoxes().get(sBoxTeam).contains(event.getBlockPlaced().getLocation().toVector())) {
+                inspawn = true;
+            }
+        }
+
+        if (!canUse || inspawn) {
             event.setCancelled(true);
         } else {
             int slot = player.getInventory().getHeldItemSlot();

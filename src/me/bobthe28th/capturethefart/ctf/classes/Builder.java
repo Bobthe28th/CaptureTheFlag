@@ -9,6 +9,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.FishHook;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -49,6 +50,7 @@ public class Builder extends CTFClass implements Listener {
         wool = new BuiWool(player,plugin,1);
         player.giveItem(wool);
         player.giveItem(new BuiPlan(player,plugin,2,wool));
+//        player.giveItem(new BuiFish(player,plugin,5));
     }
 
     @Override
@@ -69,6 +71,13 @@ public class Builder extends CTFClass implements Listener {
                 event.getHook().remove();
                 event.setCancelled(true);
             }
+        } else if (event.getState() == PlayerFishEvent.State.CAUGHT_FISH && event.getCaught() != null && event.getCaught() instanceof Item item) {
+            player.setFishCaught(player.getFishCaught() + 1);
+            player.getPlayer().sendMessage(ChatColor.YELLOW + "Caught FISH " + ChatColor.GOLD + "+" + ChatColor.RESET);
+            if (player.getFishCaught() >= 15) {
+                player.giveItem(new BuiFish(player,plugin,5));
+            }
+            item.remove();
         }
     }
 

@@ -12,12 +12,24 @@ public class CTFMap {
     BoundingBox boundingBox;
     HashMap<CTFTeam,Location> spawnLocations = new HashMap<>();
     HashMap<CTFTeam,Location> flagLocations = new HashMap<>();
+    HashMap<CTFTeam,BoundingBox> spawnPlaceBoxes = new HashMap<>();
+    HashMap<CTFTeam,BoundingBox> spawnMoveBoxes = new HashMap<>();
 
-    public CTFMap(String name, HashMap<CTFTeam,Location> spawnLocations, HashMap<CTFTeam,Location> flagLocations, BoundingBox boundingBox) {
+    public CTFMap(String name, HashMap<CTFTeam,Location> spawnLocations, HashMap<CTFTeam,Location> flagLocations, HashMap<CTFTeam,BoundingBox> spawnPlaceBoxes, HashMap<CTFTeam,BoundingBox> spawnMoveBoxes, BoundingBox boundingBox) {
         this.name = name;
         this.boundingBox = boundingBox;
         this.spawnLocations.putAll(spawnLocations);
         this.flagLocations.putAll(flagLocations);
+        this.spawnPlaceBoxes.putAll(spawnPlaceBoxes);
+        this.spawnMoveBoxes.putAll(spawnMoveBoxes);
+    }
+
+    public HashMap<CTFTeam,BoundingBox> getSpawnPlaceBoxes() {
+        return spawnPlaceBoxes;
+    }
+
+    public HashMap<CTFTeam,BoundingBox> getSpawnMoveBoxes() {
+        return spawnMoveBoxes;
     }
 
     public BoundingBox getBoundingBox() {

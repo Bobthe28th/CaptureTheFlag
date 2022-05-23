@@ -23,7 +23,7 @@ import java.util.Random;
 public class WizStickFire extends CTFDoubleCooldownItem {
 
     public WizStickFire(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("Fire Staff", Material.STICK, 3, "Solar Blast", 1.5, "Fire Ball", 10, player_, plugin_, defaultSlot_);
+        super("Fire Staff", Material.STICK, 3, "Solar Blast", 1.5,false, "Fire Ball", 10,false, player_, plugin_, defaultSlot_);
     }
 
     @Override
