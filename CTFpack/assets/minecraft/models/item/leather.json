@@ -23,6 +23,14 @@
     {
       "predicate": { "custom_model_data": 5 },
       "model": "assassin/assassinhat"
+    },
+    {
+      "predicate": { "custom_model_data": 6 },
+      "model": "archer/archerhat"
+    },
+    {
+      "predicate": { "custom_model_data": 7 },
+      "model": "alchemist/alchemisthat"
     }
   ]
 }

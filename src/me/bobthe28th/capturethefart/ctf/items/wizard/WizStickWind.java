@@ -1,7 +1,7 @@
 package me.bobthe28th.capturethefart.ctf.items.wizard;
 
-import java.util.*;
-
+import me.bobthe28th.capturethefart.Main;
+import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.damage.CTFDamage;
 import me.bobthe28th.capturethefart.ctf.damage.CTFDamageCause;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFDoubleCooldownItem;
@@ -9,19 +9,19 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.Vector;
 
-import me.bobthe28th.capturethefart.Main;
-import me.bobthe28th.capturethefart.ctf.CTFPlayer;
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.Random;
 
 public class WizStickWind extends CTFDoubleCooldownItem {
 
     public WizStickWind(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("Lightning Staff",Material.STICK,1,"Zap",0.5,"Lightning Strike",20,player_,plugin_, defaultSlot_);
+        super("Lightning Staff",Material.STICK,1,"Zap",0.5,false,"Lightning Strike",20,false,player_,plugin_, defaultSlot_);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class WizStickWind extends CTFDoubleCooldownItem {
                                     if (pd != p && Main.CTFPlayers.get(pd).getTeam() != player.getTeam()) {
                                         ArrayList<Player> playersChained = new ArrayList<>();
                                         Main.customDamageCause.put(pd, new CTFDamage(player,CTFDamageCause.WIZARD_ZAP));
-                                        pd.damage(1.0, p);
+                                        pd.damage(2.0, p);
                                         pd.getWorld().playSound(pd.getLocation(), Sound.ENTITY_BEE_DEATH, 1.0F, 2.0F);
                                         playersChained.add(p);
                                         playersChained.add(pd);
@@ -77,15 +77,15 @@ public class WizStickWind extends CTFDoubleCooldownItem {
             case RIGHT_CLICK_AIR:
                 if (getCooldown(1) == 0) {
 
-                    int range = 500;
+                    int range = 50;
 
-                    Entity target = Main.getLookedAtPlayer(p,1);
+                    CTFPlayer target = Main.getLookedAtCTFPlayer(player,3);
 
                     Block b = p.getTargetBlock(null, range);
                     Location loc = b.getLocation().add(new Vector(0.5, 1, 0.5));
 
                     if (target != null) {
-                        loc = target.getLocation();
+                        loc = target.getPlayer().getLocation();
                     }
 
                     p.getWorld().strikeLightningEffect(loc);
@@ -111,7 +111,7 @@ public class WizStickWind extends CTFDoubleCooldownItem {
         double lastDistance = Double.MAX_VALUE;
         Player result = null;
         for(Entity entity : Objects.requireNonNull(loc.getWorld()).getNearbyEntities(loc,6.0,6.0,6.0)) {
-            if(entity instanceof Player pd) {
+            if(entity instanceof Player pd && pChained.get(pChained.size()-1).hasLineOfSight(pd)) {
                 if (Main.CTFPlayers.containsKey(pd)) {
                     if (Main.CTFPlayers.get(pd).getTeam() != player.getTeam()) {
                         double distance = loc.distance(pd.getLocation());

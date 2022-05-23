@@ -4,7 +4,6 @@ import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.damage.CTFDamage;
 import me.bobthe28th.capturethefart.ctf.damage.CTFDamageCause;
-import me.bobthe28th.capturethefart.ctf.itemtypes.CTFBuildUpItem;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFStackCooldownItem;
 import org.bukkit.*;
 import org.bukkit.entity.Arrow;
@@ -34,7 +33,7 @@ public class ArcGhostArrow extends CTFStackCooldownItem {
 
         new BukkitRunnable() {
             final Location loc = arrow.getLocation();
-            final Vector dir = player.getPlayer().getEyeLocation().getDirection().normalize().multiply(force);
+            final Vector dir = player.getPlayer().getEyeLocation().getDirection().normalize().multiply(force*2);
             int t = 0;
             public void run() {
                 if (t >= 200) {
@@ -46,12 +45,14 @@ public class ArcGhostArrow extends CTFStackCooldownItem {
                 }
 
                 if (loc.getWorld() != null) {
-                    for (Entity e : loc.getWorld().getNearbyEntities(loc, 0.5, 0.5, 0.5)) {
+                    double radius = 2.0;
+                    for (Entity e : loc.getWorld().getNearbyEntities(loc, radius, radius, radius)) {
                         if (e instanceof Player p) {
                             if (Main.CTFPlayers.containsKey(p)) {
                                 if (Main.CTFPlayers.get(p).getTeam() != player.getTeam()) {
                                     Main.customDamageCause.put(p,new CTFDamage(player, CTFDamageCause.ARCHER_GHOST_ARROW));
                                     p.damage(3.0,player.getPlayer());
+                                    player.getPlayer().playSound(player.getPlayer(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.5F, 0.5F);
                                     Main.CTFPlayers.get(p).addGlow("ghost");
                                     Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                                         final Player pg = p;

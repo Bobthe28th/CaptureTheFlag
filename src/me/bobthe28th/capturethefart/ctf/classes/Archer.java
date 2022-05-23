@@ -4,10 +4,7 @@ import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFClass;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.items.archer.*;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.*;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -35,7 +32,8 @@ public class Archer extends CTFClass implements Listener {
         if (player_ != null) {
             Bukkit.getPluginManager().registerEvents(this, plugin);
         }
-        setArmor(new Material[]{Material.LEATHER_HELMET,Material.LEATHER_LEGGINGS,Material.LEATHER_BOOTS});
+        setArmor(new Material[]{Material.LEATHER,Material.LEATHER_LEGGINGS,Material.LEATHER_BOOTS});
+        setHelmetCustomModel(6);
     }
 
     @Override
@@ -73,7 +71,10 @@ public class Archer extends CTFClass implements Listener {
     public void onEntityShootBow(EntityShootBowEvent event) {
         if (event.getEntity() instanceof Player p) {
             if (p != player.getPlayer()) return;
-
+            if (player.getPlayer().getGameMode() == GameMode.SPECTATOR) {
+                event.setCancelled(true);
+                return;
+            }
             event.setConsumeItem(false);
 
             Arrow a = (Arrow) event.getProjectile();

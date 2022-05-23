@@ -25,6 +25,8 @@ public abstract class CTFStackCooldownItem extends CTFItem {
         cooldownItem = cooldownItem_;
     }
 
+    public void endCooldown() { }
+
     public void startCooldown() {
         cooldown = cooldownMax;
         CTFItem t = this;
@@ -52,6 +54,7 @@ public abstract class CTFStackCooldownItem extends CTFItem {
                     if (player.getItemSlot(t) != -1) {
                         player.getPlayer().getInventory().setItem(player.getItemSlot(t),t.getItem());
                     }
+                    endCooldown();
                     this.cancel();
                 } else {
                     cooldown -= 0.1;

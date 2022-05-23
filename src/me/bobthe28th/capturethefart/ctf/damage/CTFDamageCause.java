@@ -2,29 +2,41 @@ package me.bobthe28th.capturethefart.ctf.damage;
 
 public enum CTFDamageCause {
     //Wizard
-    WIZARD_ZAP,
-    WIZARD_LIGHTNING,
-    WIZARD_SNOWBALL,
-    WIZARD_SNOW_CHUNK,
-    WIZARD_SOLAR_BLAST,
-    WIZARD_FIREBALL,
+    WIZARD_ZAP(false),
+    WIZARD_LIGHTNING(false),
+    WIZARD_SNOWBALL(false),
+    WIZARD_SNOW_CHUNK(false),
+    WIZARD_SOLAR_BLAST(true),
+    WIZARD_FIREBALL(true),
+    WIZARD_SHULKER(true),
+    WIZARD_PEARL(true),
+    WIZARD_PHANTOM(true),
     //Paladin
-    PALADIN_HAMMER,
-    PALADIN_HAMMER_THROW,
+    PALADIN_HAMMER(true),
+    PALADIN_HAMMER_THROW(true),
     //Demo
-    DEMO_TNT,
-    DEMO_ARROW,
+    DEMO_TNT(false),
+    DEMO_ARROW(true),
     //Builder
-    BUILDER_AXE,
-    BUILDER_SHEARS, //lol
+    BUILDER_AXE(true),
+    BUILDER_SHEARS(true),
     //Assassin
-    ASSASSIN_KNIFE,
-    ASSASSIN_KNIFE_STRONG,
+    ASSASSIN_KNIFE(true),
+    ASSASSIN_KNIFE_STRONG(true),
     //Archer
-    ARCHER_ARROW,
-    ARCHER_POISON_ARROW, //not the poison effect :/
-    ARCHER_GHOST_ARROW,
-    ARCHER_SONIC_ARROW,
+    ARCHER_ARROW(true),
+    ARCHER_POISON_ARROW(true),
+    ARCHER_GHOST_ARROW(true),
+    ARCHER_SONIC_ARROW(true),
     //Alchemist
-    ALCHEMIST_DAMAGE_POT
+    ALCHEMIST_DAMAGE_POT(true);
+
+    final boolean doesKnockback;
+    CTFDamageCause(boolean i) {
+        doesKnockback = i;
+    }
+
+    public boolean doesKnockback() {
+        return doesKnockback;
+    }
 }

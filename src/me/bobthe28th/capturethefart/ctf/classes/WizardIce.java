@@ -4,9 +4,7 @@ import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFClass;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.items.wizard.WizBookIce;
-import me.bobthe28th.capturethefart.ctf.items.wizard.WizBookWind;
 import me.bobthe28th.capturethefart.ctf.items.wizard.WizStickIce;
-import me.bobthe28th.capturethefart.ctf.items.wizard.WizStickWind;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -22,7 +20,7 @@ public class WizardIce extends CTFClass implements Listener {
         if (player_ != null) {
             Bukkit.getPluginManager().registerEvents(this, plugin);
         }
-        setArmor(new Material[]{Material.LEATHER,null,null});
+        setArmor(new Material[]{Material.LEATHER,Material.GOLDEN_LEGGINGS,Material.GOLDEN_BOOTS});
         setHelmetCustomModel(2);
     }
 

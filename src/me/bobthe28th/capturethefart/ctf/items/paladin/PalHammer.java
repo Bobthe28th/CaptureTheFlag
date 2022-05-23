@@ -2,35 +2,29 @@ package me.bobthe28th.capturethefart.ctf.items.paladin;
 
 import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
+import me.bobthe28th.capturethefart.ctf.damage.CTFDamageCause;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFToolCooldownItem;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
-
-import java.util.Objects;
 
 public class PalHammer extends CTFToolCooldownItem {
 
     public PalHammer (CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("Paladin's Hammer", Material.IRON_AXE,2, "Throw",3.5,player_,plugin_, defaultSlot_);
+        super("Paladin's Hammer", Material.IRON_AXE,2, "Throw",3.5,Material.AIR,player_,plugin_, defaultSlot_);
+        setMeleeDeathMessage(CTFDamageCause.PALADIN_HAMMER);
     }
 
     @Override
     public void onclickAction(PlayerInteractEvent event) {
         Action action = event.getAction();
         if (getCooldown() <= 0 && (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)) {
-            startCooldown();
+            startAction();
             Snowball hammer = player.getPlayer().launchProjectile(Snowball.class);
             hammer.setShooter(player.getPlayer());
             hammer.setVelocity(player.getPlayer().getLocation().getDirection().multiply(0.9));

@@ -21,7 +21,7 @@ public class WizBookFire extends CTFDoubleCooldownItem {
 
 
     public WizBookFire(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("Fire Tome", Material.BOOK, 3, "Fire Wall", 13, "Attack Boost", 23, player_, plugin_, defaultSlot_);
+        super("Fire Tome", Material.BOOK, 3, "Fire Wall", 13,false, "Attack Boost", 23,false, player_, plugin_, defaultSlot_);
     }
 
     @Override
@@ -75,12 +75,13 @@ public class WizBookFire extends CTFDoubleCooldownItem {
             case RIGHT_CLICK_BLOCK:
                 if (getCooldown(1) == 0) {
                     startCooldown(1);
+                    p.getWorld().playSound(p.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 1.0F, 1.0F);
                     double radius = 8.0;
                     for (Entity e : p.getWorld().getNearbyEntities(p.getLocation(), radius, radius, radius)) {
                         if (e instanceof Player a) {
                             if (a.getLocation().distance(p.getLocation()) <= radius) {
                                 if (Main.CTFPlayers.containsKey(a)) {
-                                    if (Main.CTFPlayers.get(a).getTeam() == player.getTeam()) {
+                                    if (Main.CTFPlayers.get(a).getTeam() == player.getTeam() && !Main.CTFPlayers.get(a).isCarringFlag()) {
                                         attackBoost(Main.CTFPlayers.get(a));
                                     }
                                 }
@@ -119,10 +120,8 @@ public class WizBookFire extends CTFDoubleCooldownItem {
                     Location loc2 = p.getPlayer().getLocation().clone();
                     loc2.add(new Vector(Math.sin(angle) * ringSize,2 * ((double)(maxTime - t)/maxTime),Math.cos(angle) * ringSize));
 
-                    for (Player a : Bukkit.getOnlinePlayers()) {
-                        a.spawnParticle(Particle.FLAME,loc,0,0.0,0.0,0.0);
-                        a.spawnParticle(Particle.FLAME,loc2,0,0.0,0.0,0.0);
-                    }
+                    p.getPlayer().getWorld().spawnParticle(Particle.FLAME,loc,0,0.0,0.0,0.0);
+                    p.getPlayer().getWorld().spawnParticle(Particle.FLAME,loc2,0,0.0,0.0,0.0);
                     t++;
                 }
             }

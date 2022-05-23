@@ -20,13 +20,19 @@ import org.bukkit.potion.PotionEffectType;
 public class Paladin extends CTFClass implements Listener {
 
     String name = "Paladin";
+    PalHammer hammer;
 
     public Paladin(CTFPlayer player_, Main plugin_) {
         super("Paladin",plugin_,player_);
         if (player_ != null) {
             Bukkit.getPluginManager().registerEvents(this, plugin);
         }
-        setArmor(new Material[]{Material.IRON_HELMET,Material.IRON_LEGGINGS,Material.IRON_BOOTS});
+        setArmor(new Material[]{Material.IRON_INGOT,Material.IRON_LEGGINGS,Material.IRON_BOOTS});
+        setHelmetCustomModel(3);
+    }
+
+    public void returnHammer() {
+        hammer.startCooldown();
     }
 
     @Override
@@ -42,7 +48,8 @@ public class Paladin extends CTFClass implements Listener {
     @Override
     public void giveItems() {
         player.removeItems();
-        player.giveItem(new PalHammer(player,plugin,0));
+        hammer = new PalHammer(player,plugin,0);
+        player.giveItem(hammer);
     }
 
     @EventHandler

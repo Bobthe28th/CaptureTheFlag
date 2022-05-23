@@ -4,16 +4,19 @@ import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.classes.TeamPreview;
 import me.bobthe28th.capturethefart.ctf.classes.WizardPreview;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.scoreboard.*;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
@@ -26,6 +29,8 @@ public class CTFGameController implements Listener {
     static Main plugin;
 
     HashMap<CTFPlayer,Scoreboard> pScoreboard = new HashMap<>();
+
+    CTFMap map;
 
     Location teamStart;
     Location[] teamSelect;
@@ -49,7 +54,6 @@ public class CTFGameController implements Listener {
         plugin = plugin_;
         Bukkit.getPluginManager().registerEvents(this, plugin);
         teamStart = new Location(w, 68.5, 81, -226.5, -90F, 0F);
-//        teamStart.setYaw(-90F);
         teamSelect = new Location[Main.CTFTeams.length];
         classStart = new Location[Main.CTFClasses.length];
         classSelect = new Location[Main.CTFTeams.length][Main.CTFClasses.length];
@@ -79,6 +83,70 @@ public class CTFGameController implements Listener {
                 new Location(w,68.5, 81, -239.5),
                 new Location(w,63.5, 81, -239.5)
         };
+
+        setMap(Main.CTFMaps[0]);
+    }
+
+    public boolean getSelectingTeam() {
+        return selectingTeam;
+    }
+
+    public void setMap(CTFMap m) {
+        map = m;
+        map.set();
+    }
+
+    public CTFMap getMap() {
+        return map;
+    }
+
+    public void removeBreakableBlocks() {
+        for (Block b : Main.breakableBlocks.keySet()) {
+            if (b != null) {
+                b.setType(Material.AIR);
+            }
+        }
+        Main.breakableBlocks.clear();
+    }
+
+    public void resetFlags() {
+        for (CTFFlag flag : Main.CTFFlags) {
+            flag.setPos(flag.getHome());
+        }
+    }
+
+    public void gameEnd(CTFTeam winner) {
+        Main.pvp = false;
+        Main.breakBlocks = false;
+        removeBreakableBlocks();
+        resetFlags();
+        for (CTFPlayer p : Main.CTFPlayers.values()) {
+            if (p.getTeam() == winner) {
+                p.getPlayer().teleport(new Location(p.getPlayer().getWorld(),650, 114, 93));
+            } else {
+                p.getPlayer().teleport(new Location(p.getPlayer().getWorld(),607, 114, 89));
+            }
+            p.setCanUse(false);
+        }
+
+        for (CTFTeam team : Main.CTFTeams) {
+            team.setNameTagVisiblity(true);
+        }
+
+//        World w = Bukkit.getServer().getWorld("world");
+//        if (w != null) {
+//            new BukkitRunnable() {
+//                @Override
+//                public void run() {
+//                    Firework fWork = w.spawn(new Location(w, 0, 0, 0), Firework.class); //TODO loc
+//                    FireworkMeta fMeta = fWork.getFireworkMeta();
+//                    FireworkEffect effect = FireworkEffect.builder().withColor(winner.getColor()).with(FireworkEffect.Type.BURST).trail(true).withFade(Color.WHITE).build();
+//                    fMeta.addEffect(effect);
+//                    fWork.setFireworkMeta(fMeta);
+//                }
+//            }.runTaskTimer(plugin, 20L, 20L);
+//        }
+        //TODO game end
     }
 
     public void updateScoreboard(CTFPlayer p, ScoreboardRow r) {
@@ -147,6 +215,7 @@ public class CTFGameController implements Listener {
                 t.setAllowFriendlyFire(false);
                 t.setCanSeeFriendlyInvisibles(true);
                 t.setOption(Team.Option.NAME_TAG_VISIBILITY, team.getTeam().getOption(Team.Option.NAME_TAG_VISIBILITY));
+                t.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.FOR_OWN_TEAM);
                 for (String e : team.getTeam().getEntries()) {
                     t.addEntry(e);
                 }
@@ -155,7 +224,7 @@ public class CTFGameController implements Listener {
     }
 
     public void addScoreboard(CTFPlayer p) {
-        if (Bukkit.getScoreboardManager() != null) {
+        if (Bukkit.getScoreboardManager() != null && !pScoreboard.containsKey(p)) {
             pScoreboard.put(p,Bukkit.getScoreboardManager().getNewScoreboard());
             updateTeams(p);
             Objective o = pScoreboard.get(p).registerNewObjective("ctfscores", "dummy", "Capture The Fart");
@@ -194,8 +263,18 @@ public class CTFGameController implements Listener {
             for (CTFTeam t : Main.CTFTeams) {
                 updateScoreboardGlobal(ScoreboardRowGlobal.ALIVE,t);
             }
+            if (!pScoreboard.containsKey(p) || pScoreboard.get(p) == null) {
+                addScoreboard(p);
+            }
             p.getPlayer().setScoreboard(pScoreboard.get(p));
+            p.getPlayer().playSound(p.getPlayer(), Sound.ENTITY_WITHER_SPAWN,1,1);
         }
+        Main.pvp = true;
+        Main.breakBlocks = true;
+    }
+
+    public Scoreboard getScoreboard(CTFPlayer p) {
+        return pScoreboard.get(p);
     }
 
     public void start() {
@@ -208,11 +287,15 @@ public class CTFGameController implements Listener {
             team.setNameTagVisiblity(true);
         }
         for (Player p : Bukkit.getOnlinePlayers()) {
+            p.getInventory().clear();
             if (Main.CTFPlayers.containsKey(p)) {
                 Main.CTFPlayers.get(p).remove();
             }
-            p.teleport(teamStart);
+            p.teleport(teamStart, PlayerTeleportEvent.TeleportCause.PLUGIN);
             Main.CTFPlayers.put(p, new CTFPlayer(plugin, p));
+            if (Bukkit.getScoreboardManager() != null) {
+                p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+            }
             Main.fakeClass(p, new UUID(0,0),70, teamSelect[0].clone().add(0.0,3.0,0.0), 0F, 90F, TeamPreview.class,Main.CTFTeams[0],plugin);
             Main.fakeClass(p, new UUID(0,1),71, teamSelect[1].clone().add(0.0,3.0,0.0), 0F, 90F, TeamPreview.class,Main.CTFTeams[1],plugin);
         }
@@ -389,7 +472,7 @@ public class CTFGameController implements Listener {
                 }
                 int index = Main.CTFClasses.length - 4;
                 Main.fakeClass(p.getPlayer(), new UUID(0, index), 70 + index, classSelect[p.getTeam().getId()][index], 0F, 90F,WizardPreview.class, p.getTeam(), plugin);
-                p.getPlayer().teleport(classStart[p.getTeam().getId()]);
+                p.getPlayer().teleport(classStart[p.getTeam().getId()], PlayerTeleportEvent.TeleportCause.PLUGIN);
             }
         }
     }
@@ -423,44 +506,46 @@ public class CTFGameController implements Listener {
 
         } else if (selectingClass) {
             blockPos.setY(classSelectY);
-            int teamid = player.getTeam().getId();
+            if (player.getTeam() != null) {
+                int teamid = player.getTeam().getId();
 
-            boolean inSelect = false;
-            for (int i = 0; i < classSelect[teamid].length; i++) {
-                if (blockPos.distance(classSelect[teamid][i]) < classSelectRadius) {
-                    if (i >= Main.CTFClasses.length - 4) {
-                        selectClassJoin(player,null,i);
-                    } else {
-                        selectClassJoin(player,Main.CTFClasses[i],i);
-                    }
-                    inSelect = true;
-                }
-            }
-            if (!inSelect) {
-                if (player.getpClass() != null || player.getSelectingWizard()) {
-                    if (player.getSelectingWizard()) {
-                        int index = Main.CTFClasses.length - 4;
-                        for (CTFPlayer p : Main.CTFPlayers.values()) {
-                            if (p.getTeam() == player.getTeam()) {
-                                Main.fakeClass(p.getPlayer(), new UUID(0, index), 70 + index, classSelect[player.getTeam().getId()][index], 0F, 90F, WizardPreview.class, player.getTeam(), plugin);
-                            }
+                boolean inSelect = false;
+                for (int i = 0; i < classSelect[teamid].length; i++) {
+                    if (blockPos.distance(classSelect[teamid][i]) < classSelectRadius) {
+                        if (i >= Main.CTFClasses.length - 4) {
+                            selectClassJoin(player, null, i);
+                        } else {
+                            selectClassJoin(player, Main.CTFClasses[i], i);
                         }
-                    } else {
-                        int index = Arrays.asList(Main.CTFClasses).indexOf(player.getpClass().getClass());
-                        if (index != -1) {
+                        inSelect = true;
+                    }
+                }
+                if (!inSelect) {
+                    if (player.getpClass() != null || player.getSelectingWizard()) {
+                        if (player.getSelectingWizard()) {
+                            int index = Main.CTFClasses.length - 4;
                             for (CTFPlayer p : Main.CTFPlayers.values()) {
                                 if (p.getTeam() == player.getTeam()) {
-                                    Main.fakeClass(p.getPlayer(), new UUID(0, index), 70 + index, classSelect[player.getTeam().getId()][index], 0F, 90F,Main.CTFClasses[index], player.getTeam(), plugin);
+                                    Main.fakeClass(p.getPlayer(), new UUID(0, index), 70 + index, classSelect[player.getTeam().getId()][index], 0F, 90F, WizardPreview.class, player.getTeam(), plugin);
+                                }
+                            }
+                        } else {
+                            int index = Arrays.asList(Main.CTFClasses).indexOf(player.getpClass().getClass());
+                            if (index != -1) {
+                                for (CTFPlayer p : Main.CTFPlayers.values()) {
+                                    if (p.getTeam() == player.getTeam()) {
+                                        Main.fakeClass(p.getPlayer(), new UUID(0, index), 70 + index, classSelect[player.getTeam().getId()][index], 0F, 90F, Main.CTFClasses[index], player.getTeam(), plugin);
+                                    }
                                 }
                             }
                         }
+
+                        player.setSelectingWizard(false);
+
+                        player.leaveClass();
                     }
-
-                    player.setSelectingWizard(false);
-
-                    player.leaveClass();
+                    stopClassSelectTimer();
                 }
-                stopClassSelectTimer();
             }
         }
     }

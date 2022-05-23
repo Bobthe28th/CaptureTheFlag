@@ -1,14 +1,14 @@
 package me.bobthe28th.capturethefart.ctf.items.wizard;
 
-import java.util.Objects;
-import java.util.Random;
-
+import me.bobthe28th.capturethefart.Main;
+import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.damage.CTFDamage;
 import me.bobthe28th.capturethefart.ctf.damage.CTFDamageCause;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFDoubleCooldownItem;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
@@ -17,16 +17,13 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
-import me.bobthe28th.capturethefart.Main;
-import me.bobthe28th.capturethefart.ctf.CTFPlayer;
+import java.util.Objects;
+import java.util.Random;
 
 public class WizStickFire extends CTFDoubleCooldownItem {
 
     public WizStickFire(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("Fire Staff", Material.STICK, 3, "Solar Blast", 1.5, "Fire Ball", 3, player_, plugin_, defaultSlot_);
-        plugin = plugin_;
-        player = player_;
-        setNoHit(true);
+        super("Fire Staff", Material.STICK, 3, "Solar Blast", 1.5,false, "Fire Ball", 10,false, player_, plugin_, defaultSlot_);
     }
 
     @Override
@@ -38,6 +35,7 @@ public class WizStickFire extends CTFDoubleCooldownItem {
             case LEFT_CLICK_BLOCK:
             case LEFT_CLICK_AIR:
                 if (getCooldown(0) == 0) {
+                    p.getWorld().playSound(p.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1.0F, 1.0F);
                     double coneHeight = 5.0;
                     double coneRadius = 3.0;
                     Vector shotP = p.getLocation().toVector().add(new Vector(0.0,1.0,0.0));
@@ -45,19 +43,22 @@ public class WizStickFire extends CTFDoubleCooldownItem {
                     for (Entity entity : p.getNearbyEntities(10,10,10)) {
                         if (entity instanceof Player pN) {
                             if (pN.hasLineOfSight(p)) {
-                                //https://stackoverflow.com/questions/12826117/how-can-i-detect-if-a-point-is-inside-a-cone-or-not-in-3d-space/12826333
 
-                                Vector hitP = pN.getLocation().toVector().add(new Vector(0.0,1.0,0.0));
-                                double cDist = (hitP.clone().subtract(shotP)).clone().dot(dir);
-                                double cRad = (cDist / coneHeight) * coneRadius;
-                                double orthDist = (hitP.clone().subtract(shotP)).clone().subtract((dir.clone().multiply(cDist))).clone().length();
+                                if (Main.CTFPlayers.containsKey(pN) && Main.CTFPlayers.get(pN).getTeam() != player.getTeam()) {
+                                    //https://stackoverflow.com/questions/12826117/how-can-i-detect-if-a-point-is-inside-a-cone-or-not-in-3d-space/12826333
 
-                                if (orthDist < cRad && cDist >= 0 && cDist <= coneHeight) {
-                                    pN.setFireTicks(70);
-                                    Main.customDamageCause.put(pN,new CTFDamage(player, CTFDamageCause.WIZARD_SOLAR_BLAST));
-                                    pN.damage(2,p);
+                                    Vector hitP = pN.getLocation().toVector().add(new Vector(0.0,1.0,0.0));
+                                    double cDist = (hitP.clone().subtract(shotP)).clone().dot(dir);
+                                    double cRad = (cDist / coneHeight) * coneRadius;
+                                    double orthDist = (hitP.clone().subtract(shotP)).clone().subtract((dir.clone().multiply(cDist))).clone().length();
+
+                                    if (orthDist < cRad && cDist >= 0 && cDist <= coneHeight) {
+                                        pN.setFireTicks(70);
+                                        Main.customDamageCause.put(pN,new CTFDamage(player, CTFDamageCause.WIZARD_SOLAR_BLAST));
+                                        pN.damage(4,p);
+                                        player.getPlayer().playSound(player.getPlayer(),Sound.ENTITY_EXPERIENCE_ORB_PICKUP,0.5F,0.5F);
+                                    }
                                 }
-
                             }
                         }
                     }
@@ -82,6 +83,7 @@ public class WizStickFire extends CTFDoubleCooldownItem {
             case RIGHT_CLICK_AIR:
                 if (getCooldown(1) == 0) {
                     startCooldown(1);
+                    p.getWorld().playSound(p.getLocation(), Sound.ENTITY_GHAST_SHOOT, 1.0F, 1.0F);
                     Fireball f = p.getWorld().spawn(p.getLocation().add(p.getLocation().getDirection().normalize().multiply(1.5)).add(new Vector(0.0, 1.0, 0.0)), Fireball.class);
                     f.setDirection(p.getLocation().getDirection().normalize());
                     f.setVelocity(p.getEyeLocation().getDirection().multiply(1.7));

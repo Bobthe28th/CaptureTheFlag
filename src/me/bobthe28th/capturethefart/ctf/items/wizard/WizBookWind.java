@@ -1,26 +1,24 @@
 package me.bobthe28th.capturethefart.ctf.items.wizard;
 
-import java.util.Objects;
-import java.util.Random;
-
+import me.bobthe28th.capturethefart.Main;
+import me.bobthe28th.capturethefart.ctf.CTFPlayer;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFDoubleCooldownItem;
 import org.bukkit.*;
 import org.bukkit.Particle.DustTransition;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.Vector;
 
-import me.bobthe28th.capturethefart.Main;
-import me.bobthe28th.capturethefart.ctf.CTFPlayer;
+import java.util.Objects;
+import java.util.Random;
 
 public class WizBookWind extends CTFDoubleCooldownItem {
 
     public WizBookWind(CTFPlayer player_, Main plugin_, Integer defaultSlot_) {
-        super("Wind Tome",Material.BOOK,1,"Wind Blast",15,"Wind Jump",15,player_,plugin_, defaultSlot_);
+        super("Wind Tome",Material.BOOK,1,"Wind Blast",15,true,"Wind Jump",15,false,player_,plugin_, defaultSlot_);
         plugin = plugin_;
         player = player_;
     }
@@ -39,11 +37,10 @@ public class WizBookWind extends CTFDoubleCooldownItem {
                 break;
             case LEFT_CLICK_BLOCK:
             case LEFT_CLICK_AIR:
-                if (getCooldown(0) == 0) {
+                if (getCooldown(0) == 0 && !player.isCarringFlag()) {
                     Location l = p.getEyeLocation().add(p.getEyeLocation().clone().getDirection().normalize().multiply(2));
                     for (Entity entity : p.getWorld().getNearbyEntities(l,2.0,2.0,2.0)) {
-                        if (entity.getType() == EntityType.PLAYER && entity != p) {
-                            Player pd = (Player)entity;
+                        if (entity instanceof Player pd && p != pd && Main.CTFPlayers.containsKey(pd) && Main.CTFPlayers.get(pd).getTeam() != player.getTeam()) {
                             pd.setVelocity(pd.getVelocity().add(p.getEyeLocation().getDirection().normalize().multiply(2)));
                         }
                     }

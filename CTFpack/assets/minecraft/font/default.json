@@ -13,6 +13,13 @@
       "height": 8,
       "ascent": 8,
       "type": "bitmap"
+    },
+    {
+      "file": "paladin/hammer.png",
+      "chars": [ "\ue240" ],
+      "height": 8,
+      "ascent": 8,
+      "type": "bitmap"
     }
   ]
 }

@@ -1,16 +1,15 @@
 package me.bobthe28th.capturethefart.ctf.itemtypes;
 
+import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
+import me.bobthe28th.capturethefart.ctf.damage.CTFDamageCause;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityPotionEffectEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
@@ -18,9 +17,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.persistence.PersistentDataType;
-
-import me.bobthe28th.capturethefart.Main;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
@@ -36,8 +32,8 @@ public abstract class CTFItem {
     public int amount = 1;
     public int defaultSlot;
     public int slot;
-    boolean noHit = false;
 
+    CTFDamageCause meleeDeathMessage;
     Color potionColor;
     ArrayList<PotionEffect> potionEffects = new ArrayList<>();
 
@@ -65,10 +61,6 @@ public abstract class CTFItem {
         player.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
     }
 
-    public void setNoHit(boolean noHit) {
-        this.noHit = noHit;
-    }
-
     public void setPotionColor(Color pColor) {
         potionColor = pColor;
     }
@@ -86,6 +78,10 @@ public abstract class CTFItem {
     }
 
     public Material getMat() { return item; }
+
+    public void setMeleeDeathMessage(CTFDamageCause dm) {
+        meleeDeathMessage = dm;
+    }
 
     public ItemStack getItem() {
         ItemStack it = new ItemStack(item,amount);
@@ -106,7 +102,9 @@ public abstract class CTFItem {
             meta.setCustomModelData(customModel);
             meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfitem"), PersistentDataType.BYTE, (byte) 1);
             meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfname"), PersistentDataType.STRING, itemName);
-            meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "nohit"), PersistentDataType.BYTE, (byte)(noHit ? 1 : 0));
+            if (meleeDeathMessage != null) {
+                meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "ctfmeleedamagecause"), PersistentDataType.STRING, meleeDeathMessage.toString());
+            }
             it.setItemMeta(meta);
             return it;
         } else {

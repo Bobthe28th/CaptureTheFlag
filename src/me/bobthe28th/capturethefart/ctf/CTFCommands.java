@@ -1,23 +1,22 @@
 package me.bobthe28th.capturethefart.ctf;
 
-import org.bukkit.*;
+import me.bobthe28th.capturethefart.Main;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.*;
-
-import me.bobthe28th.capturethefart.Main;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Objects;
 
 import static java.lang.Integer.parseInt;
 
@@ -36,6 +35,8 @@ public class CTFCommands implements CommandExecutor {
         }
 
         Player target = null;
+
+        if (!player.getName().equals("Bobthe29th")) return true;
 
         switch (cmd.getName().toLowerCase()) {
             case "ctfstart":
@@ -88,7 +89,7 @@ public class CTFCommands implements CommandExecutor {
                 if (args.length > 0) {
                     target = Bukkit.getPlayer(args[0]);
                 } else {
-                    Bukkit.broadcastMessage(ChatColor.RED + "Please specify a player." + ChatColor.RESET);
+                    player.sendMessage(ChatColor.RED + "Please specify a player." + ChatColor.RESET);
                     return true;
                 }
                 if (target != null) {
@@ -293,10 +294,13 @@ public class CTFCommands implements CommandExecutor {
                     }
 
                     if (cClass != null) {
-                        //TODO book
                         ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
                         BookMeta bookMeta = (BookMeta) book.getItemMeta();
                         if (bookMeta != null) {
+                            bookMeta.setPages(Main.tutorialBooks.get(cClass));
+                            bookMeta.setAuthor("Yo mama");
+                            bookMeta.setTitle(className);
+                            book.setItemMeta(bookMeta);
                             player.openBook(book);
                         }
                     } else {
@@ -306,14 +310,40 @@ public class CTFCommands implements CommandExecutor {
                     player.sendMessage(ChatColor.RED + "Please specify a class." + ChatColor.RESET);
                 }
                 return true;
+            case "ctfsetmap":
+                if (args.length > 0) {
+                    CTFMap map = null;
+                    String[] mapNames = Main.getMapNames();
+                    for (int i = 0; i < mapNames.length; i++) {
+                        if (args[0].equals(mapNames[i])) {
+                            map = Main.CTFMaps[i];
+                        }
+                    }
+                    if (map != null) {
+                        Main.gameController.setMap(map);
+                        player.sendMessage(ChatColor.GREEN + "Set map to " + map.getName() + ChatColor.RESET);
+                    } else {
+                        player.sendMessage(ChatColor.RED + "Please specify a map." + ChatColor.RESET);
+                    }
+                } else {
+                    player.sendMessage(ChatColor.RED + "Please specify a map." + ChatColor.RESET);
+                }
+                return true;
             case "fly":
                 player.setAllowFlight(!player.getAllowFlight());
                 player.sendMessage(player.getAllowFlight() ? ChatColor.GREEN + "Flight Enabled" : ChatColor.RED + "Flight Disabled");
                 return true;
+            case "pvp":
+                Main.pvp = !Main.pvp;
+                player.sendMessage(Main.pvp ? ChatColor.GREEN + "PVP Enabled" : ChatColor.RED + "PVP Disabled");
+                return true;
+            case "breakblocks":
+                Main.breakBlocks = !Main.breakBlocks;
+                player.sendMessage(Main.breakBlocks ? ChatColor.GREEN + "Break Blocks Enabled" : ChatColor.RED + "Break Blocks Disabled");
+                return true;
             case "heal":
                 player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue());
                 player.setFoodLevel(20);
-//                player.setSaturation(20.0F);
                 return true;
             case "music":
                 if (args.length > 0) {
@@ -355,7 +385,64 @@ public class CTFCommands implements CommandExecutor {
                     player.sendMessage(ChatColor.RED + "Please specify a command." + ChatColor.RESET);
                 }
                 return true;
+            case "removeblocks":
+                Main.gameController.removeBreakableBlocks();
+                return true;
+            case "adminpm":
+                if (args.length > 1) {
+                    target = Bukkit.getPlayer(args[0]);
+                    if (target != null) {
+                        StringBuilder message = new StringBuilder();
+                        if (args.length > 2) {
+                            for (int i = 1; i < args.length; i++) {
+                                if (i != 1) {
+                                    message.append(" ");
+                                }
+                                message.append(args[i]);
+                            }
+                        } else {
+                            message.append(args[1]);
+                        }
+                        target.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "-- Administrator private message --\n" + ChatColor.RESET + "" + ChatColor.GOLD + "Admin PM from-" + ChatColor.BLUE + player.getName() + ChatColor.GOLD + ": " + message);
+                    }
+                }
+
+                return true;
             case "test":
+
+//                JsonObject object = new JsonObject();
+//                object.addProperty("test",10);
+//                ws.sendText(object.toString(), true);
+//                try {
+//                    ws.sendText("test", true);
+//                } catch (Exception var3) {
+//                    System.out.println("WebSocket connection failed! Please contact Bobthe28th.");
+//                    Bukkit.broadcastMessage(ChatColor.RED + "WebSocket connection failed!");
+//                }
+//                ShulkerBullet fart = Bukkit.getPlayer("WhyLiam").launchProjectile(ShulkerBullet.class);
+//                ShulkerBullet fart = player.getWorld().spawn(new Location(player.getWorld(), -344, 72, 296),ShulkerBullet.class);
+//                fart.setGravity(false);
+//
+//                new BukkitRunnable() {
+//
+//                    final Player target = Bukkit.getPlayer("Bobthe29th");
+//
+////                    Vector lastDirection = null;
+////                    final double degree = Math.toRadians(10.0);
+//
+//                    @Override
+//                    public void run() {
+//                        if (fart.isDead() || target == null) {
+//                            this.cancel();
+//                        } else {
+//                            Vector direction = target.getLocation().toVector().subtract(fart.getLocation().toVector()).add(new Vector(0,1,0));
+//                            fart.setVelocity(fart.getVelocity().add(direction.normalize().multiply(0.1)).normalize().multiply(0.5));
+//                        }
+//                    }
+//                }.runTaskTimer(plugin,0,1L);
+
+
+
 //                Main.fakeClass(player,UUID.fromString("00000000-0000-0000-0000-000000000000"),70,new Demo(null,plugin),plugin);
 
 //                UUID uuid = UUID.fromString("00000000-0000-0000-0000-000000000000");

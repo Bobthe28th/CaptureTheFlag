@@ -7,6 +7,14 @@
     {
       "predicate": { "custom_model_data": 1 },
       "model": "demolitionist/rocket"
+    },
+    {
+      "predicate": { "custom_model_data": 2 },
+      "model": "archer/ghost"
+    },
+    {
+      "predicate": { "custom_model_data": 3 },
+      "model": "archer/sonic"
     }
   ]
 }

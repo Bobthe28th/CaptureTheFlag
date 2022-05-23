@@ -1,23 +1,33 @@
 {
   "death": {
     "default": ["$1 died","$1 farted","/killed $1"],
-    "FALL": ["$1 fell and didn't get up","$1 went splat","$1 falled","$1 is malding","$1 fucking fell over"]
+    "FALL": ["$1 fell and didn't get up","$1 went splat","$1 falled","$1 is malding","$1 fucking fell over"],
+    "FIRE_TICK": ["wow $1 look like a big ol chicjken nugget","$1 was incinerated"]
   },
   "deathbe": {
-    "default": ["$1 was killed by $2","$1 could not handle the awesomeness of $2","$1 got fuccking died by $2"],
+    "default": ["$1 was slain by $2","$1 got destroyed by $2","$1 was killed by $2","$1 could not handle the awesomeness of $2","$1 got fuccking died by $2","$1 got zip-bombed by $2","$1 had their mother fucked by $2","$1 was turned into a marketable plushie by $2","$1 was put into the femur breaker by $2"],
     "WIZARD_ZAP": ["$1 got zapped by $2","$1 got electrocuted to fucking death by $2","$1 got absolutely smited to death by $2"],
-    "WIZARD_LIGHTNING": ["$1 got lightning stroke by $2"],
-    "WIZARD_FIREBALL": ["fireball"],
+    "WIZARD_LIGHTNING": ["$1 got lightning stroke by $2","dang $1 just got plugged into $2's outlet bro... haha"],
+    "WIZARD_FIREBALL": ["$1 got fireballed on by $2","$1 got their pants on fire from $2"],
     "WIZARD_SOLAR_BLAST": ["$1 was incinerated by $2","$1 got fucking scorched by $2","$1 burnt to a crisp due to $2"],
     "WIZARD_FREEZE": ["$1 frozed to death by $2","$1 god frostbitted by $2","$1 hit absolute zero from $2"],
+    "WIZARD_SNOWBALL": ["$1 got balled on by $2","$1 passionately gargled $2's icy nutsack"],
+    "WIZARD_SNOW_CHUNK": ["$1 faced the weight of their sins from $2","$1 had their balls crushed by $2"],
+    "WIZARD_SHULKER": ["$1 couldn't dodge $2's wondrous orb","$1 got outskilled by $2"],
+    "WIZARD_PEARL": ["$1 got jumpscared by $2","$1 got telefragged by $2"],
+    "WIZARD_PHANTOM": ["$1 got killed by $2's big bird lol","owen killed $1 and there was $2's pahntom but it was really owen it was just timed right so it looked like the phantom hit you but bro i totoally saw it it was owen not the phantom because owen did it and it wasnt me either (joe)"],
     "BUILDER_AXE": ["$1 got hella 90s built on them by $2","$1 lost the build battle to $2","$1 could not escape maze built by $2"],
-    "BUILDER_SHEARS": ["$1 fucking died to sheers from $2"],
+    "BUILDER_SHEARS": ["$1 fucking died to shears from $2","$1 was shaved to death by $2... somehow","$1 bleated their final words to $2"],
     "DEMO_TNT": ["$1 got blown into a million pieces by $2", "$1 got fucking blown up by $2","$1 bit za dusto due to $2"],
-    "DEMO_ARROW": ["$1 demo arrow $2"],
-    "ENTITY_ATTACK": ["$1 was slain by $2","$1 got destroyed by $2"],
-    "ARCHER_ARROW": ["$1 arrowed by $2"],
-    "ARCHER_GHOST_ARROW": ["$1 ghost arrowed by $2"],
-    "ARCHER_POISON_ARROW": ["$1 poison arrowed by $2"],
-    "ARCHER_SONIC_ARROW": ["$1 sonic arrowed by $2"]
+    "DEMO_ARROW": ["$1 got explodered by $2 from afar"],
+    "ARCHER_ARROW": ["$1 got gatted by $2","$1 was sniped by $2","$1 got no scoped by $2"],
+    "ARCHER_GHOST_ARROW": ["$1 got to see grandpa again by $2","$1's funeral was quickened by $2"],
+    "ARCHER_POISON_ARROW": ["$1 caught the bubonic plague from $2","$1 died of $2's cringe"],
+    "ARCHER_SONIC_ARROW": ["$1 felt the force of a shooting star from $2","$1 got flicked a little too hard by $2"],
+    "PALADIN_HAMMER": ["$1 got bonked by $2","$1 got smashed by $2","$1's head caved in by $2"],
+    "PALADIN_HAMMER_THROW": ["$1 got remote bonked by $2","$1 got their ass beat by $2","$1 caught $2's ha...mmer?"],
+    "ASSASSIN_KNIFE": ["$1 got stabbed by $2","$1 got stabby wabbied by $2"],
+    "ASSASSIN_KNIFE_STRONG": ["$1 got mega stabbed by $2","$1 got trick-stabbed by $2"],
+    "ALCHEMIST_DAMAGE_POT": ["$1 got piss-bombed by $2","$1 got water up their nose from $2"]
   }
 }

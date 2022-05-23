@@ -13,7 +13,7 @@ public class WizardPreview extends CTFClass implements Listener {
 
     public WizardPreview(CTFTeam team, Main plugin_) {
         super("Wizard", plugin_, null);
-        setArmor(new Material[]{Material.LEATHER,null,null});
+        setArmor(new Material[]{Material.LEATHER,Material.GOLDEN_LEGGINGS,Material.GOLDEN_BOOTS});
         setHelmetCustomModel(1);
     }
 

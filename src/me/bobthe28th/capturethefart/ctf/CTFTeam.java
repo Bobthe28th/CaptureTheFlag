@@ -18,13 +18,12 @@ public class CTFTeam {
     Material banner;
     Location spawnLocation;
 
-    public CTFTeam(Integer id_, String name_, ChatColor chatColor_, Color color_, Material banner_, Location spawnLocation_) {
+    public CTFTeam(Integer id_, String name_, ChatColor chatColor_, Color color_, Material banner_) {
         id = id_;
         name = name_;
         chatColor = chatColor_;
         color = color_;
         banner = banner_;
-        spawnLocation = spawnLocation_;
 
         Scoreboard s = Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard();
         Team t = s.registerNewTeam("ctf" + id);
@@ -33,6 +32,7 @@ public class CTFTeam {
         t.setAllowFriendlyFire(false);
         t.setCanSeeFriendlyInvisibles(true);
         t.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.FOR_OTHER_TEAMS);
+        t.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.FOR_OWN_TEAM);
         team = t;
     }
 
@@ -73,12 +73,19 @@ public class CTFTeam {
         return alive + "/" + total;
     }
 
+    public void setSpawnLocation(Location loc) {
+        spawnLocation = loc.clone();
+    }
+
     public Location getSpawnLocation() {
         return spawnLocation;
     }
 
     public void scorePoint() {
         points ++;
+        if (points >= 3) {
+            Main.gameController.gameEnd(this);
+        }
         Main.gameController.updateScoreboardGlobal(ScoreboardRowGlobal.POINTS,this);
     }
 

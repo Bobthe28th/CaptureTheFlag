@@ -3,7 +3,8 @@ package me.bobthe28th.capturethefart.ctf.classes;
 import me.bobthe28th.capturethefart.Main;
 import me.bobthe28th.capturethefart.ctf.CTFClass;
 import me.bobthe28th.capturethefart.ctf.CTFPlayer;
-import me.bobthe28th.capturethefart.ctf.items.wizard.*;
+import me.bobthe28th.capturethefart.ctf.items.wizard.WizBookWind;
+import me.bobthe28th.capturethefart.ctf.items.wizard.WizStickWind;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -25,7 +26,7 @@ public class WizardWind extends CTFClass implements Listener {
         if (player_ != null) {
             Bukkit.getPluginManager().registerEvents(this, plugin);
         }
-        setArmor(new Material[]{Material.LEATHER,null,null});
+        setArmor(new Material[]{Material.LEATHER,Material.GOLDEN_LEGGINGS,Material.GOLDEN_BOOTS});
         setHelmetCustomModel(3);
     }
 
@@ -55,7 +56,7 @@ public class WizardWind extends CTFClass implements Listener {
 
         Player pE = event.getPlayer();
 
-        if(!pE.isSneaking()) {
+        if(!pE.isSneaking() && player.getPlayer().getGameMode() != GameMode.SPECTATOR && !player.isCarringFlag()) {
             if (pE.getVelocity().getY() <= 0) {
                 pE.setVelocity(pE.getVelocity().setY(0.0));
             }

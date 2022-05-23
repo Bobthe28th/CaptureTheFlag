@@ -33,5 +33,52 @@
     "category": "music",
     "sounds": [ "custom/ordinary_days" ],
     "stream": true
+  },
+  "sonic": {
+    "category": "master",
+    "sounds": [ "custom/sonic" ]
+  },
+  "blueshield": {
+    "category": "master",
+    "sounds": [ "custom/blueshield" ]
+  },
+  "bwoink": {
+    "category": "master",
+    "sounds": [ "custom/bwoink" ]
+  },
+  "ghast": {
+    "category": "master",
+    "sounds": [ "custom/ghast" ],
+    "stream": true
+  },
+  "flag": {
+    "category": "master",
+    "sounds": [ "custom/flag" ],
+    "stream": true
+  },
+  "willsmenumusic": {
+    "category": "music",
+    "sounds": [ "custom/willsmenumusic" ],
+    "stream": true
+  },
+  "all_that_glitters": {
+    "category": "music",
+    "sounds": [ "custom/all_that_glitters" ],
+    "stream": true
+  },
+  "cast_list": {
+    "category": "music",
+    "sounds": [ "custom/cast_list" ],
+    "stream": true
+  },
+  "city_escape": {
+    "category": "music",
+    "sounds": [ "custom/city_escape" ],
+    "stream": true
+  },
+  "live_and_learn": {
+    "category": "music",
+    "sounds": [ "custom/live_and_learn" ],
+    "stream": true
   }
 }

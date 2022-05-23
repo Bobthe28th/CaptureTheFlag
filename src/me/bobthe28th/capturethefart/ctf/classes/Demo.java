@@ -7,7 +7,10 @@ import me.bobthe28th.capturethefart.ctf.items.demo.DemArrow;
 import me.bobthe28th.capturethefart.ctf.items.demo.DemBow;
 import me.bobthe28th.capturethefart.ctf.items.demo.DemTNT;
 import me.bobthe28th.capturethefart.ctf.itemtypes.CTFBuildUpItem;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
@@ -35,7 +38,7 @@ public class Demo extends CTFClass implements Listener {
         }
         setArmor(new Material[]{Material.IRON_INGOT,Material.LEATHER_LEGGINGS,Material.IRON_BOOTS});
         setHelmetCustomModel(2);
-        setEnchantments(new Enchantment[][]{null, null, new Enchantment[]{Enchantment.PROTECTION_FALL}}, new Integer[][]{null, null, new Integer[]{4}});
+        setEnchantments(new Enchantment[][]{null, null, new Enchantment[]{Enchantment.PROTECTION_FALL}}, new Integer[][]{null, null, new Integer[]{6}});
     }
 
     @Override
@@ -64,6 +67,7 @@ public class Demo extends CTFClass implements Listener {
             event.getBlock().setType(Material.AIR);
             TNTPrimed tnt = player.getPlayer().getWorld().spawn(event.getBlock().getLocation().add(new Vector(0.5,0.0,0.5)), TNTPrimed.class);
             tnt.setMetadata("playerSent", new FixedMetadataValue(plugin, Objects.requireNonNull(player.getPlayer()).getName()));
+            tnt.setMetadata("tntType", new FixedMetadataValue(plugin, "demotnt"));
             tnt.setFuseTicks(10);
         }
     }
@@ -80,8 +84,6 @@ public class Demo extends CTFClass implements Listener {
             ((Arrow) event.getProjectile()).setCritical(false);
             event.getProjectile().setMetadata("ctfProjectile",new FixedMetadataValue(plugin,true));
             event.getProjectile().setMetadata("ctfProjectileType",new FixedMetadataValue(plugin,"bombarrow"));
-//            event.getProjectile().setMetadata("bombArrow", new FixedMetadataValue(plugin, true));
-//            event.getProjectile().setMetadata("playerSent", new FixedMetadataValue(plugin, Objects.requireNonNull(player.getPlayer()).getName()));
 
             new BukkitRunnable() {
                 final Arrow a = (Arrow) event.getProjectile();
